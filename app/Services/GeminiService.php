@@ -59,7 +59,7 @@ class GeminiService
                 $modelNames = array_map(fn($m) => str_replace('models/', '', $m['name'] ?? ''), $models);
 
                 // Check text, image, and video model availability
-                $hasText = count(array_filter($modelNames, fn($n) => str_contains($n, 'gemini-1.5') || str_contains($n, 'gemini-2.0') || str_contains($n, 'gemini-2.5'))) > 0;
+                $hasText = count(array_filter($modelNames, fn($n) => str_contains(strtolower($n), 'gemini'))) > 0;
                 $hasImage = count(array_filter($modelNames, fn($n) => str_contains($n, 'imagen') || str_contains($n, 'image'))) > 0;
                 $hasVideo = count(array_filter($modelNames, fn($n) => str_contains($n, 'veo') || str_contains($n, 'video'))) > 0;
 
@@ -105,7 +105,7 @@ class GeminiService
             return ['success' => false, 'message' => 'API Key belum diisi.'];
         }
 
-        $model = $model ?: AppSetting::get('gemini_text_model', 'gemini-2.5-flash');
+        $model = $model ?: AppSetting::get('gemini_text_model', 'gemini-3.0-flash');
         $startTime = microtime(true);
 
         try {
@@ -292,7 +292,7 @@ class GeminiService
         array $sources = []
     ): array {
         $key = $this->getApiKey();
-        $model = AppSetting::get('gemini_text_model', 'gemini-2.5-flash');
+        $model = AppSetting::get('gemini_text_model', 'gemini-3.0-flash');
 
         $sourceCitations = implode("; ", array_map(fn($s) => ($s['title'] ?? '') . ' (' . ($s['reference_section'] ?? '') . ')', $sources));
 
@@ -534,7 +534,7 @@ PROMPT;
     public function generateQuiz(string $title, string $script): array
     {
         $key = $this->getApiKey();
-        $model = AppSetting::get('gemini_text_model', 'gemini-2.5-flash');
+        $model = AppSetting::get('gemini_text_model', 'gemini-3.0-flash');
 
         $prompt = <<<PROMPT
 Buat 2 pertanyaan kuis pilihan ganda edukatif berdasarkan naskah video edukasi Hindu berikut:

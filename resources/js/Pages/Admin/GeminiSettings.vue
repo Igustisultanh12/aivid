@@ -426,14 +426,24 @@ const runTestVideo = async () => {
                             <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">
                                 Model Naskah & Storyboard (Teks)
                             </label>
-                            <select
-                                v-model="modelForm.text_model"
-                                class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-slate-900 dark:text-white"
-                            >
-                                <option v-for="m in modelOptions.text" :key="m.id" :value="m.id">
-                                    {{ m.name }}
-                                </option>
-                            </select>
+                            <div class="space-y-1.5">
+                                <select
+                                    v-model="modelForm.text_model"
+                                    class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-slate-900 dark:text-white"
+                                >
+                                    <option v-for="m in modelOptions.text" :key="m.id" :value="m.id">
+                                        {{ m.name }}
+                                    </option>
+                                    <option value="custom">Model Khusus / Ketik Manual...</option>
+                                </select>
+                                <input
+                                    v-if="modelForm.text_model === 'custom' || !modelOptions.text.some(m => m.id === modelForm.text_model)"
+                                    v-model="modelForm.text_model"
+                                    type="text"
+                                    placeholder="Contoh: gemini-3.0-flash atau gemini-3.8..."
+                                    class="w-full px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-mono text-slate-900 dark:text-white"
+                                />
+                            </div>
                         </div>
 
                         <div>

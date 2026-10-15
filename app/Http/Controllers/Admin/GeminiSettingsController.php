@@ -21,7 +21,7 @@ class GeminiSettingsController extends Controller
         $settings = [
             'is_configured' => $isConfigured,
             'masked_key' => $maskedKey,
-            'text_model' => AppSetting::get('gemini_text_model', 'gemini-2.5-flash'),
+            'text_model' => AppSetting::get('gemini_text_model', 'gemini-3.0-flash'),
             'image_model' => AppSetting::get('gemini_image_model', 'imagen-3.0-generate-002'),
             'tts_model' => AppSetting::get('gemini_tts_model', 'gemini-2.0-flash'),
             'video_model' => AppSetting::get('gemini_video_model', 'veo-2.0-generate-001'),
@@ -35,10 +35,13 @@ class GeminiSettingsController extends Controller
         // Available models list
         $modelOptions = [
             'text' => [
-                ['id' => 'gemini-2.5-flash', 'name' => 'Gemini 2.5 Flash (Rekomendasi - Cepat & Cerdas)'],
+                ['id' => 'gemini-3.0-flash', 'name' => 'Gemini 3.0 Flash (Rekomendasi Utama Google - Cepat & Cerdas)'],
+                ['id' => 'gemini-3.8-flash', 'name' => 'Gemini 3.8 Flash'],
+                ['id' => 'gemini-3.0-pro', 'name' => 'Gemini 3.0 Pro (Penalaran Mendalam)'],
+                ['id' => 'gemini-2.5-flash', 'name' => 'Gemini 2.5 Flash'],
                 ['id' => 'gemini-2.0-flash', 'name' => 'Gemini 2.0 Flash'],
                 ['id' => 'gemini-1.5-flash', 'name' => 'Gemini 1.5 Flash'],
-                ['id' => 'gemini-1.5-pro', 'name' => 'Gemini 1.5 Pro (Nalar Mendalam)'],
+                ['id' => 'gemini-1.5-pro', 'name' => 'Gemini 1.5 Pro'],
             ],
             'image' => [
                 ['id' => 'imagen-3.0-generate-002', 'name' => 'Imagen 3 (Kualitas Gambar Sinematik Tertinggi)'],
