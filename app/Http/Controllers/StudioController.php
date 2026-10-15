@@ -36,10 +36,12 @@ class StudioController extends Controller
 
         // Available voice choices
         $voices = [
-            ['id' => 'Pari', 'name' => 'Pari (Wanita, Hangat & Bercerita)', 'gender' => 'female'],
-            ['id' => 'Kore', 'name' => 'Kore (Pria, Tenang & Mengayomi)', 'gender' => 'male'],
-            ['id' => 'Zephyr', 'name' => 'Zephyr (Wanita, Inspiratif & Santai)', 'gender' => 'female'],
-            ['id' => 'Fenrir', 'name' => 'Fenrir (Pria, Berwibawa & Reflektif)', 'gender' => 'male'],
+            ['id' => 'Sulafat', 'name' => 'Sulafat (Wanita, Hangat & Bercerita)', 'gender' => 'female'],
+            ['id' => 'Charon', 'name' => 'Charon (Pria, Tenang & Informatif)', 'gender' => 'male'],
+            ['id' => 'Aoede', 'name' => 'Aoede (Wanita, Ringan & Santai)', 'gender' => 'female'],
+            ['id' => 'Orus', 'name' => 'Orus (Pria, Tegas & Berwibawa)', 'gender' => 'male'],
+            ['id' => 'Kore', 'name' => 'Kore (Wanita, Mantap & Jelas)', 'gender' => 'female'],
+            ['id' => 'Fenrir', 'name' => 'Fenrir (Pria, Bersemangat)', 'gender' => 'male'],
         ];
 
         // Available visual styles

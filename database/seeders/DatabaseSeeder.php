@@ -23,11 +23,11 @@ class DatabaseSeeder extends Seeder
     {
         // 1. App Settings
         $defaultSettings = [
-            'gemini_text_model' => ['value' => 'gemini-3.0-flash', 'encrypted' => false, 'group' => 'gemini'],
-            'gemini_image_model' => ['value' => 'imagen-3.0-generate-002', 'encrypted' => false, 'group' => 'gemini'],
+            'gemini_text_model' => ['value' => 'gemini-3.8-flash', 'encrypted' => false, 'group' => 'gemini'],
+            'gemini_image_model' => ['value' => 'gemini-nano-banana-2.1', 'encrypted' => false, 'group' => 'gemini'],
             'gemini_tts_model' => ['value' => 'gemini-3.8-flash-tts', 'encrypted' => false, 'group' => 'gemini'],
             'gemini_video_model' => ['value' => 'gemini-omni-1.1-flash', 'encrypted' => false, 'group' => 'gemini'],
-            'gemini_voice_name' => ['value' => 'Pari', 'encrypted' => false, 'group' => 'gemini'],
+            'gemini_voice_name' => ['value' => 'Sulafat', 'encrypted' => false, 'group' => 'gemini'],
             'app_max_video_per_user' => ['value' => '10', 'encrypted' => false, 'group' => 'limits'],
             'app_daily_render_limit' => ['value' => '50', 'encrypted' => false, 'group' => 'limits'],
         ];
@@ -330,7 +330,7 @@ class DatabaseSeeder extends Seeder
             'production_mode' => 'illustration_motion',
             'visual_style' => 'modern_editorial',
             'aspect_ratio' => '9:16',
-            'voice_id' => 'Pari',
+            'voice_id' => 'Sulafat',
             'has_subtitles' => true,
             'status' => 'completed',
             'progress_percent' => 100,
