@@ -96,7 +96,7 @@ class ProduceVideoJob implements ShouldQueue
 
             foreach ($scenes as $scene) {
                 if (empty($scene->audio_path)) {
-                    $audioRes = $gemini->generateSceneAudio($scene->narration_text, $video->voice_id ?: 'Pari');
+                    $audioRes = $gemini->generateSceneAudio($scene->narration_text, $video->voice_id ?: null);
                     $scene->update(['audio_path' => $audioRes['audio_path']]);
                 }
             }

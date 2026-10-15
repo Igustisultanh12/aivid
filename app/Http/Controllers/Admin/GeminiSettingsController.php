@@ -21,50 +21,48 @@ class GeminiSettingsController extends Controller
         $settings = [
             'is_configured' => $isConfigured,
             'masked_key' => $maskedKey,
-            'text_model' => AppSetting::get('gemini_text_model', 'gemini-3.8-flash'),
-            'image_model' => AppSetting::get('gemini_image_model', 'imagen-3.0-generate-002'),
-            'tts_model' => AppSetting::get('gemini_tts_model', 'gemini-3.8-flash-tts'),
-            'video_model' => AppSetting::get('gemini_video_model', 'gemini-omni-1.1-flash'),
-            'voice_name' => AppSetting::get('gemini_voice_name', 'Pari'),
+            'text_model' => GeminiService::resolveModel('text', AppSetting::get('gemini_text_model')),
+            'image_model' => GeminiService::resolveModel('image', AppSetting::get('gemini_image_model')),
+            'tts_model' => GeminiService::resolveModel('tts', AppSetting::get('gemini_tts_model')),
+            'video_model' => GeminiService::resolveModel('video', AppSetting::get('gemini_video_model')),
+            'voice_name' => $gemini->voice(),
             'max_video_per_user' => (int) AppSetting::get('app_max_video_per_user', 10),
             'daily_render_limit' => (int) AppSetting::get('app_daily_render_limit', 50),
             'last_tested_at' => AppSetting::get('gemini_last_tested_at'),
             'last_test_result' => json_decode(AppSetting::get('gemini_last_test_result', '{}'), true),
         ];
 
-        // Available models list
+        // Daftar model sesuai https://ai.google.dev/gemini-api/docs/models
         $modelOptions = [
             'text' => [
-                ['id' => 'gemini-3.8-flash', 'name' => 'Gemini 3.8 Flash (Rekomendasi Utama - Versi 3.8)'],
-                ['id' => 'gemini-3.8', 'name' => 'Gemini 3.8'],
-                ['id' => 'gemini-3.0-flash', 'name' => 'Gemini 3.0 Flash'],
-                ['id' => 'gemini-3.0-pro', 'name' => 'Gemini 3.0 Pro (Penalaran Mendalam)'],
-                ['id' => 'gemini-2.5-flash', 'name' => 'Gemini 2.5 Flash'],
-                ['id' => 'gemini-2.0-flash', 'name' => 'Gemini 2.0 Flash'],
-                ['id' => 'gemini-1.5-flash', 'name' => 'Gemini 1.5 Flash'],
-                ['id' => 'gemini-1.5-pro', 'name' => 'Gemini 1.5 Pro'],
+                ['id' => 'gemini-3.8-flash', 'name' => 'Gemini 3.8 Flash (Rekomendasi Google - Naskah & Kuis)'],
+                ['id' => 'gemini-4-argon', 'name' => 'Gemini 4 Argon (Penalaran Mendalam, lebih mahal)'],
+                ['id' => 'gemini-3.6-flash', 'name' => 'Gemini 3.6 Flash (Generasi Sebelumnya)'],
+                ['id' => 'gemini-3.5-flash-lite', 'name' => 'Gemini 3.5 Flash-Lite (Hemat Biaya)'],
             ],
             'image' => [
-                ['id' => 'imagen-3.0-generate-002', 'name' => 'Imagen 3 (Kualitas Gambar Sinematik Tertinggi)'],
-                ['id' => 'gemini-2.0-flash', 'name' => 'Gemini 2.0 Flash Multimodal'],
-                ['id' => 'gemini-omni-1.1-flash', 'name' => 'Gemini Omni Flash Multimodal'],
+                ['id' => 'gemini-nano-banana-2.1', 'name' => 'Nano Banana 2.1 (Rekomendasi Google - Gambar Terbaru)'],
+                ['id' => 'gemini-3.1-flash-image', 'name' => 'Nano Banana 2 (gemini-3.1-flash-image)'],
+                ['id' => 'gemini-3.1-flash-lite-image', 'name' => 'Nano Banana 2 Lite (Cepat & Hemat)'],
+                ['id' => 'gemini-3-pro-image', 'name' => 'Nano Banana Pro (Kualitas Tertinggi)'],
             ],
             'tts' => [
-                ['id' => 'gemini-3.8-flash-tts', 'name' => 'Gemini 3.8 Flash TTS (Rekomendasi Resmi Google AI Studio - Audio WAV/RIFF)'],
-                ['id' => 'gemini-2.0-flash', 'name' => 'Gemini 2.0 Native Audio Modality'],
-                ['id' => 'google-tts-indonesia', 'name' => 'Google Speech Standard ID (Cadangan)'],
+                ['id' => 'gemini-3.8-flash-tts', 'name' => 'Gemini 3.8 Flash TTS (Rekomendasi Google)'],
+                ['id' => 'gemini-3.8-flash-lite-tts', 'name' => 'Gemini 3.8 Flash-Lite TTS (Hemat Biaya)'],
+                ['id' => 'google-tts-indonesia', 'name' => 'Google Speech Standard ID (Cadangan tanpa Gemini)'],
             ],
             'video' => [
-                ['id' => 'gemini-omni-1.1-flash', 'name' => 'Gemini Omni Flash (gemini-omni-1.1-flash - Rekomendasi Utama Video Google)'],
-                ['id' => 'veo-3.1', 'name' => 'Google Veo 3.1 (Generasi Video Sinematik)'],
-                ['id' => 'veo-2.0-generate-001', 'name' => 'Veo 2.0 (Model Video Google)'],
-                ['id' => 'gemini-2.0-flash-exp', 'name' => 'Gemini 2.0 Experimental Video'],
+                ['id' => 'gemini-omni-1.1-flash', 'name' => 'Gemini Omni Flash (Rekomendasi Google - Video)'],
+                ['id' => 'veo-3.1-generate-preview', 'name' => 'Veo 3.1 (Video Sinematik + Audio)'],
+                ['id' => 'veo-3.1-lite-generate-preview', 'name' => 'Veo 3.1 Lite (Hemat Biaya)'],
             ],
             'voices' => [
-                ['id' => 'Pari', 'name' => 'Pari - Suara Wanita Lembut & Naratif'],
-                ['id' => 'Kore', 'name' => 'Kore - Suara Pria Hangat & Bijak'],
-                ['id' => 'Zephyr', 'name' => 'Zephyr - Suara Wanita Dinamis'],
-                ['id' => 'Fenrir', 'name' => 'Fenrir - Suara Pria Berwibawa'],
+                ['id' => 'Sulafat', 'name' => 'Sulafat - Suara Wanita Hangat & Naratif'],
+                ['id' => 'Charon', 'name' => 'Charon - Suara Pria Tenang & Informatif'],
+                ['id' => 'Aoede', 'name' => 'Aoede - Suara Wanita Ringan & Santai'],
+                ['id' => 'Orus', 'name' => 'Orus - Suara Pria Tegas & Berwibawa'],
+                ['id' => 'Kore', 'name' => 'Kore - Suara Wanita Mantap & Jelas'],
+                ['id' => 'Fenrir', 'name' => 'Fenrir - Suara Pria Bersemangat'],
             ]
         ];
 
@@ -121,10 +119,10 @@ class GeminiSettingsController extends Controller
             'daily_render_limit' => ['required', 'integer', 'min:1', 'max:1000'],
         ]);
 
-        AppSetting::set('gemini_text_model', $validated['text_model'], false, 'gemini');
-        AppSetting::set('gemini_image_model', $validated['image_model'], false, 'gemini');
-        AppSetting::set('gemini_tts_model', $validated['tts_model'], false, 'gemini');
-        AppSetting::set('gemini_video_model', $validated['video_model'], false, 'gemini');
+        AppSetting::set('gemini_text_model', GeminiService::resolveModel('text', $validated['text_model']), false, 'gemini');
+        AppSetting::set('gemini_image_model', GeminiService::resolveModel('image', $validated['image_model']), false, 'gemini');
+        AppSetting::set('gemini_tts_model', GeminiService::resolveModel('tts', $validated['tts_model']), false, 'gemini');
+        AppSetting::set('gemini_video_model', GeminiService::resolveModel('video', $validated['video_model']), false, 'gemini');
         AppSetting::set('gemini_voice_name', $validated['voice_name'], false, 'gemini');
         AppSetting::set('app_max_video_per_user', (string) $validated['max_video_per_user'], false, 'limits');
         AppSetting::set('app_daily_render_limit', (string) $validated['daily_render_limit'], false, 'limits');

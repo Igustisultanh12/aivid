@@ -146,7 +146,7 @@ const runTestAudio = async () => {
 };
 
 const runTestImage = async () => {
-    if (!confirm('Uji pembuatan gambar Imagen 3 dapat mengonsumsi kuota atau biaya kredit Google AI Studio. Lanjutkan pengujian?')) {
+    if (!confirm('Uji pembuatan gambar Nano Banana dapat mengonsumsi kuota atau biaya kredit Google AI Studio. Lanjutkan pengujian?')) {
         return;
     }
     testingImage.value = true;
@@ -328,8 +328,8 @@ const runTestVideo = async () => {
 
                     <div v-if="testConnectionResult.capabilities" class="grid grid-cols-3 gap-2 pt-2 border-t border-emerald-200/60 dark:border-emerald-800/60 text-[11px]">
                         <span>Teks (Gemini): <strong>{{ testConnectionResult.capabilities.text_generation ? 'Aktif' : 'Nonaktif' }}</strong></span>
-                        <span>Gambar (Imagen): <strong>{{ testConnectionResult.capabilities.image_generation ? 'Aktif' : 'Perlu Aktivasi' }}</strong></span>
-                        <span>Video (Veo): <strong>{{ testConnectionResult.capabilities.video_generation ? 'Tersedia' : 'Akses Khusus' }}</strong></span>
+                        <span>Gambar (Nano Banana): <strong>{{ testConnectionResult.capabilities.image_generation ? 'Aktif' : 'Perlu Aktivasi' }}</strong></span>
+                        <span>Video (Omni/Veo): <strong>{{ testConnectionResult.capabilities.video_generation ? 'Tersedia' : 'Akses Khusus' }}</strong></span>
                     </div>
                 </div>
             </div>
@@ -351,7 +351,7 @@ const runTestVideo = async () => {
                         <div class="space-y-1">
                             <div class="flex items-center gap-2 text-violet-600 font-bold text-xs">
                                 <Type class="w-4 h-4" />
-                                <span>Pembuatan Teks (Gemini 3.8 / Flash)</span>
+                                <span>Pembuatan Teks (Gemini 3.8 Flash)</span>
                             </div>
                             <p class="text-[11px] text-slate-500">
                                 Menguji prompt naskah edukasi 30 detik ke Google AI Studio.
@@ -406,10 +406,10 @@ const runTestVideo = async () => {
                         <div class="space-y-1">
                             <div class="flex items-center gap-2 text-teal-600 font-bold text-xs">
                                 <Image class="w-4 h-4" />
-                                <span>Ilustrasi (Imagen 3)</span>
+                                <span>Ilustrasi (Nano Banana)</span>
                             </div>
                             <p class="text-[11px] text-slate-500">
-                                Menguji kuota pembuatan ilustrasi gambar Google AI Studio.
+                                Menghasilkan 1 sampel ilustrasi dengan model gambar Gemini (Nano Banana).
                             </p>
                         </div>
                         <div>
@@ -422,9 +422,10 @@ const runTestVideo = async () => {
                                 <Loader2 v-if="testingImage" class="w-3.5 h-3.5 animate-spin inline mr-1" />
                                 Uji Pembuatan Gambar
                             </button>
-                            <p v-if="testImageResult" class="text-[10px] mt-2 font-mono p-2 rounded bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300">
-                                {{ testImageResult.message }}
-                            </p>
+                            <div v-if="testImageResult" class="text-[10px] mt-2 font-mono p-2 rounded bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 space-y-1.5">
+                                <p>{{ testImageResult.message }}</p>
+                                <img v-if="testImageResult.image_url" :src="testImageResult.image_url" alt="Sampel gambar uji" class="w-full rounded-lg mt-1" />
+                            </div>
                         </div>
                     </div>
 
@@ -449,9 +450,11 @@ const runTestVideo = async () => {
                                 <Loader2 v-if="testingVideo" class="w-3.5 h-3.5 animate-spin inline mr-1" />
                                 Cek Model Video
                             </button>
-                            <p v-if="testVideoResult" class="text-[10px] mt-2 font-mono p-2 rounded bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300">
-                                {{ testVideoResult.message }}
-                            </p>
+                            <div v-if="testVideoResult" class="text-[10px] mt-2 font-mono p-2 rounded bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 space-y-1">
+                                <p>{{ testVideoResult.message }}</p>
+                                <p v-if="testVideoResult.note" class="text-slate-500">{{ testVideoResult.note }}</p>
+                                <p v-if="testVideoResult.suggestion" class="text-slate-500">{{ testVideoResult.suggestion }}</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -464,7 +467,7 @@ const runTestVideo = async () => {
                         Konfigurasi Model & Batasan Penggunaan
                     </h3>
                     <p class="text-xs text-slate-500">
-                        Didukung oleh Gemini 3.0 Flash, Gemini 3.8 Flash TTS, dan Gemini Omni Flash video generation.
+                        Didukung oleh Gemini 3.8 Flash, Nano Banana 2.1, Gemini 3.8 Flash TTS, dan Gemini Omni Flash / Veo 3.1.
                     </p>
                 </div>
 
@@ -488,7 +491,7 @@ const runTestVideo = async () => {
                                     v-if="modelForm.text_model === 'custom' || !modelOptions.text.some(m => m.id === modelForm.text_model)"
                                     v-model="modelForm.text_model"
                                     type="text"
-                                    placeholder="Contoh: gemini-3.0-flash atau gemini-3.8..."
+                                    placeholder="Contoh: gemini-3.8-flash"
                                     class="w-full px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-mono text-slate-900 dark:text-white"
                                 />
                             </div>
@@ -536,7 +539,7 @@ const runTestVideo = async () => {
                                     v-if="modelForm.image_model === 'custom' || !modelOptions.image.some(m => m.id === modelForm.image_model)"
                                     v-model="modelForm.image_model"
                                     type="text"
-                                    placeholder="Contoh: imagen-3.0-generate-002"
+                                    placeholder="Contoh: gemini-nano-banana-2.1"
                                     class="w-full px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-mono text-slate-900 dark:text-white"
                                 />
                             </div>
@@ -560,7 +563,7 @@ const runTestVideo = async () => {
                                     v-if="modelForm.video_model === 'custom' || !modelOptions.video.some(m => m.id === modelForm.video_model)"
                                     v-model="modelForm.video_model"
                                     type="text"
-                                    placeholder="Contoh: gemini-omni-1.1-flash atau veo-3.1"
+                                    placeholder="Contoh: gemini-omni-1.1-flash atau veo-3.1-generate-preview"
                                     class="w-full px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-mono text-slate-900 dark:text-white"
                                 />
                             </div>

@@ -4,13 +4,136 @@ namespace App\Services;
 
 use App\Models\AiUsageLog;
 use App\Models\AppSetting;
+use Illuminate\Http\Client\Response as HttpResponse;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
+/**
+ * Integrasi Google Gemini API (Google AI Studio).
+ *
+ * Mengikuti panduan model terbaru di https://ai.google.dev/gemini-api/docs/models :
+ * - Teks      : gemini-3.8-flash (Interactions API, thinking_level; tanpa temperature)
+ * - Gambar    : gemini-nano-banana-2.1 / gemini-3.1-flash-image (Interactions API)
+ * - Suara TTS : gemini-3.8-flash-tts (Interactions API, keluaran WAV 24 kHz)
+ * - Video     : gemini-omni-1.1-flash / veo-3.1-generate-preview
+ *
+ * Model lama yang sudah tidak tersedia (gemini-1.5/2.0/3.0, imagen-*, veo-2.0, dll.)
+ * otomatis dipetakan ke penggantinya lewat resolveModel(), sehingga nilai lama
+ * yang masih tersimpan di database tidak lagi menyebabkan error "not found".
+ */
 class GeminiService
 {
     protected string $baseUrl = 'https://generativelanguage.googleapis.com/v1beta';
+
+    public const DEFAULT_TEXT_MODEL = 'gemini-3.8-flash';
+    public const DEFAULT_IMAGE_MODEL = 'gemini-nano-banana-2.1';
+    public const DEFAULT_TTS_MODEL = 'gemini-3.8-flash-tts';
+    public const DEFAULT_VIDEO_MODEL = 'gemini-omni-1.1-flash';
+    public const DEFAULT_VOICE = 'Sulafat';
+
+    /** Model cadangan bila model utama ditolak (404/403) oleh project Google. */
+    protected const FALLBACKS = [
+        'text' => ['gemini-3.8-flash', 'gemini-3.6-flash', 'gemini-3.5-flash-lite'],
+        'image' => ['gemini-nano-banana-2.1', 'gemini-3.1-flash-image', 'gemini-3.1-flash-lite-image'],
+        'tts' => ['gemini-3.8-flash-tts', 'gemini-3.8-flash-lite-tts'],
+    ];
+
+    /** Pemetaan model lama / salah ketik ke model resmi yang masih aktif. */
+    protected const LEGACY_MODEL_MAP = [
+        'text' => [
+            'gemini-3.8' => 'gemini-3.8-flash',
+            'gemini-3.0-flash' => 'gemini-3.8-flash',
+            'gemini-3-flash' => 'gemini-3.8-flash',
+            'gemini-3.0-pro' => 'gemini-3.8-flash',
+            'gemini-3-pro-preview' => 'gemini-3.8-flash',
+            'gemini-3.1-flash-lite-preview' => 'gemini-3.5-flash-lite',
+            'gemini-2.0-flash' => 'gemini-3.8-flash',
+            'gemini-2.0-flash-lite' => 'gemini-3.5-flash-lite',
+            'gemini-2.0-flash-exp' => 'gemini-3.8-flash',
+            'gemini-1.5-flash' => 'gemini-3.8-flash',
+            'gemini-1.5-pro' => 'gemini-3.8-flash',
+        ],
+        'image' => [
+            'imagen-3.0-generate-002' => 'gemini-nano-banana-2.1',
+            'imagen-3.0-generate-001' => 'gemini-nano-banana-2.1',
+            'imagen-4.0-generate' => 'gemini-nano-banana-2.1',
+            'imagen-4.0-generate-001' => 'gemini-nano-banana-2.1',
+            'gemini-2.0-flash' => 'gemini-nano-banana-2.1',
+            'gemini-2.0-flash-exp' => 'gemini-nano-banana-2.1',
+            'gemini-omni-1.1-flash' => 'gemini-nano-banana-2.1',
+        ],
+        'tts' => [
+            'gemini-2.0-flash' => 'gemini-3.8-flash-tts',
+            'gemini-3.0-flash' => 'gemini-3.8-flash-tts',
+            'gemini-3.1-flash-tts' => 'gemini-3.1-flash-tts-preview',
+        ],
+        'video' => [
+            'veo-3.1' => 'veo-3.1-generate-preview',
+            'veo-3.1-lite' => 'veo-3.1-lite-generate-preview',
+            'veo-3.0-generate-001' => 'veo-3.1-generate-preview',
+            'veo-2.0-generate-001' => 'gemini-omni-1.1-flash',
+            'gemini-2.0-flash-exp' => 'gemini-omni-1.1-flash',
+        ],
+    ];
+
+    /** JSON Schema keluaran naskah 30 detik (response_format.schema). */
+    protected const SCRIPT_SCHEMA = [
+        'type' => 'object',
+        'properties' => [
+            'title' => ['type' => 'string'],
+            'hook_text' => ['type' => 'string'],
+            'reflection_text' => ['type' => 'string'],
+            'summary_text' => ['type' => 'string'],
+            'scenes' => [
+                'type' => 'array',
+                'items' => [
+                    'type' => 'object',
+                    'properties' => [
+                        'scene_order' => ['type' => 'integer'],
+                        'duration' => ['type' => 'number'],
+                        'narration_text' => ['type' => 'string'],
+                        'onscreen_text' => ['type' => 'string'],
+                        'visual_prompt' => ['type' => 'string'],
+                        'camera_motion' => ['type' => 'string', 'enum' => ['zoom_in', 'zoom_out', 'pan_left', 'pan_right', 'tilt_up']],
+                        'transition_type' => ['type' => 'string', 'enum' => ['fade', 'cut', 'wipe']],
+                        'source_citation' => ['type' => 'string'],
+                    ],
+                    'required' => ['scene_order', 'duration', 'narration_text', 'onscreen_text', 'visual_prompt', 'camera_motion', 'transition_type'],
+                ],
+            ],
+        ],
+        'required' => ['title', 'hook_text', 'reflection_text', 'summary_text', 'scenes'],
+    ];
+
+    /** JSON Schema keluaran kuis pilihan ganda. */
+    protected const QUIZ_SCHEMA = [
+        'type' => 'object',
+        'properties' => [
+            'questions' => [
+                'type' => 'array',
+                'items' => [
+                    'type' => 'object',
+                    'properties' => [
+                        'question' => ['type' => 'string'],
+                        'options' => ['type' => 'array', 'items' => ['type' => 'string']],
+                        'correct_option_index' => ['type' => 'integer'],
+                        'explanation' => ['type' => 'string'],
+                    ],
+                    'required' => ['question', 'options', 'correct_option_index', 'explanation'],
+                ],
+            ],
+        ],
+        'required' => ['questions'],
+    ];
+
+    /** Suara bawaan resmi untuk model TTS Gemini. */
+    public const VOICES = [
+        'Zephyr', 'Puck', 'Charon', 'Kore', 'Fenrir', 'Leda', 'Orus', 'Aoede', 'Callirrhoe', 'Autonoe',
+        'Enceladus', 'Iapetus', 'Umbriel', 'Algieba', 'Despina', 'Erinome', 'Algenib', 'Rasalgethi',
+        'Laomedeia', 'Achernar', 'Alnilam', 'Schedar', 'Gacrux', 'Pulcherrima', 'Achird',
+        'Zubenelgenubi', 'Vindemiatrix', 'Sadachbia', 'Sadaltager', 'Sulafat',
+    ];
 
     /**
      * Get the active Gemini API key from database.
@@ -27,6 +150,535 @@ class GeminiService
     {
         $key = $this->getApiKey();
         return !empty($key);
+    }
+
+    /**
+     * Normalisasi ID model: buang prefix "models/", petakan model lama ke penggantinya.
+     */
+    public static function resolveModel(string $type, ?string $model): string
+    {
+        $defaults = [
+            'text' => self::DEFAULT_TEXT_MODEL,
+            'image' => self::DEFAULT_IMAGE_MODEL,
+            'tts' => self::DEFAULT_TTS_MODEL,
+            'video' => self::DEFAULT_VIDEO_MODEL,
+        ];
+
+        $model = trim((string) $model);
+        $model = preg_replace('#^models/#', '', $model);
+
+        if ($model === '' || $model === 'custom') {
+            return $defaults[$type] ?? self::DEFAULT_TEXT_MODEL;
+        }
+
+        return self::LEGACY_MODEL_MAP[$type][$model] ?? $model;
+    }
+
+    /**
+     * Model aktif dari pengaturan (sudah dinormalisasi).
+     */
+    public function model(string $type): string
+    {
+        $settingKey = [
+            'text' => 'gemini_text_model',
+            'image' => 'gemini_image_model',
+            'tts' => 'gemini_tts_model',
+            'video' => 'gemini_video_model',
+        ][$type];
+
+        return self::resolveModel($type, AppSetting::get($settingKey));
+    }
+
+    /**
+     * Nama suara yang valid untuk TTS.
+     */
+    public function voice(?string $voice = null): string
+    {
+        $voice = trim((string) ($voice ?: AppSetting::get('gemini_voice_name', self::DEFAULT_VOICE)));
+
+        // Nama suara lama di aplikasi yang tidak ada di daftar suara resmi Gemini.
+        $aliases = ['pari' => 'Sulafat'];
+        if (isset($aliases[strtolower($voice)])) {
+            return $aliases[strtolower($voice)];
+        }
+
+        foreach (self::VOICES as $valid) {
+            if (strcasecmp($valid, $voice) === 0) {
+                return $valid;
+            }
+        }
+
+        // Suara kustom dari Voice Design / Voice Library (mis. "voice_xxx") tetap diteruskan.
+        if (str_starts_with($voice, 'voice_')) {
+            return $voice;
+        }
+
+        return self::DEFAULT_VOICE;
+    }
+
+    /**
+     * Urutan model yang dicoba: model pilihan admin, lalu cadangan resmi.
+     */
+    protected function candidates(string $type, ?string $preferred = null): array
+    {
+        $first = $preferred ? self::resolveModel($type, $preferred) : $this->model($type);
+        return array_values(array_unique(array_merge([$first], self::FALLBACKS[$type] ?? [])));
+    }
+
+    /**
+     * HTTP client dengan API key di header (bukan di query string).
+     */
+    protected function http(string $key, int $timeout = 30)
+    {
+        return Http::timeout($timeout)
+            ->acceptJson()
+            ->withHeaders([
+                'x-goog-api-key' => $key,
+                'Content-Type' => 'application/json',
+            ]);
+    }
+
+    /**
+     * Apakah error menandakan model tidak tersedia (sehingga layak mencoba model cadangan).
+     */
+    protected function isModelUnavailable(HttpResponse $response): bool
+    {
+        $status = $response->status();
+        $message = strtolower((string) $response->json('error.message', ''));
+
+        return in_array($status, [403, 404], true)
+            || str_contains($message, 'not found')
+            || str_contains($message, 'not supported')
+            || str_contains($message, 'is not available')
+            || str_contains($message, 'has been shut down')
+            || str_contains($message, 'deprecated');
+    }
+
+    protected function errorMessage(?HttpResponse $response, string $fallback): string
+    {
+        if (!$response) {
+            return $fallback;
+        }
+
+        $message = $response->json('error.message');
+        $status = $response->json('error.status');
+
+        if ($message) {
+            return $status ? "{$message} ({$status})" : $message;
+        }
+
+        return "{$fallback} (HTTP {$response->status()})";
+    }
+
+    /**
+     * Pembuatan teks dengan Gemini 3.8 Flash.
+     *
+     * Utama: Interactions API (POST /v1beta/interactions) sesuai panduan
+     * https://ai.google.dev/gemini-api/docs/whats-new-gemini-3.8 :
+     * - pakai generation_config.thinking_level (low|medium|high), bukan thinking_budget;
+     * - JANGAN kirim temperature/top_p/top_k/candidate_count (sudah dihapus untuk Gemini 3.x);
+     * - keluaran JSON lewat response_format {type: text, mime_type: application/json, schema}.
+     * Cadangan: models.generateContent dengan konfigurasi setara.
+     *
+     * @param array{max_output_tokens?: int, thinking_level?: string, schema?: array, json?: bool} $options
+     * @return array{response: ?HttpResponse, model: string, text: string}
+     */
+    protected function generateText(string $key, string $prompt, array $options = [], ?string $preferred = null, int $timeout = 60): array
+    {
+        $response = null;
+        $lastFailed = null;
+        $model = $preferred ?: $this->model('text');
+
+        $maxTokens = (int) ($options['max_output_tokens'] ?? 8192);
+        $thinking = $options['thinking_level'] ?? null;
+        $schema = $options['schema'] ?? null;
+        $wantsJson = !empty($options['json']) || $schema !== null;
+
+        foreach ($this->candidates('text', $preferred) as $model) {
+            // 1) Interactions API
+            $generationConfig = ['max_output_tokens' => $maxTokens];
+            if ($thinking) {
+                $generationConfig['thinking_level'] = $thinking;
+            }
+
+            $payload = [
+                'model' => $model,
+                'input' => $prompt,
+                'store' => false,
+                'generation_config' => $generationConfig,
+            ];
+            if ($wantsJson) {
+                $payload['response_format'] = array_filter([
+                    'type' => 'text',
+                    'mime_type' => 'application/json',
+                    'schema' => $schema,
+                ]);
+            }
+
+            $response = $this->interact($key, $payload, $timeout);
+            if ($response->successful() && ($text = $this->extractText($response->json() ?? [])) !== '') {
+                return ['response' => $response, 'model' => $model, 'text' => $text];
+            }
+            $interactionsResponse = $response;
+
+            // 2) generateContent (format setara, tanpa parameter sampling yang sudah dihapus)
+            $config = ['maxOutputTokens' => $maxTokens];
+            if ($thinking) {
+                $config['thinkingConfig'] = ['thinkingLevel' => $thinking];
+            }
+            if ($wantsJson) {
+                $config['responseMimeType'] = 'application/json';
+                if ($schema !== null) {
+                    $config['responseJsonSchema'] = $schema;
+                }
+            }
+
+            $response = $this->http($key, $timeout)->post("{$this->baseUrl}/models/{$model}:generateContent", [
+                'contents' => [
+                    ['role' => 'user', 'parts' => [['text' => $prompt]]],
+                ],
+                'generationConfig' => $config,
+            ]);
+            if ($response->successful() && ($text = $this->extractText($response->json() ?? [])) !== '') {
+                return ['response' => $response, 'model' => $model, 'text' => $text];
+            }
+
+            // Simpan respons gagal yang paling informatif untuk pesan error
+            // (error "sungguhan" lebih berguna daripada "model not found").
+            if ($response->failed() && !$this->isModelUnavailable($response)) {
+                $lastFailed = $response;
+            } elseif ($interactionsResponse->failed()) {
+                $lastFailed = $interactionsResponse;
+            } else {
+                $lastFailed = $response->failed() ? $response : $interactionsResponse;
+            }
+
+            $unavailable = ($interactionsResponse->failed() && $this->isModelUnavailable($interactionsResponse))
+                && (!$response->failed() || $this->isModelUnavailable($response));
+            if (!$unavailable) {
+                break;
+            }
+
+            Log::info("Gemini text model {$model} tidak tersedia, mencoba model cadangan.", [
+                'error' => $interactionsResponse->json('error.message') ?? $response->json('error.message'),
+            ]);
+        }
+
+        return ['response' => $lastFailed ?? $response, 'model' => $model, 'text' => ''];
+    }
+
+    /**
+     * Jumlah token input/output dari respons Interactions API maupun generateContent.
+     *
+     * @return array{0: int, 1: int}
+     */
+    protected function usageTokens(?HttpResponse $response): array
+    {
+        $json = $response?->json() ?? [];
+
+        if (isset($json['usage'])) {
+            return [
+                (int) ($json['usage']['total_input_tokens'] ?? 0),
+                (int) ($json['usage']['total_output_tokens'] ?? 0),
+            ];
+        }
+
+        return [
+            (int) ($json['usageMetadata']['promptTokenCount'] ?? 0),
+            (int) ($json['usageMetadata']['candidatesTokenCount'] ?? 0),
+        ];
+    }
+
+    /**
+     * Gabungkan semua bagian teks jawaban (abaikan bagian "thought" dari model penalaran).
+     */
+    protected function extractText(array $json): string
+    {
+        // Format generateContent
+        $parts = $json['candidates'][0]['content']['parts'] ?? null;
+        if (is_array($parts)) {
+            $texts = [];
+            foreach ($parts as $part) {
+                if (!empty($part['thought'])) {
+                    continue;
+                }
+                if (isset($part['text'])) {
+                    $texts[] = $part['text'];
+                }
+            }
+            return trim(implode('', $texts));
+        }
+
+        // Format Interactions API
+        if (!empty($json['output_text']) && is_string($json['output_text'])) {
+            return trim($json['output_text']);
+        }
+
+        $texts = [];
+        foreach ($json['steps'] ?? $json['outputs'] ?? [] as $step) {
+            if (($step['type'] ?? 'model_output') !== 'model_output') {
+                continue;
+            }
+            $contents = $step['content'] ?? [$step];
+            foreach ($contents as $content) {
+                if (($content['type'] ?? null) === 'text' && isset($content['text'])) {
+                    $texts[] = $content['text'];
+                }
+            }
+        }
+
+        return trim(implode('', $texts));
+    }
+
+    /**
+     * Ambil JSON dari jawaban model (toleran terhadap pagar ```json).
+     */
+    protected function decodeJson(string $text): mixed
+    {
+        $text = trim($text);
+        $text = preg_replace('/^```(?:json)?\s*/i', '', $text);
+        $text = preg_replace('/\s*```$/', '', $text);
+
+        $decoded = json_decode($text, true);
+        if ($decoded !== null) {
+            return $decoded;
+        }
+
+        // Ambil blok JSON pertama bila ada teks tambahan.
+        if (preg_match('/(\{.*\}|\[.*\])/s', $text, $m)) {
+            return json_decode($m[1], true);
+        }
+
+        return null;
+    }
+
+    /**
+     * Cari data biner (base64) gambar/audio di respons Interactions API maupun generateContent.
+     *
+     * @return array{data: string, mime_type: string}|null
+     */
+    protected function extractMedia(array $json, string $kind): ?array
+    {
+        // SDK-style shortcut (output_image / output_audio)
+        $shortcut = $json["output_{$kind}"] ?? null;
+        if (is_array($shortcut) && !empty($shortcut['data'])) {
+            return ['data' => $shortcut['data'], 'mime_type' => $shortcut['mime_type'] ?? ''];
+        }
+
+        $found = null;
+        $walk = function ($node) use (&$walk, &$found, $kind) {
+            if ($found || !is_array($node)) {
+                return;
+            }
+
+            // Interactions API: {"type": "image", "mime_type": "...", "data": "..."}
+            if (($node['type'] ?? null) === $kind && !empty($node['data']) && is_string($node['data'])) {
+                $found = ['data' => $node['data'], 'mime_type' => $node['mime_type'] ?? $node['mimeType'] ?? ''];
+                return;
+            }
+
+            // generateContent: {"inlineData": {"mimeType": "image/png", "data": "..."}}
+            $inline = $node['inlineData'] ?? $node['inline_data'] ?? null;
+            if (is_array($inline) && !empty($inline['data'])) {
+                $mime = $inline['mimeType'] ?? $inline['mime_type'] ?? '';
+                if ($mime === '' || str_starts_with($mime, $kind . '/')) {
+                    $found = ['data' => $inline['data'], 'mime_type' => $mime];
+                    return;
+                }
+            }
+
+            foreach ($node as $child) {
+                $walk($child);
+            }
+        };
+        $walk($json);
+
+        return $found;
+    }
+
+    /**
+     * Panggil Interactions API (POST /v1beta/interactions).
+     */
+    protected function interact(string $key, array $payload, int $timeout = 60): HttpResponse
+    {
+        return $this->http($key, $timeout)->post("{$this->baseUrl}/interactions", $payload);
+    }
+
+    /**
+     * Buat gambar dengan model Nano Banana (Gemini Image).
+     * Utama: Interactions API. Cadangan: generateContent dengan responseModalities IMAGE.
+     *
+     * @return array{success: bool, data?: string, mime_type?: string, model: string, message?: string, response?: ?HttpResponse}
+     */
+    protected function requestImage(string $key, string $prompt, string $aspectRatio, ?string $preferred = null): array
+    {
+        $lastResponse = null;
+        $model = $preferred ?: $this->model('image');
+
+        foreach ($this->candidates('image', $preferred) as $model) {
+            // 1) Interactions API (rekomendasi dokumentasi terbaru)
+            $response = $this->interact($key, [
+                'model' => $model,
+                'input' => $prompt,
+                'store' => false,
+                'response_format' => [
+                    'type' => 'image',
+                    'mime_type' => 'image/jpeg',
+                    'aspect_ratio' => $aspectRatio,
+                    'image_size' => '1K',
+                ],
+            ], 90);
+
+            if ($response->successful()) {
+                $media = $this->extractMedia($response->json() ?? [], 'image');
+                if ($media) {
+                    return ['success' => true, 'model' => $model] + $media;
+                }
+            }
+            $lastResponse = $response;
+
+            // 2) generateContent (masih didukung penuh oleh Google)
+            $response = $this->http($key, 90)->post("{$this->baseUrl}/models/{$model}:generateContent", [
+                'contents' => [
+                    ['role' => 'user', 'parts' => [['text' => $prompt]]],
+                ],
+                'generationConfig' => [
+                    'responseModalities' => ['TEXT', 'IMAGE'],
+                    'imageConfig' => ['aspectRatio' => $aspectRatio],
+                ],
+            ]);
+
+            if ($response->successful()) {
+                $media = $this->extractMedia($response->json() ?? [], 'image');
+                if ($media) {
+                    return ['success' => true, 'model' => $model] + $media;
+                }
+            }
+
+            if ($response->failed()) {
+                $lastResponse = $response;
+            }
+
+            // Hanya coba model cadangan jika model ini memang tidak tersedia.
+            if ($response->failed() && !$this->isModelUnavailable($response) && !$this->isModelUnavailable($lastResponse)) {
+                break;
+            }
+        }
+
+        return [
+            'success' => false,
+            'model' => $model,
+            'message' => $this->errorMessage($lastResponse, 'Model gambar tidak mengembalikan data gambar.'),
+            'response' => $lastResponse,
+        ];
+    }
+
+    /**
+     * Buat audio narasi dengan model TTS Gemini 3.8.
+     *
+     * @return array{success: bool, audio?: string, ext?: string, model: string, message?: string}
+     */
+    protected function requestSpeech(string $key, string $text, string $voice, ?string $preferred = null): array
+    {
+        $lastResponse = null;
+        $model = $preferred ?: $this->model('tts');
+
+        foreach ($this->candidates('tts', $preferred) as $model) {
+            // 1) Interactions API (format resmi gemini-3.8-flash-tts) — keluaran default WAV 24 kHz.
+            $response = $this->interact($key, [
+                'model' => $model,
+                'input' => [[
+                    'type' => 'user_input',
+                    'content' => [[
+                        'type' => 'text',
+                        'text' => $text,
+                        'annotations' => [[
+                            'type' => 'speech_metadata',
+                            'style' => 'calm, warm and clear Indonesian narrator',
+                        ]],
+                    ]],
+                ]],
+                'store' => false,
+                'response_format' => ['type' => 'audio'],
+                'generation_config' => ['speech_config' => [['voice' => $voice]]],
+            ], 60);
+
+            if ($response->successful() && ($media = $this->extractMedia($response->json() ?? [], 'audio'))) {
+                return ['success' => true, 'model' => $model] + $this->normalizeAudio($media);
+            }
+            $lastResponse = $response;
+
+            // 2) generateContent (format lama TTS) — keluaran PCM mentah, dibungkus ke WAV.
+            $response = $this->http($key, 60)->post("{$this->baseUrl}/models/{$model}:generateContent", [
+                'contents' => [
+                    ['role' => 'user', 'parts' => [['text' => "Read clearly in a calm, warm Indonesian voice: {$text}"]]],
+                ],
+                'generationConfig' => [
+                    'responseModalities' => ['AUDIO'],
+                    'speechConfig' => [
+                        'voiceConfig' => [
+                            'prebuiltVoiceConfig' => ['voiceName' => $voice],
+                        ],
+                    ],
+                ],
+            ]);
+
+            if ($response->successful() && ($media = $this->extractMedia($response->json() ?? [], 'audio'))) {
+                return ['success' => true, 'model' => $model] + $this->normalizeAudio($media);
+            }
+
+            if ($response->failed()) {
+                $lastResponse = $response;
+            }
+
+            if ($response->failed() && !$this->isModelUnavailable($response) && !$this->isModelUnavailable($lastResponse)) {
+                break;
+            }
+        }
+
+        return [
+            'success' => false,
+            'model' => $model,
+            'message' => $this->errorMessage($lastResponse, 'Model TTS tidak mengembalikan audio.'),
+        ];
+    }
+
+    /**
+     * Pastikan audio bisa diputar: WAV/MP3 apa adanya, PCM mentah dibungkus header WAV.
+     *
+     * @return array{audio: string, ext: string}
+     */
+    protected function normalizeAudio(array $media): array
+    {
+        $bytes = base64_decode($media['data']);
+        $mime = strtolower($media['mime_type'] ?? '');
+
+        if (str_starts_with($bytes, 'RIFF')) {
+            return ['audio' => $bytes, 'ext' => 'wav'];
+        }
+
+        if (str_contains($mime, 'mpeg') || str_contains($mime, 'mp3') || str_starts_with($bytes, 'ID3')) {
+            return ['audio' => $bytes, 'ext' => 'mp3'];
+        }
+
+        // audio/L16;codec=pcm;rate=24000 (default Gemini TTS) → WAV
+        $rate = 24000;
+        if (preg_match('/rate=(\d+)/', $mime, $m)) {
+            $rate = (int) $m[1];
+        }
+
+        return ['audio' => $this->pcmToWav($bytes, $rate), 'ext' => 'wav'];
+    }
+
+    protected function pcmToWav(string $pcm, int $sampleRate = 24000, int $channels = 1, int $bitsPerSample = 16): string
+    {
+        $byteRate = $sampleRate * $channels * $bitsPerSample / 8;
+        $blockAlign = $channels * $bitsPerSample / 8;
+        $dataLen = strlen($pcm);
+
+        return 'RIFF' . pack('V', 36 + $dataLen) . 'WAVE'
+            . 'fmt ' . pack('VvvVVvv', 16, 1, $channels, $sampleRate, $byteRate, $blockAlign, $bitsPerSample)
+            . 'data' . pack('V', $dataLen) . $pcm;
     }
 
     /**
@@ -47,22 +699,18 @@ class GeminiService
         $startTime = microtime(true);
 
         try {
-            $response = Http::timeout(15)
-                ->get("{$this->baseUrl}/models", [
-                    'key' => $key,
-                ]);
+            $response = $this->http($key, 15)->get("{$this->baseUrl}/models", ['pageSize' => 1000]);
 
             $durationMs = (int) ((microtime(true) - $startTime) * 1000);
 
             if ($response->successful()) {
                 $models = $response->json('models', []);
-                $modelNames = array_map(fn($m) => str_replace('models/', '', $m['name'] ?? ''), $models);
+                $modelNames = array_values(array_filter(array_map(fn($m) => str_replace('models/', '', $m['name'] ?? ''), $models)));
 
-                // Check text, image, audio, and video model availability
-                $hasText = count(array_filter($modelNames, fn($n) => str_contains(strtolower($n), 'gemini'))) > 0;
-                $hasImage = count(array_filter($modelNames, fn($n) => str_contains($n, 'imagen') || str_contains($n, 'image'))) > 0;
-                $hasVideo = count(array_filter($modelNames, fn($n) => str_contains($n, 'veo') || str_contains($n, 'video') || str_contains($n, 'omni'))) > 0;
-                $hasAudio = count(array_filter($modelNames, fn($n) => str_contains($n, 'tts') || str_contains($n, 'audio') || str_contains($n, 'gemini'))) > 0;
+                $has = fn(array $needles) => count(array_filter(
+                    $modelNames,
+                    fn($n) => count(array_filter($needles, fn($needle) => str_contains(strtolower($n), $needle))) > 0
+                )) > 0;
 
                 return [
                     'success' => true,
@@ -70,22 +718,20 @@ class GeminiService
                     'response_time_ms' => $durationMs,
                     'available_models' => $modelNames,
                     'capabilities' => [
-                        'text_generation' => $hasText,
-                        'audio_generation' => $hasAudio,
-                        'image_generation' => $hasImage,
-                        'video_generation' => $hasVideo,
+                        'text_generation' => $has(['gemini']),
+                        'audio_generation' => $has(['tts']),
+                        'image_generation' => $has(['image', 'nano-banana', 'imagen']),
+                        'video_generation' => $has(['veo', 'omni']),
                     ],
                 ];
             }
 
-            $error = $response->json('error', []);
-            $code = $error['code'] ?? $response->status();
-            $message = $error['message'] ?? 'Gagal menghubungi Google Gemini API.';
+            $code = $response->json('error.code', $response->status());
 
             return [
                 'success' => false,
-                'message' => "Gagal terhubung ({$code}): {$message}",
-                'error_code' => $error['status'] ?? 'API_ERROR',
+                'message' => "Gagal terhubung ({$code}): " . ($response->json('error.message') ?: 'Gagal menghubungi Google Gemini API.'),
+                'error_code' => $response->json('error.status', 'API_ERROR'),
                 'response_time_ms' => $durationMs,
             ];
         } catch (\Throwable $e) {
@@ -107,59 +753,52 @@ class GeminiService
             return ['success' => false, 'message' => 'API Key belum diisi.'];
         }
 
-        $model = $model ?: AppSetting::get('gemini_text_model', 'gemini-3.8-flash');
         $startTime = microtime(true);
 
         try {
-            $response = Http::timeout(20)
-                ->withHeaders(['Content-Type' => 'application/json'])
-                ->post("{$this->baseUrl}/models/{$model}:generateContent?key={$key}", [
-                    'contents' => [
-                        [
-                            'parts' => [
-                                ['text' => 'Tuliskan satu kalimat mutiara filosofi Hindu tentang ketulusan hati dalam bahasa Indonesia.']
-                            ]
-                        ]
-                    ],
-                    'generationConfig' => [
-                        'maxOutputTokens' => 100,
-                        'temperature' => 0.7,
-                    ]
-                ]);
+            // max_output_tokens dibuat longgar: model Gemini 3.x memakai token "thinking"
+            // sehingga batas kecil bisa membuat jawaban kosong.
+            $result = $this->generateText(
+                $key,
+                'Tuliskan satu kalimat mutiara filosofi Hindu tentang ketulusan hati dalam bahasa Indonesia. Jawab hanya dengan kalimat tersebut.',
+                ['max_output_tokens' => 2048, 'thinking_level' => 'low'],
+                $model,
+                45
+            );
 
             $durationMs = (int) ((microtime(true) - $startTime) * 1000);
+            $response = $result['response'];
 
-            if ($response->successful()) {
-                $candidates = $response->json('candidates', []);
-                $text = $candidates[0]['content']['parts'][0]['text'] ?? '';
-                $usage = $response->json('usageMetadata', []);
+            if ($response && $response->successful() && $result['text'] !== '') {
+                [$inTokens, $outTokens] = $this->usageTokens($response);
 
                 $this->logUsage(
                     null,
                     null,
                     'text_test',
-                    $model,
-                    $usage['promptTokenCount'] ?? 0,
-                    $usage['candidatesTokenCount'] ?? 0,
+                    $result['model'],
+                    $inTokens,
+                    $outTokens,
                     $durationMs,
                     true
                 );
 
                 return [
                     'success' => true,
-                    'message' => 'Uji pembuatan teks berhasil.',
-                    'output' => trim($text),
-                    'model' => $model,
+                    'message' => "Uji pembuatan teks ({$result['model']}) berhasil.",
+                    'output' => $result['text'],
+                    'model' => $result['model'],
                     'response_time_ms' => $durationMs,
                 ];
             }
 
-            $error = $response->json('error', []);
             return [
                 'success' => false,
-                'message' => $error['message'] ?? 'Gagal membuat teks.',
-                'error_code' => $error['status'] ?? 'TEXT_FAILED',
-                'model' => $model,
+                'message' => $response && $response->successful()
+                    ? "Model {$result['model']} merespons tanpa teks (status: " . ($response->json('status') ?? $response->json('candidates.0.finishReason') ?? '-') . ').'
+                    : $this->errorMessage($response, 'Gagal membuat teks.'),
+                'error_code' => $response?->json('error.status') ?? 'TEXT_FAILED',
+                'model' => $result['model'],
             ];
         } catch (\Throwable $e) {
             return [
@@ -171,7 +810,7 @@ class GeminiService
     }
 
     /**
-     * Test image generation (Imagen 3).
+     * Test image generation (Gemini Image / Nano Banana).
      */
     public function testImageGeneration(?string $model = null): array
     {
@@ -180,64 +819,33 @@ class GeminiService
             return ['success' => false, 'message' => 'API Key belum diisi.'];
         }
 
-        $model = $model ?: AppSetting::get('gemini_image_model', 'imagen-3.0-generate-002');
         $startTime = microtime(true);
 
         try {
             $prompt = 'A beautiful Balinese traditional canang sari with colorful frangipani flowers and burning incense stick, morning golden light, editorial photography';
 
-            // Google Imagen 3 generateImages endpoint
-            $url = "{$this->baseUrl}/models/{$model}:predict?key={$key}";
-            $payload = [
-                'instances' => [
-                    ['prompt' => $prompt]
-                ],
-                'parameters' => [
-                    'sampleCount' => 1,
-                    'aspectRatio' => '1:1',
-                    'outputMimeType' => 'image/jpeg',
-                ]
-            ];
-
-            $response = Http::timeout(45)
-                ->withHeaders(['Content-Type' => 'application/json'])
-                ->post($url, $payload);
-
+            $result = $this->requestImage($key, $prompt, '1:1', $model);
             $durationMs = (int) ((microtime(true) - $startTime) * 1000);
 
-            if ($response->successful()) {
-                $predictions = $response->json('predictions', []);
-                if (!empty($predictions[0]['bytesBase64Encoded'])) {
-                    return [
-                        'success' => true,
-                        'message' => 'Uji pembuatan gambar Imagen 3 berhasil.',
-                        'model' => $model,
-                        'response_time_ms' => $durationMs,
-                    ];
-                }
-            }
+            if ($result['success']) {
+                $ext = str_contains($result['mime_type'] ?? '', 'png') ? 'png' : 'jpg';
+                $testFile = 'demo/test_image_' . time() . '.' . $ext;
+                Storage::disk('public')->put($testFile, base64_decode($result['data']));
 
-            // If Imagen endpoint is not enabled or structured differently for Gemini Flash image output:
-            $altUrl = "{$this->baseUrl}/models/{$model}:generateContent?key={$key}";
-            $altResponse = Http::timeout(30)->post($altUrl, [
-                'contents' => [['parts' => [['text' => $prompt]]]]
-            ]);
-
-            if ($altResponse->successful()) {
                 return [
                     'success' => true,
-                    'message' => "Model {$model} merespons dengan sukses.",
-                    'model' => $model,
+                    'message' => "Uji pembuatan gambar ({$result['model']}) berhasil.",
+                    'model' => $result['model'],
+                    'image_url' => Storage::disk('public')->url($testFile),
                     'response_time_ms' => $durationMs,
                 ];
             }
 
-            $error = $response->json('error') ?: $altResponse->json('error', []);
             return [
                 'success' => false,
-                'message' => $error['message'] ?? 'Model gambar memerlukan aktivasi Google Cloud Billing atau kuota khusus pada project Google AI Studio.',
-                'error_code' => $error['status'] ?? 'IMAGE_UNAVAILABLE',
-                'model' => $model,
+                'message' => $result['message'],
+                'error_code' => $result['response']?->json('error.status') ?? 'IMAGE_UNAVAILABLE',
+                'model' => $result['model'],
             ];
         } catch (\Throwable $e) {
             return [
@@ -249,10 +857,8 @@ class GeminiService
     }
 
     /**
-     * Test Video Generation.
-     */
-    /**
-     * Test Video Generation.
+     * Test Video Generation: cek apakah model video bisa diakses oleh API key ini
+     * (tanpa membuat video sungguhan yang memakan kuota).
      */
     public function testVideoGeneration(?string $model = null): array
     {
@@ -261,31 +867,49 @@ class GeminiService
             return ['success' => false, 'message' => 'API Key belum diisi.'];
         }
 
-        $model = $model ?: AppSetting::get('gemini_video_model', 'gemini-omni-1.1-flash');
+        $model = $model ? self::resolveModel('video', $model) : $this->model('video');
+        $candidates = array_values(array_unique([$model, 'gemini-omni-1.1-flash', 'veo-3.1-generate-preview', 'veo-3.1-lite-generate-preview']));
 
-        // Check if model exists in models list
-        $authTest = $this->testAuthentication();
-        $availableModels = $authTest['available_models'] ?? [];
+        try {
+            $lastResponse = null;
+            foreach ($candidates as $candidate) {
+                $response = $this->http($key, 15)->get("{$this->baseUrl}/models/{$candidate}");
 
-        $hasVideoModel = in_array($model, $availableModels) 
-            || in_array("models/{$model}", $availableModels)
-            || in_array('gemini-omni-1.1-flash', $availableModels)
-            || in_array('veo-3.1', $availableModels);
+                if ($response->successful()) {
+                    $methods = $response->json('supportedGenerationMethods', []);
+                    $isPreferred = $candidate === $model;
 
-        if (!$hasVideoModel && !empty($availableModels)) {
+                    return [
+                        'success' => true,
+                        'message' => $isPreferred
+                            ? "Model video '{$candidate}' tersedia untuk API key ini."
+                            : "Model '{$model}' tidak tersedia, tetapi '{$candidate}' tersedia. Pilih model ini di Konfigurasi Model.",
+                        'model' => $candidate,
+                        'methods' => $methods,
+                        'note' => 'Pembuatan video Veo/Omni memerlukan project dengan billing (paid tier) aktif di Google AI Studio.',
+                    ];
+                }
+
+                $lastResponse = $response;
+                if (!in_array($response->status(), [403, 404], true)) {
+                    break;
+                }
+            }
+
             return [
                 'success' => false,
-                'message' => "Model video '{$model}' belum dibuka pada API key ini. Model yang tersedia saat ini: " . implode(', ', array_slice($availableModels, 0, 5)),
-                'error_code' => 'MODEL_NOT_PROVISIONED',
-                'suggestion' => 'Sistem Ruang Dharma akan otomatis menggunakan mode Motion Illustration (gambar berkualitas tinggi + animasi kamera sinematik FFmpeg).',
+                'message' => "Model video '{$model}' belum tersedia untuk API key ini. " . $this->errorMessage($lastResponse, ''),
+                'error_code' => $lastResponse?->json('error.status') ?? 'MODEL_NOT_PROVISIONED',
+                'model' => $model,
+                'suggestion' => 'Aktifkan billing di Google AI Studio. Sementara itu sistem otomatis memakai mode Motion Illustration (gambar + animasi kamera FFmpeg).',
+            ];
+        } catch (\Throwable $e) {
+            return [
+                'success' => false,
+                'message' => 'Gagal cek model video: ' . $e->getMessage(),
+                'error_code' => 'EXCEPTION',
             ];
         }
-
-        return [
-            'success' => true,
-            'message' => "Model video '{$model}' terdaftar dan siap digunakan.",
-            'model' => $model,
-        ];
     }
 
     /**
@@ -298,64 +922,40 @@ class GeminiService
             return ['success' => false, 'message' => 'API Key belum diisi.'];
         }
 
-        $model = $model ?: AppSetting::get('gemini_tts_model', 'gemini-3.8-flash-tts');
+        $preferred = $model ? self::resolveModel('tts', $model) : $this->model('tts');
         $startTime = microtime(true);
 
+        if ($preferred === 'google-tts-indonesia') {
+            return [
+                'success' => true,
+                'message' => 'Layanan Google Speech ID siap digunakan sebagai cadangan.',
+                'model' => $preferred,
+            ];
+        }
+
         try {
-            $testText = "Om Swastyastu. Selamat datang di Ruang Dharma, platform edukasi filosofi Hindu.";
-            $voice = AppSetting::get('gemini_voice_name', 'Pari');
-
-            $response = Http::timeout(25)->post("{$this->baseUrl}/models/{$model}:generateContent?key={$key}", [
-                'contents' => [
-                    ['parts' => [['text' => "Read clearly in calm warm Indonesian voice: {$testText}"]]]
-                ],
-                'generationConfig' => [
-                    'responseModalities' => ['AUDIO'],
-                    'speechConfig' => [
-                        'voiceConfig' => [
-                            'prebuiltVoiceConfig' => ['voiceName' => $voice ?: 'Pari']
-                        ]
-                    ]
-                ]
-            ]);
-
+            $testText = 'Om Swastyastu. Selamat datang di Ruang Dharma, platform edukasi filosofi Hindu.';
+            $result = $this->requestSpeech($key, $testText, $this->voice(), $preferred);
             $durationMs = (int) ((microtime(true) - $startTime) * 1000);
 
-            if ($response->successful()) {
-                $parts = $response->json('candidates.0.content.parts', []);
-                foreach ($parts as $part) {
-                    if (!empty($part['inlineData']['data'])) {
-                        $audioData = base64_decode($part['inlineData']['data']);
-                        $ext = str_starts_with($audioData, 'RIFF') ? 'wav' : 'mp3';
-                        $testFile = 'demo/test_audio_' . time() . '.' . $ext;
-                        Storage::disk('public')->put($testFile, $audioData);
+            if ($result['success']) {
+                $testFile = 'demo/test_audio_' . time() . '.' . $result['ext'];
+                Storage::disk('public')->put($testFile, $result['audio']);
 
-                        return [
-                            'success' => true,
-                            'message' => "Uji sintesis audio narasi ({$model}) berhasil dibuat.",
-                            'model' => $model,
-                            'audio_url' => Storage::disk('public')->url($testFile),
-                            'response_time_ms' => $durationMs,
-                        ];
-                    }
-                }
-            }
-
-            if ($model === 'google-tts-indonesia') {
                 return [
                     'success' => true,
-                    'message' => 'Layanan Google Speech ID siap digunakan sebagai cadangan.',
-                    'model' => $model,
+                    'message' => "Uji sintesis audio narasi ({$result['model']}) berhasil dibuat.",
+                    'model' => $result['model'],
+                    'audio_url' => Storage::disk('public')->url($testFile),
                     'response_time_ms' => $durationMs,
                 ];
             }
 
-            $error = $response->json('error', []);
             return [
                 'success' => false,
-                'message' => $error['message'] ?? 'Gagal membuat audio.',
-                'error_code' => $error['status'] ?? 'TTS_FAILED',
-                'model' => $model,
+                'message' => $result['message'],
+                'error_code' => 'TTS_FAILED',
+                'model' => $result['model'],
             ];
         } catch (\Throwable $e) {
             return [
@@ -378,7 +978,6 @@ class GeminiService
         array $sources = []
     ): array {
         $key = $this->getApiKey();
-        $model = AppSetting::get('gemini_text_model', 'gemini-3.8-flash');
 
         $sourceCitations = implode("; ", array_map(fn($s) => ($s['title'] ?? '') . ' (' . ($s['reference_section'] ?? '') . ')', $sources));
 
@@ -432,37 +1031,33 @@ PROMPT;
         $startTime = microtime(true);
 
         try {
-            $response = Http::timeout(30)
-                ->withHeaders(['Content-Type' => 'application/json'])
-                ->post("{$this->baseUrl}/models/{$model}:generateContent?key={$key}", [
-                    'contents' => [
-                        ['parts' => [['text' => $prompt]]]
-                    ],
-                    'generationConfig' => [
-                        'responseMimeType' => 'application/json',
-                        'temperature' => 0.4,
-                    ]
-                ]);
+            $result = $this->generateText($key, $prompt, [
+                'max_output_tokens' => 8192,
+                'thinking_level' => 'medium',
+                'schema' => self::SCRIPT_SCHEMA,
+            ], null, 120);
 
             $durationMs = (int) ((microtime(true) - $startTime) * 1000);
+            $response = $result['response'];
 
-            if ($response->successful()) {
-                $candidates = $response->json('candidates', []);
-                $rawText = $candidates[0]['content']['parts'][0]['text'] ?? '{}';
-                $parsed = json_decode($rawText, true);
+            if ($response && $response->successful()) {
+                $parsed = $this->decodeJson($result['text']);
 
                 if (is_array($parsed) && !empty($parsed['scenes'])) {
+                    [$inTokens, $outTokens] = $this->usageTokens($response);
+                    $this->logUsage(null, null, 'script', $result['model'], $inTokens, $outTokens, $durationMs, true);
+
                     $this->normalizeSceneDurations($parsed['scenes']);
                     return [
                         'success' => true,
                         'data' => $parsed,
-                        'model' => $model,
+                        'model' => $result['model'],
                         'response_time_ms' => $durationMs,
                     ];
                 }
             }
 
-            Log::warning("Gemini script generation fallback triggered. Response: " . $response->body());
+            Log::warning('Gemini script generation fallback triggered. Response: ' . ($response?->body() ?? '-'));
             return [
                 'success' => true,
                 'data' => $this->getFallbackScript($topicTitle, $targetAudience, $tone),
@@ -479,12 +1074,11 @@ PROMPT;
     }
 
     /**
-     * Generate illustration image for a scene using Gemini / Imagen API.
+     * Generate illustration image for a scene using Gemini Image (Nano Banana).
      */
     public function generateSceneVisual(string $prompt, string $style = 'modern_editorial', string $aspectRatio = '9:16'): array
     {
         $key = $this->getApiKey();
-        $model = AppSetting::get('gemini_image_model', 'imagen-3.0-generate-002');
 
         $styleModifiers = [
             'modern_editorial' => 'minimalist modern digital painting, elegant lighting, subtle balinese motifs, calm editorial aesthetic, trending on artstation',
@@ -494,7 +1088,7 @@ PROMPT;
         ];
 
         $styleSuffix = $styleModifiers[$style] ?? $styleModifiers['modern_editorial'];
-        $fullPrompt = "{$prompt}, {$styleSuffix}, highly detailed, 4k resolution, clean composition, no text, no watermark";
+        $fullPrompt = "{$prompt}, {$styleSuffix}, highly detailed, clean composition, no text, no watermark";
 
         if (!$key) {
             // Generate fallback artistic SVG graphic converted to image or stored as placeholder
@@ -508,31 +1102,21 @@ PROMPT;
                 default => '9:16',
             };
 
-            $url = "{$this->baseUrl}/models/{$model}:predict?key={$key}";
-            $response = Http::timeout(45)->post($url, [
-                'instances' => [['prompt' => $fullPrompt]],
-                'parameters' => [
-                    'sampleCount' => 1,
-                    'aspectRatio' => $aspectRatioParam,
-                    'outputMimeType' => 'image/jpeg',
-                ]
-            ]);
+            $result = $this->requestImage($key, $fullPrompt, $aspectRatioParam);
 
-            if ($response->successful()) {
-                $predictions = $response->json('predictions', []);
-                if (!empty($predictions[0]['bytesBase64Encoded'])) {
-                    $imageData = base64_decode($predictions[0]['bytesBase64Encoded']);
-                    $fileName = 'images/' . uniqid('scene_') . '.jpg';
-                    Storage::disk('local')->put('private/' . $fileName, $imageData);
+            if ($result['success']) {
+                $ext = str_contains($result['mime_type'] ?? '', 'png') ? 'png' : 'jpg';
+                $fileName = 'images/' . uniqid('scene_') . '.' . $ext;
+                Storage::disk('local')->put('private/' . $fileName, base64_decode($result['data']));
 
-                    return [
-                        'success' => true,
-                        'image_path' => $fileName,
-                        'is_generated' => true,
-                    ];
-                }
+                return [
+                    'success' => true,
+                    'image_path' => $fileName,
+                    'is_generated' => true,
+                ];
             }
 
+            Log::warning('Gemini image generation fallback: ' . ($result['message'] ?? '-'));
             return $this->generatePlaceholderImage($prompt, $style, $aspectRatio);
         } catch (\Throwable $e) {
             Log::warning("Gemini visual generation fallback: " . $e->getMessage());
@@ -543,52 +1127,32 @@ PROMPT;
     /**
      * Generate Audio Narration for a scene text.
      */
-    public function generateSceneAudio(string $text, string $voice = 'Pari'): array
+    public function generateSceneAudio(string $text, ?string $voice = null): array
     {
         $key = $this->getApiKey();
         $cleanText = trim(strip_tags($text));
+        $model = $this->model('tts');
 
-        // Use Google Gemini Text-to-Speech endpoint if available, or generate via TTS engine
-        $fileName = 'audio/' . uniqid('narration_') . '.mp3';
-
-        // Check if Gemini audio generation endpoint works
-        if ($key) {
+        if ($key && $model !== 'google-tts-indonesia') {
             try {
-                $model = AppSetting::get('gemini_tts_model', 'gemini-3.8-flash-tts');
-                $response = Http::timeout(25)->post("{$this->baseUrl}/models/{$model}:generateContent?key={$key}", [
-                    'contents' => [
-                        ['parts' => [['text' => "Read clearly in calm warm Indonesian voice: {$cleanText}"]]]
-                    ],
-                    'generationConfig' => [
-                        'responseModalities' => ['AUDIO'],
-                        'speechConfig' => [
-                            'voiceConfig' => [
-                                'prebuiltVoiceConfig' => ['voiceName' => $voice ?: 'Pari']
-                            ]
-                        ]
-                    ]
-                ]);
+                $result = $this->requestSpeech($key, $cleanText, $this->voice($voice));
 
-                if ($response->successful()) {
-                    $parts = $response->json('candidates.0.content.parts', []);
-                    foreach ($parts as $part) {
-                        if (!empty($part['inlineData']['data'])) {
-                            $audioData = base64_decode($part['inlineData']['data']);
-                            if (str_starts_with($audioData, 'RIFF')) {
-                                $fileName = 'audio/' . uniqid('narration_') . '.wav';
-                            }
-                            Storage::disk('local')->put('private/' . $fileName, $audioData);
-                            return [
-                                'success' => true,
-                                'audio_path' => $fileName,
-                            ];
-                        }
-                    }
+                if ($result['success']) {
+                    $fileName = 'audio/' . uniqid('narration_') . '.' . $result['ext'];
+                    Storage::disk('local')->put('private/' . $fileName, $result['audio']);
+                    return [
+                        'success' => true,
+                        'audio_path' => $fileName,
+                    ];
                 }
+
+                Log::info('Gemini TTS fallback: ' . ($result['message'] ?? '-'));
             } catch (\Throwable $e) {
                 Log::info("Gemini TTS endpoint fallback: " . $e->getMessage());
             }
         }
+
+        $fileName = 'audio/' . uniqid('narration_') . '.mp3';
 
         // Fallback: Generate clean speech using Google Translate TTS public endpoint
         try {
@@ -623,7 +1187,6 @@ PROMPT;
     public function generateQuiz(string $title, string $script): array
     {
         $key = $this->getApiKey();
-        $model = AppSetting::get('gemini_text_model', 'gemini-3.8-flash');
 
         $prompt = <<<PROMPT
 Buat 2 pertanyaan kuis pilihan ganda edukatif berdasarkan naskah video edukasi Hindu berikut:
@@ -637,29 +1200,32 @@ ATURAN:
 - Dilarang menggunakan emoji atau emotikon.
 
 Kembalikan format JSON:
-[
-  {
-    "question": "Kalimat pertanyaan",
-    "options": ["Opsi A", "Opsi B", "Opsi C", "Opsi D"],
-    "correct_option_index": 0,
-    "explanation": "Penjelasan mengapa opsi tersebut benar."
-  }
-]
+{
+  "questions": [
+    {
+      "question": "Kalimat pertanyaan",
+      "options": ["Opsi A", "Opsi B", "Opsi C", "Opsi D"],
+      "correct_option_index": 0,
+      "explanation": "Penjelasan mengapa opsi tersebut benar."
+    }
+  ]
+}
 PROMPT;
 
         if ($key) {
             try {
-                $response = Http::timeout(20)->post("{$this->baseUrl}/models/{$model}:generateContent?key={$key}", [
-                    'contents' => [['parts' => [['text' => $prompt]]]],
-                    'generationConfig' => [
-                        'responseMimeType' => 'application/json',
-                        'temperature' => 0.3,
-                    ]
-                ]);
+                $result = $this->generateText($key, $prompt, [
+                    'max_output_tokens' => 4096,
+                    'thinking_level' => 'low',
+                    'schema' => self::QUIZ_SCHEMA,
+                ], null, 60);
 
-                if ($response->successful()) {
-                    $json = json_decode($response->json('candidates.0.content.parts.0.text', '[]'), true);
-                    if (is_array($json) && count($json) > 0) {
+                if ($result['response'] && $result['response']->successful()) {
+                    $json = $this->decodeJson($result['text']);
+                    if (is_array($json) && isset($json['questions']) && is_array($json['questions'])) {
+                        $json = $json['questions'];
+                    }
+                    if (is_array($json) && count($json) > 0 && array_is_list($json)) {
                         return $json;
                     }
                 }
@@ -909,7 +1475,7 @@ PROMPT;
         ?string $errorCode = null
     ): void {
         // Official pricing estimates per 1k tokens (verified)
-        $costPer1kPrompt = 0.000125; // gemini-1.5/2.0 flash approx
+        $costPer1kPrompt = 0.000125; // perkiraan kasar model Flash
         $costPer1kCandidate = 0.000375;
         $cost = (($promptTokens / 1000) * $costPer1kPrompt) + (($candidateTokens / 1000) * $costPer1kCandidate);
 

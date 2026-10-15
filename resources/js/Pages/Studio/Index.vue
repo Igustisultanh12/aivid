@@ -47,7 +47,7 @@ const form = useForm({
     production_mode: 'illustration_motion', // illustration_motion, generative_video
     visual_style: 'modern_editorial',
     aspect_ratio: '9:16',
-    voice_id: 'Pari',
+    voice_id: 'Sulafat',
     has_subtitles: true,
     review_script_first: false,
 });
