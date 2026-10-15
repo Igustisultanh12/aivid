@@ -8,6 +8,7 @@ use Illuminate\Http\Client\Response as HttpResponse;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Sleep;
 
 /**
  * Integrasi Google Gemini API (Google AI Studio).
@@ -254,20 +255,83 @@ class GeminiService
             || str_contains($message, 'deprecated');
     }
 
-    protected function errorMessage(?HttpResponse $response, string $fallback): string
+    /**
+     * Error sementara atau kuota (503 server sibuk, 429 kuota habis, 5xx lain):
+     * model lain bisa saja masih punya kapasitas/kuota, jadi layak pindah ke model cadangan.
+     */
+    protected function isTransient(?HttpResponse $response): bool
+    {
+        if (!$response || $response->successful()) {
+            return false;
+        }
+
+        $status = strtoupper((string) $response->json('error.status', ''));
+
+        return in_array($response->status(), [429, 500, 502, 503, 504], true)
+            || in_array($status, ['UNAVAILABLE', 'RESOURCE_EXHAUSTED', 'INTERNAL', 'DEADLINE_EXCEEDED'], true);
+    }
+
+    /**
+     * Apakah sebaiknya mencoba model cadangan berikutnya.
+     */
+    protected function shouldTryNextModel(?HttpResponse $response): bool
+    {
+        return $response !== null && $response->failed()
+            && ($this->isModelUnavailable($response) || $this->isTransient($response));
+    }
+
+    /**
+     * Pilih respons gagal yang paling informatif untuk ditampilkan:
+     * error "sungguhan" (mis. API key salah) > kuota/server sibuk > model tidak ditemukan.
+     */
+    protected function moreInformative(?HttpResponse $current, ?HttpResponse $candidate): ?HttpResponse
+    {
+        if (!$candidate || $candidate->successful()) {
+            return $current;
+        }
+        if (!$current || $current->successful()) {
+            return $candidate;
+        }
+
+        $rank = fn (HttpResponse $r) => $this->isTransient($r) ? 2 : ($this->isModelUnavailable($r) ? 1 : 3);
+
+        return $rank($candidate) > $rank($current) ? $candidate : $current;
+    }
+
+    protected function errorMessage(?HttpResponse $response, string $fallback, array $triedModels = []): string
     {
         if (!$response) {
             return $fallback;
         }
 
-        $message = $response->json('error.message');
+        $message = (string) $response->json('error.message', '');
         $status = $response->json('error.status');
+        $tried = $triedModels ? ' Model yang dicoba: ' . implode(', ', array_unique($triedModels)) . '.' : '';
 
-        if ($message) {
-            return $status ? "{$message} ({$status})" : $message;
+        // 429 / RESOURCE_EXHAUSTED: kuota habis atau tidak ada kuota sama sekali (limit: 0).
+        if ($response->status() === 429 || $status === 'RESOURCE_EXHAUSTED') {
+            $retry = preg_match('/retry in ([0-9hms.]+)/i', $message, $m) ? ' Bisa dicoba lagi dalam ' . preg_replace('/\.\d+s$/', 's', $m[1]) . '.' : '';
+
+            if (preg_match('/limit:\s*0\b/', $message)) {
+                return 'Kuota model ini untuk API key Anda adalah 0 (tidak termasuk free tier). '
+                    . 'Aktifkan billing (Tier 1) pada project di Google AI Studio, lalu cek kuota di https://aistudio.google.com/rate-limit .'
+                    . $tried . ' (RESOURCE_EXHAUSTED)';
+            }
+
+            return 'Kuota/batas permintaan Google Gemini habis.' . $retry . $tried . ' (RESOURCE_EXHAUSTED)';
         }
 
-        return "{$fallback} (HTTP {$response->status()})";
+        // 503 / UNAVAILABLE: server Google sedang sibuk (sementara).
+        if ($response->status() === 503 || $status === 'UNAVAILABLE') {
+            return 'Server Google Gemini sedang sibuk (permintaan tinggi). Ini sementara, silakan coba lagi beberapa menit lagi.'
+                . $tried . ' (UNAVAILABLE)';
+        }
+
+        if ($message !== '') {
+            return ($status ? "{$message} ({$status})" : $message) . $tried;
+        }
+
+        return "{$fallback} (HTTP {$response->status()})" . $tried;
     }
 
     /**
@@ -287,6 +351,7 @@ class GeminiService
     {
         $response = null;
         $lastFailed = null;
+        $tried = [];
         $model = $preferred ?: $this->model('text');
 
         $maxTokens = (int) ($options['max_output_tokens'] ?? 8192);
@@ -315,11 +380,22 @@ class GeminiService
                 ]);
             }
 
+            $tried[] = $model;
             $response = $this->interact($key, $payload, $timeout);
             if ($response->successful() && ($text = $this->extractText($response->json() ?? [])) !== '') {
                 return ['response' => $response, 'model' => $model, 'text' => $text];
             }
             $interactionsResponse = $response;
+
+            // Server sibuk / kuota habis untuk model ini: langsung pindah ke model cadangan
+            // (generateContent untuk model yang sama akan mengalami hal serupa).
+            if ($this->isTransient($response)) {
+                $lastFailed = $this->moreInformative($lastFailed, $response);
+                Log::info("Gemini text model {$model} sibuk/kuota habis, mencoba model cadangan.", [
+                    'error' => $response->json('error.status') ?? $response->status(),
+                ]);
+                continue;
+            }
 
             // 2) generateContent (format setara, tanpa parameter sampling yang sudah dihapus)
             $config = ['maxOutputTokens' => $maxTokens];
@@ -345,17 +421,15 @@ class GeminiService
 
             // Simpan respons gagal yang paling informatif untuk pesan error
             // (error "sungguhan" lebih berguna daripada "model not found").
-            if ($response->failed() && !$this->isModelUnavailable($response)) {
+            $lastFailed = $this->moreInformative($lastFailed, $interactionsResponse);
+            $lastFailed = $this->moreInformative($lastFailed, $response);
+            if (!$lastFailed) {
                 $lastFailed = $response;
-            } elseif ($interactionsResponse->failed()) {
-                $lastFailed = $interactionsResponse;
-            } else {
-                $lastFailed = $response->failed() ? $response : $interactionsResponse;
             }
 
-            $unavailable = ($interactionsResponse->failed() && $this->isModelUnavailable($interactionsResponse))
-                && (!$response->failed() || $this->isModelUnavailable($response));
-            if (!$unavailable) {
+            $tryNext = $this->shouldTryNextModel($interactionsResponse)
+                && (!$response->failed() || $this->shouldTryNextModel($response));
+            if (!$tryNext) {
                 break;
             }
 
@@ -364,7 +438,7 @@ class GeminiService
             ]);
         }
 
-        return ['response' => $lastFailed ?? $response, 'model' => $model, 'text' => ''];
+        return ['response' => $lastFailed ?? $response, 'model' => $model, 'text' => '', 'tried' => $tried];
     }
 
     /**
@@ -501,7 +575,23 @@ class GeminiService
      */
     protected function interact(string $key, array $payload, int $timeout = 60): HttpResponse
     {
-        return $this->http($key, $timeout)->post("{$this->baseUrl}/interactions", $payload);
+        return $this->postWithRetry($key, "{$this->baseUrl}/interactions", $payload, $timeout);
+    }
+
+    /**
+     * POST dengan satu kali coba ulang bila server Google sibuk (500/502/503/504).
+     * 429 (kuota habis) tidak dicoba ulang karena tidak akan pulih dalam hitungan detik.
+     */
+    protected function postWithRetry(string $key, string $url, array $payload, int $timeout = 60): HttpResponse
+    {
+        $response = $this->http($key, $timeout)->post($url, $payload);
+
+        if (in_array($response->status(), [500, 502, 503, 504], true)) {
+            Sleep::for(2)->seconds();
+            $response = $this->http($key, $timeout)->post($url, $payload);
+        }
+
+        return $response;
     }
 
     /**
@@ -513,9 +603,12 @@ class GeminiService
     protected function requestImage(string $key, string $prompt, string $aspectRatio, ?string $preferred = null): array
     {
         $lastResponse = null;
+        $tried = [];
         $model = $preferred ?: $this->model('image');
 
         foreach ($this->candidates('image', $preferred) as $model) {
+            $tried[] = $model;
+
             // 1) Interactions API (rekomendasi dokumentasi terbaru)
             $response = $this->interact($key, [
                 'model' => $model,
@@ -535,7 +628,16 @@ class GeminiService
                     return ['success' => true, 'model' => $model] + $media;
                 }
             }
-            $lastResponse = $response;
+            $interactionsResponse = $response;
+            $lastResponse = $this->moreInformative($lastResponse, $response) ?? $response;
+
+            // Kuota habis (mis. limit: 0) / server sibuk: langsung coba model gambar berikutnya.
+            if ($this->isTransient($response)) {
+                Log::info("Gemini image model {$model} kuota habis/sibuk, mencoba model cadangan.", [
+                    'error' => $response->json('error.status') ?? $response->status(),
+                ]);
+                continue;
+            }
 
             // 2) generateContent (masih didukung penuh oleh Google)
             $response = $this->http($key, 90)->post("{$this->baseUrl}/models/{$model}:generateContent", [
@@ -555,12 +657,12 @@ class GeminiService
                 }
             }
 
-            if ($response->failed()) {
-                $lastResponse = $response;
-            }
+            $lastResponse = $this->moreInformative($lastResponse, $response);
 
-            // Hanya coba model cadangan jika model ini memang tidak tersedia.
-            if ($response->failed() && !$this->isModelUnavailable($response) && !$this->isModelUnavailable($lastResponse)) {
+            // Coba model cadangan hanya bila model ini tidak tersedia / kuota habis / sibuk.
+            $tryNext = $this->shouldTryNextModel($interactionsResponse)
+                && (!$response->failed() || $this->shouldTryNextModel($response));
+            if (!$tryNext) {
                 break;
             }
         }
@@ -568,7 +670,7 @@ class GeminiService
         return [
             'success' => false,
             'model' => $model,
-            'message' => $this->errorMessage($lastResponse, 'Model gambar tidak mengembalikan data gambar.'),
+            'message' => $this->errorMessage($lastResponse, 'Model gambar tidak mengembalikan data gambar.', $tried),
             'response' => $lastResponse,
         ];
     }
@@ -581,9 +683,12 @@ class GeminiService
     protected function requestSpeech(string $key, string $text, string $voice, ?string $preferred = null): array
     {
         $lastResponse = null;
+        $tried = [];
         $model = $preferred ?: $this->model('tts');
 
         foreach ($this->candidates('tts', $preferred) as $model) {
+            $tried[] = $model;
+
             // 1) Interactions API (format resmi gemini-3.8-flash-tts) — keluaran default WAV 24 kHz.
             $response = $this->interact($key, [
                 'model' => $model,
@@ -606,7 +711,12 @@ class GeminiService
             if ($response->successful() && ($media = $this->extractMedia($response->json() ?? [], 'audio'))) {
                 return ['success' => true, 'model' => $model] + $this->normalizeAudio($media);
             }
-            $lastResponse = $response;
+            $interactionsResponse = $response;
+            $lastResponse = $this->moreInformative($lastResponse, $response) ?? $response;
+
+            if ($this->isTransient($response)) {
+                continue;
+            }
 
             // 2) generateContent (format lama TTS) — keluaran PCM mentah, dibungkus ke WAV.
             $response = $this->http($key, 60)->post("{$this->baseUrl}/models/{$model}:generateContent", [
@@ -627,11 +737,11 @@ class GeminiService
                 return ['success' => true, 'model' => $model] + $this->normalizeAudio($media);
             }
 
-            if ($response->failed()) {
-                $lastResponse = $response;
-            }
+            $lastResponse = $this->moreInformative($lastResponse, $response);
 
-            if ($response->failed() && !$this->isModelUnavailable($response) && !$this->isModelUnavailable($lastResponse)) {
+            $tryNext = $this->shouldTryNextModel($interactionsResponse)
+                && (!$response->failed() || $this->shouldTryNextModel($response));
+            if (!$tryNext) {
                 break;
             }
         }
@@ -639,7 +749,7 @@ class GeminiService
         return [
             'success' => false,
             'model' => $model,
-            'message' => $this->errorMessage($lastResponse, 'Model TTS tidak mengembalikan audio.'),
+            'message' => $this->errorMessage($lastResponse, 'Model TTS tidak mengembalikan audio.', $tried),
         ];
     }
 
@@ -796,7 +906,7 @@ class GeminiService
                 'success' => false,
                 'message' => $response && $response->successful()
                     ? "Model {$result['model']} merespons tanpa teks (status: " . ($response->json('status') ?? $response->json('candidates.0.finishReason') ?? '-') . ').'
-                    : $this->errorMessage($response, 'Gagal membuat teks.'),
+                    : $this->errorMessage($response, 'Gagal membuat teks.', $result['tried'] ?? []),
                 'error_code' => $response?->json('error.status') ?? 'TEXT_FAILED',
                 'model' => $result['model'],
             ];

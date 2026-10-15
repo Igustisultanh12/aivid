@@ -8,6 +8,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Sleep;
 use Tests\TestCase;
 
 class GeminiServiceTest extends TestCase
@@ -103,6 +104,91 @@ class GeminiServiceTest extends TestCase
         $this->assertFalse($result['success']);
         $this->assertStringContainsString('API key not valid', $result['message']);
         Http::assertSentCount(2); // interactions + generateContent untuk gemini-3.8-flash saja
+    }
+
+    public function test_text_retries_then_falls_back_when_gemini_is_overloaded(): void
+    {
+        Sleep::fake();
+
+        Http::fake(function (Request $request) {
+            if (($request->data()['model'] ?? null) === 'gemini-3.6-flash') {
+                return Http::response($this->textInteraction('Jawaban dari 3.6.'));
+            }
+
+            return Http::response(['error' => [
+                'code' => 503,
+                'message' => 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.',
+                'status' => 'UNAVAILABLE',
+            ]], 503);
+        });
+
+        $result = app(GeminiService::class)->testTextGeneration();
+
+        $this->assertTrue($result['success'], $result['message']);
+        $this->assertSame('gemini-3.6-flash', $result['model']);
+        // 3.8-flash: 2x interactions (1x coba ulang), tanpa generateContent; lalu 3.6-flash berhasil.
+        Http::assertSentCount(3);
+        Sleep::assertSleptTimes(1);
+    }
+
+    public function test_text_reports_friendly_message_when_all_models_overloaded(): void
+    {
+        Sleep::fake();
+
+        Http::fake([
+            '*' => Http::response(['error' => ['code' => 503, 'message' => 'This model is currently experiencing high demand.', 'status' => 'UNAVAILABLE']], 503),
+        ]);
+
+        $result = app(GeminiService::class)->testTextGeneration();
+
+        $this->assertFalse($result['success']);
+        $this->assertStringContainsString('sedang sibuk', $result['message']);
+        $this->assertStringContainsString('gemini-3.5-flash-lite', $result['message']);
+    }
+
+    public function test_image_falls_back_when_nano_banana_quota_is_zero(): void
+    {
+        Http::fake(function (Request $request) {
+            if (($request->data()['model'] ?? null) === 'gemini-3.1-flash-image') {
+                return Http::response([
+                    'status' => 'completed',
+                    'steps' => [[
+                        'type' => 'model_output',
+                        'content' => [['type' => 'image', 'mime_type' => 'image/jpeg', 'data' => base64_encode('fake-jpeg')]],
+                    ]],
+                ]);
+            }
+
+            return Http::response(['error' => [
+                'code' => 429,
+                'message' => 'You exceeded your current quota. * Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-nano-banana-2.1 Please retry in 7h35m22.268266749s.',
+                'status' => 'RESOURCE_EXHAUSTED',
+            ]], 429);
+        });
+
+        $result = app(GeminiService::class)->testImageGeneration();
+
+        $this->assertTrue($result['success'], $result['message']);
+        $this->assertSame('gemini-3.1-flash-image', $result['model']);
+        Http::assertNotSent(fn (Request $r) => str_contains($r->url(), ':generateContent'));
+    }
+
+    public function test_image_explains_billing_when_every_image_model_has_zero_quota(): void
+    {
+        Http::fake([
+            '*' => Http::response(['error' => [
+                'code' => 429,
+                'message' => 'You exceeded your current quota. limit: 0, model: gemini-nano-banana-2.1 Please retry in 7h35m22.2s.',
+                'status' => 'RESOURCE_EXHAUSTED',
+            ]], 429),
+        ]);
+
+        $result = app(GeminiService::class)->testImageGeneration();
+
+        $this->assertFalse($result['success']);
+        $this->assertStringContainsString('billing', $result['message']);
+        $this->assertStringContainsString('gemini-3.1-flash-lite-image', $result['message']);
+        Http::assertSentCount(3); // satu permintaan per model gambar, tanpa coba ulang
     }
 
     public function test_image_uses_nano_banana_instead_of_imagen(): void
