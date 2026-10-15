@@ -293,10 +293,21 @@ class DatabaseSeeder extends Seeder
             'name' => 'Dharma Explorer',
             'email' => 'user@ruangdharma.id',
             'email_verified_at' => now(),
-            'password' => Hash::make('RuangDharma2026!'),
+            'password' => Hash::make('password'),
             'role' => 'user',
             'quota_total' => 10,
             'quota_used' => 1,
+            'avatar_url' => null,
+        ]);
+
+        User::create([
+            'name' => 'Administrator Ruang Dharma',
+            'email' => 'admin@ruangdharma.id',
+            'email_verified_at' => now(),
+            'password' => Hash::make('admin123'),
+            'role' => 'admin',
+            'quota_total' => 1000,
+            'quota_used' => 0,
             'avatar_url' => null,
         ]);
 

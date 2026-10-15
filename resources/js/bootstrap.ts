@@ -13,14 +13,17 @@ declare global {
 
 window.Pusher = Pusher;
 
+const isHttps = typeof window !== 'undefined' && window.location.protocol === 'https:';
+const currentHost = typeof window !== 'undefined' ? window.location.hostname : 'localhost';
+
 try {
     window.Echo = new Echo({
         broadcaster: 'reverb',
-        key: import.meta.env.VITE_REVERB_APP_KEY || 'app-key',
-        wsHost: import.meta.env.VITE_REVERB_HOST || window.location.hostname,
-        wsPort: import.meta.env.VITE_REVERB_PORT || 8080,
-        wssPort: import.meta.env.VITE_REVERB_PORT || 8080,
-        forceTLS: (import.meta.env.VITE_REVERB_SCHEME ?? 'https') === 'https',
+        key: import.meta.env.VITE_REVERB_APP_KEY || 'rd-prod-key-xyz',
+        wsHost: currentHost,
+        wsPort: isHttps ? 443 : (Number(import.meta.env.VITE_REVERB_PORT) || 8080),
+        wssPort: isHttps ? 443 : (Number(import.meta.env.VITE_REVERB_PORT) || 8080),
+        forceTLS: isHttps,
         enabledTransports: ['ws', 'wss'],
     });
 } catch (e) {
