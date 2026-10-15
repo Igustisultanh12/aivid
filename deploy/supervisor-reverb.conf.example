@@ -1,0 +1,10 @@
+[program:ruang-dharma-reverb]
+process_name=%(program_name)s
+command=/www/server/php/83/bin/php /www/wwwroot/ruangdharma.com/artisan reverb:start --host=0.0.0.0 --port=8080
+autostart=true
+autorestart=true
+user=www
+redirect_stderr=true
+stdout_logfile=/www/wwwroot/ruangdharma.com/storage/logs/reverb.log
+stopwaitsecs=30
+priority=20

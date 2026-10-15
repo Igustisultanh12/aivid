@@ -1,0 +1,121 @@
+@import 'tailwindcss';
+
+@theme {
+    --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+    --font-serif: 'Cinzel', serif;
+
+    /* Custom Color Palette */
+    --color-dharma-purple-50: #f5f3ff;
+    --color-dharma-purple-100: #ede9fe;
+    --color-dharma-purple-200: #ddd6fe;
+    --color-dharma-purple-300: #c4b5fd;
+    --color-dharma-purple-400: #a78bfa;
+    --color-dharma-purple-500: #8b5cf6;
+    --color-dharma-purple-600: #7c3aed;
+    --color-dharma-purple-700: #6d28d9;
+    --color-dharma-purple-800: #5b21b6;
+    --color-dharma-purple-900: #4c1d95;
+
+    --color-dharma-coral-400: #fb923c;
+    --color-dharma-coral-500: #f97316;
+    --color-dharma-coral-600: #ea580c;
+
+    --color-dharma-gold-400: #fbbf24;
+    --color-dharma-gold-500: #f59e0b;
+    --color-dharma-gold-600: #d97706;
+
+    --color-dharma-teal-400: #2dd4bf;
+    --color-dharma-teal-500: #14b8a6;
+    --color-dharma-teal-600: #0d9488;
+
+    --color-dharma-ivory: #faf9f6;
+    --color-dharma-ivory-dark: #f3efe6;
+
+    --color-dharma-navy-900: #0b0f19;
+    --color-dharma-navy-800: #111827;
+    --color-dharma-navy-700: #1f2937;
+}
+
+/* Base Body Styles */
+body {
+    font-family: var(--font-sans);
+    letter-spacing: -0.01em;
+}
+
+/* Balinese Subtle Decorative Patterns */
+.bg-mesh-purple {
+    background: radial-gradient(at 0% 0%, rgba(124, 58, 237, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(249, 115, 22, 0.12) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(20, 184, 166, 0.1) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, rgba(245, 158, 11, 0.1) 0px, transparent 50%);
+}
+
+.dark .bg-mesh-purple {
+    background: radial-gradient(at 0% 0%, rgba(109, 40, 217, 0.25) 0px, transparent 55%),
+                radial-gradient(at 100% 0%, rgba(234, 88, 12, 0.18) 0px, transparent 55%),
+                radial-gradient(at 100% 100%, rgba(13, 148, 136, 0.15) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, rgba(217, 119, 6, 0.15) 0px, transparent 50%);
+}
+
+/* Custom Interactive Utilities */
+.btn-primary {
+    background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+    color: white;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    transform: translateY(-1.5px);
+    box-shadow: 0 10px 25px -5px rgba(124, 58, 237, 0.35);
+}
+
+.btn-primary:active {
+    transform: translateY(0.5px) scale(0.99);
+}
+
+.btn-coral {
+    background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+    color: white;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-coral:hover {
+    background: linear-gradient(135deg, #fb923c 0%, #f97316 100%);
+    transform: translateY(-1.5px);
+    box-shadow: 0 10px 25px -5px rgba(249, 115, 22, 0.35);
+}
+
+.card-glass {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.dark .card-glass {
+    background: rgba(17, 24, 39, 0.8);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(31, 41, 55, 0.8);
+}
+
+/* Focus States */
+:focus-visible {
+    outline: 2px solid #7c3aed;
+    outline-offset: 2px;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(156, 163, 175, 0.4);
+    border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(156, 163, 175, 0.7);
+}

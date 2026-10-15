@@ -1,0 +1,10 @@
+[program:ruang-dharma-horizon]
+process_name=%(program_name)s
+command=/www/server/php/83/bin/php /www/wwwroot/ruangdharma.com/artisan horizon
+autostart=true
+autorestart=true
+user=www
+redirect_stderr=true
+stdout_logfile=/www/wwwroot/ruangdharma.com/storage/logs/horizon.log
+stopwaitsecs=3600
+priority=10
