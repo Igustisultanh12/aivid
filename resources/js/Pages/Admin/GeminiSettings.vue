@@ -351,7 +351,7 @@ const runTestVideo = async () => {
                         <div class="space-y-1">
                             <div class="flex items-center gap-2 text-violet-600 font-bold text-xs">
                                 <Type class="w-4 h-4" />
-                                <span>Pembuatan Teks (Gemini 3.0)</span>
+                                <span>Pembuatan Teks (Gemini 3.8 / Flash)</span>
                             </div>
                             <p class="text-[11px] text-slate-500">
                                 Menguji prompt naskah edukasi 30 detik ke Google AI Studio.

@@ -23,7 +23,7 @@ class DatabaseSeeder extends Seeder
     {
         // 1. App Settings
         $defaultSettings = [
-            'gemini_text_model' => ['value' => 'gemini-3.0-flash', 'encrypted' => false, 'group' => 'gemini'],
+            'gemini_text_model' => ['value' => 'gemini-3.8-flash', 'encrypted' => false, 'group' => 'gemini'],
             'gemini_image_model' => ['value' => 'imagen-3.0-generate-002', 'encrypted' => false, 'group' => 'gemini'],
             'gemini_tts_model' => ['value' => 'gemini-3.8-flash-tts', 'encrypted' => false, 'group' => 'gemini'],
             'gemini_video_model' => ['value' => 'gemini-omni-1.1-flash', 'encrypted' => false, 'group' => 'gemini'],

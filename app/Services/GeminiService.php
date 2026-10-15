@@ -107,7 +107,7 @@ class GeminiService
             return ['success' => false, 'message' => 'API Key belum diisi.'];
         }
 
-        $model = $model ?: AppSetting::get('gemini_text_model', 'gemini-3.0-flash');
+        $model = $model ?: AppSetting::get('gemini_text_model', 'gemini-3.8-flash');
         $startTime = microtime(true);
 
         try {
@@ -378,7 +378,7 @@ class GeminiService
         array $sources = []
     ): array {
         $key = $this->getApiKey();
-        $model = AppSetting::get('gemini_text_model', 'gemini-3.0-flash');
+        $model = AppSetting::get('gemini_text_model', 'gemini-3.8-flash');
 
         $sourceCitations = implode("; ", array_map(fn($s) => ($s['title'] ?? '') . ' (' . ($s['reference_section'] ?? '') . ')', $sources));
 
@@ -623,7 +623,7 @@ PROMPT;
     public function generateQuiz(string $title, string $script): array
     {
         $key = $this->getApiKey();
-        $model = AppSetting::get('gemini_text_model', 'gemini-3.0-flash');
+        $model = AppSetting::get('gemini_text_model', 'gemini-3.8-flash');
 
         $prompt = <<<PROMPT
 Buat 2 pertanyaan kuis pilihan ganda edukatif berdasarkan naskah video edukasi Hindu berikut:

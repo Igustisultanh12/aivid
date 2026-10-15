@@ -21,7 +21,7 @@ class GeminiSettingsController extends Controller
         $settings = [
             'is_configured' => $isConfigured,
             'masked_key' => $maskedKey,
-            'text_model' => AppSetting::get('gemini_text_model', 'gemini-3.0-flash'),
+            'text_model' => AppSetting::get('gemini_text_model', 'gemini-3.8-flash'),
             'image_model' => AppSetting::get('gemini_image_model', 'imagen-3.0-generate-002'),
             'tts_model' => AppSetting::get('gemini_tts_model', 'gemini-3.8-flash-tts'),
             'video_model' => AppSetting::get('gemini_video_model', 'gemini-omni-1.1-flash'),
@@ -35,8 +35,9 @@ class GeminiSettingsController extends Controller
         // Available models list
         $modelOptions = [
             'text' => [
-                ['id' => 'gemini-3.0-flash', 'name' => 'Gemini 3.0 Flash (Rekomendasi Utama Teks Google - Cepat & Cerdas)'],
-                ['id' => 'gemini-3.8-flash', 'name' => 'Gemini 3.8 Flash'],
+                ['id' => 'gemini-3.8-flash', 'name' => 'Gemini 3.8 Flash (Rekomendasi Utama - Versi 3.8)'],
+                ['id' => 'gemini-3.8', 'name' => 'Gemini 3.8'],
+                ['id' => 'gemini-3.0-flash', 'name' => 'Gemini 3.0 Flash'],
                 ['id' => 'gemini-3.0-pro', 'name' => 'Gemini 3.0 Pro (Penalaran Mendalam)'],
                 ['id' => 'gemini-2.5-flash', 'name' => 'Gemini 2.5 Flash'],
                 ['id' => 'gemini-2.0-flash', 'name' => 'Gemini 2.0 Flash'],
