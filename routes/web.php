@@ -106,6 +106,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/settings/gemini/models', [GeminiSettingsController::class, 'updateModels'])->name('settings.gemini.models');
         Route::post('/settings/gemini/test-connection', [GeminiSettingsController::class, 'testConnection'])->name('settings.gemini.test.connection');
         Route::post('/settings/gemini/test-text', [GeminiSettingsController::class, 'testText'])->name('settings.gemini.test.text');
+        Route::post('/settings/gemini/test-audio', [GeminiSettingsController::class, 'testAudio'])->name('settings.gemini.test.audio');
         Route::post('/settings/gemini/test-image', [GeminiSettingsController::class, 'testImage'])->name('settings.gemini.test.image');
         Route::post('/settings/gemini/test-video', [GeminiSettingsController::class, 'testVideo'])->name('settings.gemini.test.video');
 

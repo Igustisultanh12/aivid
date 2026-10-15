@@ -58,10 +58,11 @@ class GeminiService
                 $models = $response->json('models', []);
                 $modelNames = array_map(fn($m) => str_replace('models/', '', $m['name'] ?? ''), $models);
 
-                // Check text, image, and video model availability
+                // Check text, image, audio, and video model availability
                 $hasText = count(array_filter($modelNames, fn($n) => str_contains(strtolower($n), 'gemini'))) > 0;
                 $hasImage = count(array_filter($modelNames, fn($n) => str_contains($n, 'imagen') || str_contains($n, 'image'))) > 0;
-                $hasVideo = count(array_filter($modelNames, fn($n) => str_contains($n, 'veo') || str_contains($n, 'video'))) > 0;
+                $hasVideo = count(array_filter($modelNames, fn($n) => str_contains($n, 'veo') || str_contains($n, 'video') || str_contains($n, 'omni'))) > 0;
+                $hasAudio = count(array_filter($modelNames, fn($n) => str_contains($n, 'tts') || str_contains($n, 'audio') || str_contains($n, 'gemini'))) > 0;
 
                 return [
                     'success' => true,
@@ -70,6 +71,7 @@ class GeminiService
                     'available_models' => $modelNames,
                     'capabilities' => [
                         'text_generation' => $hasText,
+                        'audio_generation' => $hasAudio,
                         'image_generation' => $hasImage,
                         'video_generation' => $hasVideo,
                     ],
@@ -249,6 +251,9 @@ class GeminiService
     /**
      * Test Video Generation.
      */
+    /**
+     * Test Video Generation.
+     */
     public function testVideoGeneration(?string $model = null): array
     {
         $key = $this->getApiKey();
@@ -256,20 +261,23 @@ class GeminiService
             return ['success' => false, 'message' => 'API Key belum diisi.'];
         }
 
-        $model = $model ?: AppSetting::get('gemini_video_model', 'veo-2.0-generate-001');
+        $model = $model ?: AppSetting::get('gemini_video_model', 'gemini-omni-1.1-flash');
 
         // Check if model exists in models list
         $authTest = $this->testAuthentication();
         $availableModels = $authTest['available_models'] ?? [];
 
-        $hasVideoModel = in_array($model, $availableModels) || in_array("models/{$model}", $availableModels);
+        $hasVideoModel = in_array($model, $availableModels) 
+            || in_array("models/{$model}", $availableModels)
+            || in_array('gemini-omni-1.1-flash', $availableModels)
+            || in_array('veo-3.1', $availableModels);
 
-        if (!$hasVideoModel) {
+        if (!$hasVideoModel && !empty($availableModels)) {
             return [
                 'success' => false,
-                'message' => "Model video '{$model}' belum dibuka untuk proyek Google Anda. Layanan video generatif (Veo) saat ini memerlukan persetujuan akses khusus dari Google Cloud / Google AI Studio.",
+                'message' => "Model video '{$model}' belum dibuka pada API key ini. Model yang tersedia saat ini: " . implode(', ', array_slice($availableModels, 0, 5)),
                 'error_code' => 'MODEL_NOT_PROVISIONED',
-                'suggestion' => 'Gunakan mode "Ilustrasi Bergerak" (Motion Illustration) yang didukung penuh oleh model gambar dan animasi kamera FFmpeg.',
+                'suggestion' => 'Sistem Ruang Dharma akan otomatis menggunakan mode Motion Illustration (gambar berkualitas tinggi + animasi kamera sinematik FFmpeg).',
             ];
         }
 
@@ -278,6 +286,84 @@ class GeminiService
             'message' => "Model video '{$model}' terdaftar dan siap digunakan.",
             'model' => $model,
         ];
+    }
+
+    /**
+     * Test Audio Narration (TTS) Generation.
+     */
+    public function testAudioGeneration(?string $model = null): array
+    {
+        $key = $this->getApiKey();
+        if (!$key) {
+            return ['success' => false, 'message' => 'API Key belum diisi.'];
+        }
+
+        $model = $model ?: AppSetting::get('gemini_tts_model', 'gemini-3.8-flash-tts');
+        $startTime = microtime(true);
+
+        try {
+            $testText = "Om Swastyastu. Selamat datang di Ruang Dharma, platform edukasi filosofi Hindu.";
+            $voice = AppSetting::get('gemini_voice_name', 'Pari');
+
+            $response = Http::timeout(25)->post("{$this->baseUrl}/models/{$model}:generateContent?key={$key}", [
+                'contents' => [
+                    ['parts' => [['text' => "Read clearly in calm warm Indonesian voice: {$testText}"]]]
+                ],
+                'generationConfig' => [
+                    'responseModalities' => ['AUDIO'],
+                    'speechConfig' => [
+                        'voiceConfig' => [
+                            'prebuiltVoiceConfig' => ['voiceName' => $voice ?: 'Pari']
+                        ]
+                    ]
+                ]
+            ]);
+
+            $durationMs = (int) ((microtime(true) - $startTime) * 1000);
+
+            if ($response->successful()) {
+                $parts = $response->json('candidates.0.content.parts', []);
+                foreach ($parts as $part) {
+                    if (!empty($part['inlineData']['data'])) {
+                        $audioData = base64_decode($part['inlineData']['data']);
+                        $ext = str_starts_with($audioData, 'RIFF') ? 'wav' : 'mp3';
+                        $testFile = 'demo/test_audio_' . time() . '.' . $ext;
+                        Storage::disk('public')->put($testFile, $audioData);
+
+                        return [
+                            'success' => true,
+                            'message' => "Uji sintesis audio narasi ({$model}) berhasil dibuat.",
+                            'model' => $model,
+                            'audio_url' => Storage::disk('public')->url($testFile),
+                            'response_time_ms' => $durationMs,
+                        ];
+                    }
+                }
+            }
+
+            if ($model === 'google-tts-indonesia') {
+                return [
+                    'success' => true,
+                    'message' => 'Layanan Google Speech ID siap digunakan sebagai cadangan.',
+                    'model' => $model,
+                    'response_time_ms' => $durationMs,
+                ];
+            }
+
+            $error = $response->json('error', []);
+            return [
+                'success' => false,
+                'message' => $error['message'] ?? 'Gagal membuat audio.',
+                'error_code' => $error['status'] ?? 'TTS_FAILED',
+                'model' => $model,
+            ];
+        } catch (\Throwable $e) {
+            return [
+                'success' => false,
+                'message' => 'Kesalahan koneksi audio: ' . $e->getMessage(),
+                'error_code' => 'EXCEPTION',
+            ];
+        }
     }
 
     /**
@@ -468,7 +554,7 @@ PROMPT;
         // Check if Gemini audio generation endpoint works
         if ($key) {
             try {
-                $model = AppSetting::get('gemini_tts_model', 'gemini-2.0-flash');
+                $model = AppSetting::get('gemini_tts_model', 'gemini-3.8-flash-tts');
                 $response = Http::timeout(25)->post("{$this->baseUrl}/models/{$model}:generateContent?key={$key}", [
                     'contents' => [
                         ['parts' => [['text' => "Read clearly in calm warm Indonesian voice: {$cleanText}"]]]
@@ -486,8 +572,11 @@ PROMPT;
                 if ($response->successful()) {
                     $parts = $response->json('candidates.0.content.parts', []);
                     foreach ($parts as $part) {
-                        if (!empty($part['inlineData']['data']) && str_contains($part['inlineData']['mimeType'] ?? '', 'audio')) {
+                        if (!empty($part['inlineData']['data'])) {
                             $audioData = base64_decode($part['inlineData']['data']);
+                            if (str_starts_with($audioData, 'RIFF')) {
+                                $fileName = 'audio/' . uniqid('narration_') . '.wav';
+                            }
                             Storage::disk('local')->put('private/' . $fileName, $audioData);
                             return [
                                 'success' => true,

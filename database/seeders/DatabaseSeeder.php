@@ -25,8 +25,8 @@ class DatabaseSeeder extends Seeder
         $defaultSettings = [
             'gemini_text_model' => ['value' => 'gemini-3.0-flash', 'encrypted' => false, 'group' => 'gemini'],
             'gemini_image_model' => ['value' => 'imagen-3.0-generate-002', 'encrypted' => false, 'group' => 'gemini'],
-            'gemini_tts_model' => ['value' => 'gemini-2.0-flash', 'encrypted' => false, 'group' => 'gemini'],
-            'gemini_video_model' => ['value' => 'veo-2.0-generate-001', 'encrypted' => false, 'group' => 'gemini'],
+            'gemini_tts_model' => ['value' => 'gemini-3.8-flash-tts', 'encrypted' => false, 'group' => 'gemini'],
+            'gemini_video_model' => ['value' => 'gemini-omni-1.1-flash', 'encrypted' => false, 'group' => 'gemini'],
             'gemini_voice_name' => ['value' => 'Pari', 'encrypted' => false, 'group' => 'gemini'],
             'app_max_video_per_user' => ['value' => '10', 'encrypted' => false, 'group' => 'limits'],
             'app_daily_render_limit' => ['value' => '50', 'encrypted' => false, 'group' => 'limits'],

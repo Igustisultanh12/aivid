@@ -67,6 +67,9 @@ const testConnectionResult = ref<any>(props.settings.last_test_result);
 const testingText = ref(false);
 const testTextResult = ref<any>(null);
 
+const testingAudio = ref(false);
+const testAudioResult = ref<any>(null);
+
 const testingImage = ref(false);
 const testImageResult = ref<any>(null);
 
@@ -122,6 +125,23 @@ const runTestText = async () => {
         testTextResult.value = await res.json();
     } finally {
         testingText.value = false;
+    }
+};
+
+const runTestAudio = async () => {
+    testingAudio.value = true;
+    testAudioResult.value = null;
+    try {
+        const res = await fetch('/admin/settings/gemini/test-audio', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content || '',
+                'Content-Type': 'application/json',
+            }
+        });
+        testAudioResult.value = await res.json();
+    } finally {
+        testingAudio.value = false;
     }
 };
 
@@ -325,16 +345,16 @@ const runTestVideo = async () => {
                     </p>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     <!-- Test Text -->
                     <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 flex flex-col justify-between space-y-3">
                         <div class="space-y-1">
                             <div class="flex items-center gap-2 text-violet-600 font-bold text-xs">
                                 <Type class="w-4 h-4" />
-                                <span>Pembuatan Teks (Naskah)</span>
+                                <span>Pembuatan Teks (Gemini 3.0)</span>
                             </div>
                             <p class="text-[11px] text-slate-500">
-                                Menguji pemanggilan prompt Gemini 2.5/Flash untuk pembuatan naskah 30 detik.
+                                Menguji prompt naskah edukasi 30 detik ke Google AI Studio.
                             </p>
                         </div>
                         <div>
@@ -353,15 +373,43 @@ const runTestVideo = async () => {
                         </div>
                     </div>
 
+                    <!-- Test Audio Narration (TTS) -->
+                    <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 flex flex-col justify-between space-y-3">
+                        <div class="space-y-1">
+                            <div class="flex items-center gap-2 text-blue-600 font-bold text-xs">
+                                <Volume2 class="w-4 h-4" />
+                                <span>Narasi Audio (Gemini 3.8 TTS)</span>
+                            </div>
+                            <p class="text-[11px] text-slate-500">
+                                Menguji sintesis suara narasi Bahasa Indonesia dengan format WAV RIFF.
+                            </p>
+                        </div>
+                        <div>
+                            <button
+                                type="button"
+                                @click="runTestAudio"
+                                :disabled="testingAudio || !settings.is_configured"
+                                class="w-full py-2 rounded-xl bg-blue-600 text-white font-bold text-xs disabled:opacity-50"
+                            >
+                                <Loader2 v-if="testingAudio" class="w-3.5 h-3.5 animate-spin inline mr-1" />
+                                Uji Narasi Suara (TTS)
+                            </button>
+                            <div v-if="testAudioResult" class="text-[10px] mt-2 font-mono p-2 rounded bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 space-y-1.5">
+                                <p>{{ testAudioResult.message }}</p>
+                                <audio v-if="testAudioResult.audio_url" :src="testAudioResult.audio_url" controls class="w-full h-7 mt-1" />
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Test Image -->
                     <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 flex flex-col justify-between space-y-3">
                         <div class="space-y-1">
                             <div class="flex items-center gap-2 text-teal-600 font-bold text-xs">
                                 <Image class="w-4 h-4" />
-                                <span>Pembuatan Gambar (Imagen)</span>
+                                <span>Ilustrasi (Imagen 3)</span>
                             </div>
                             <p class="text-[11px] text-slate-500">
-                                Menghasilkan 1 sampel visual. Memerlukan kuota Imagen 3 aktif.
+                                Menguji kuota pembuatan ilustrasi gambar Google AI Studio.
                             </p>
                         </div>
                         <div>
@@ -385,7 +433,7 @@ const runTestVideo = async () => {
                         <div class="space-y-1">
                             <div class="flex items-center gap-2 text-orange-600 font-bold text-xs">
                                 <Video class="w-4 h-4" />
-                                <span>Pembuatan Video (Veo)</span>
+                                <span>Video (Gemini Omni / Veo)</span>
                             </div>
                             <p class="text-[11px] text-slate-500">
                                 Memeriksa ketersediaan model video generatif pada proyek Google Anda.
@@ -399,7 +447,7 @@ const runTestVideo = async () => {
                                 class="w-full py-2 rounded-xl bg-orange-600 text-white font-bold text-xs disabled:opacity-50"
                             >
                                 <Loader2 v-if="testingVideo" class="w-3.5 h-3.5 animate-spin inline mr-1" />
-                                Cek Akses Model Video
+                                Cek Model Video
                             </button>
                             <p v-if="testVideoResult" class="text-[10px] mt-2 font-mono p-2 rounded bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300">
                                 {{ testVideoResult.message }}
@@ -416,7 +464,7 @@ const runTestVideo = async () => {
                         Konfigurasi Model & Batasan Penggunaan
                     </h3>
                     <p class="text-xs text-slate-500">
-                        Perubahan langsung disimpan ke database dan aktif seketika tanpa perlu rebuild frontend.
+                        Didukung oleh Gemini 3.0 Flash, Gemini 3.8 Flash TTS, dan Gemini Omni Flash video generation.
                     </p>
                 </div>
 
@@ -448,58 +496,74 @@ const runTestVideo = async () => {
 
                         <div>
                             <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">
-                                Model Ilustrasi Adegan (Gambar)
-                            </label>
-                            <select
-                                v-model="modelForm.image_model"
-                                class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-slate-900 dark:text-white"
-                            >
-                                <option v-for="m in modelOptions.image" :key="m.id" :value="m.id">
-                                    {{ m.name }}
-                                </option>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">
                                 Model Narasi Suara (TTS)
                             </label>
-                            <select
-                                v-model="modelForm.tts_model"
-                                class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-slate-900 dark:text-white"
-                            >
-                                <option v-for="m in modelOptions.tts" :key="m.id" :value="m.id">
-                                    {{ m.name }}
-                                </option>
-                            </select>
+                            <div class="space-y-1.5">
+                                <select
+                                    v-model="modelForm.tts_model"
+                                    class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-slate-900 dark:text-white"
+                                >
+                                    <option v-for="m in modelOptions.tts" :key="m.id" :value="m.id">
+                                        {{ m.name }}
+                                    </option>
+                                    <option value="custom">Model Khusus / Ketik Manual...</option>
+                                </select>
+                                <input
+                                    v-if="modelForm.tts_model === 'custom' || !modelOptions.tts.some(m => m.id === modelForm.tts_model)"
+                                    v-model="modelForm.tts_model"
+                                    type="text"
+                                    placeholder="Contoh: gemini-3.8-flash-tts"
+                                    class="w-full px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-mono text-slate-900 dark:text-white"
+                                />
+                            </div>
                         </div>
 
                         <div>
                             <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">
-                                Suara Narator Bawaan
+                                Model Ilustrasi Adegan (Gambar)
                             </label>
-                            <select
-                                v-model="modelForm.voice_name"
-                                class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-slate-900 dark:text-white"
-                            >
-                                <option v-for="v in modelOptions.voices" :key="v.id" :value="v.id">
-                                    {{ v.name }}
-                                </option>
-                            </select>
+                            <div class="space-y-1.5">
+                                <select
+                                    v-model="modelForm.image_model"
+                                    class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-slate-900 dark:text-white"
+                                >
+                                    <option v-for="m in modelOptions.image" :key="m.id" :value="m.id">
+                                        {{ m.name }}
+                                    </option>
+                                    <option value="custom">Model Khusus / Ketik Manual...</option>
+                                </select>
+                                <input
+                                    v-if="modelForm.image_model === 'custom' || !modelOptions.image.some(m => m.id === modelForm.image_model)"
+                                    v-model="modelForm.image_model"
+                                    type="text"
+                                    placeholder="Contoh: imagen-3.0-generate-002"
+                                    class="w-full px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-mono text-slate-900 dark:text-white"
+                                />
+                            </div>
                         </div>
 
                         <div>
                             <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">
                                 Model Video Generatif
                             </label>
-                            <select
-                                v-model="modelForm.video_model"
-                                class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-slate-900 dark:text-white"
-                            >
-                                <option v-for="m in modelOptions.video" :key="m.id" :value="m.id">
-                                    {{ m.name }}
-                                </option>
-                            </select>
+                            <div class="space-y-1.5">
+                                <select
+                                    v-model="modelForm.video_model"
+                                    class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-slate-900 dark:text-white"
+                                >
+                                    <option v-for="m in modelOptions.video" :key="m.id" :value="m.id">
+                                        {{ m.name }}
+                                    </option>
+                                    <option value="custom">Model Khusus / Ketik Manual...</option>
+                                </select>
+                                <input
+                                    v-if="modelForm.video_model === 'custom' || !modelOptions.video.some(m => m.id === modelForm.video_model)"
+                                    v-model="modelForm.video_model"
+                                    type="text"
+                                    placeholder="Contoh: gemini-omni-1.1-flash atau veo-3.1"
+                                    class="w-full px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-mono text-slate-900 dark:text-white"
+                                />
+                            </div>
                         </div>
 
                         <div>
