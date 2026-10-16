@@ -11,6 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Drop existing tables if previous migration attempt stopped midway in MySQL
+        Schema::dropIfExists('cartoon_prompt_scenes');
+        Schema::dropIfExists('cartoon_prompt_projects');
+
         Schema::create('cartoon_prompt_projects', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
@@ -28,13 +32,13 @@ return new class extends Migration
             $table->json('metadata')->nullable();
             $table->timestamps();
 
-            $table->index(['user_id', 'created_at']);
+            $table->index(['user_id', 'created_at'], 'cp_projects_user_created_idx');
         });
 
         Schema::create('cartoon_prompt_scenes', function (Blueprint $table) {
             $table->id();
             $table->foreignUuid('cartoon_prompt_project_id')
-                ->constrained('cartoon_prompt_projects')
+                ->constrained('cartoon_prompt_projects', 'id', 'cp_scenes_project_fk')
                 ->cascadeOnDelete();
             $table->unsignedInteger('scene_number');
             $table->decimal('start_second', 5, 2)->default(0.00);
@@ -50,7 +54,8 @@ return new class extends Migration
             $table->text('negative_prompt')->nullable();
             $table->timestamps();
 
-            $table->index(['cartoon_prompt_project_id', 'scene_number']);
+            // Explicit short index name to adhere to MySQL 64-char identifier limit
+            $table->index(['cartoon_prompt_project_id', 'scene_number'], 'cp_scenes_project_scene_idx');
         });
     }
 
