@@ -13,7 +13,9 @@ import {
     Loader2,
     Calendar,
     Layers,
-    Compass
+    Compass,
+    Clapperboard,
+    Wand2
 } from 'lucide-vue-next';
 import type { Video as VideoType, Topic } from '@/types';
 
@@ -54,7 +56,15 @@ defineProps<{
                     </p>
                 </div>
 
-                <div class="z-10">
+                <div class="z-10 flex flex-col sm:flex-row gap-3">
+                    <Link
+                        href="/cartoon-prompts"
+                        class="px-6 py-3.5 rounded-2xl font-extrabold text-sm inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 shadow-lg shadow-amber-500/25 whitespace-nowrap hover:scale-102 transition-transform"
+                    >
+                        <Clapperboard class="w-5 h-5 text-slate-950" />
+                        <span>Prompt Video Kartun</span>
+                        <span class="px-1.5 py-0.5 rounded text-[10px] bg-slate-950 text-amber-300 uppercase font-black">Baru</span>
+                    </Link>
                     <Link
                         href="/studio"
                         class="btn-coral px-6 py-3.5 rounded-2xl font-bold text-sm inline-flex items-center gap-2 shadow-lg shadow-orange-600/30 whitespace-nowrap"
@@ -63,6 +73,34 @@ defineProps<{
                         <span>Buat Video Sekarang</span>
                     </Link>
                 </div>
+            </div>
+
+            <!-- Cartoon Video Prompts Highlight Feature Card -->
+            <div class="p-6 rounded-3xl bg-gradient-to-r from-amber-500/10 via-purple-500/10 to-violet-500/10 border-2 border-amber-500/30 dark:border-amber-500/20 shadow-md flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
+                <div class="flex items-start gap-4">
+                    <div class="w-12 h-12 rounded-2xl bg-amber-500 text-slate-950 flex items-center justify-center font-extrabold text-xl shadow-md shrink-0">
+                        🎬
+                    </div>
+                    <div class="space-y-1">
+                        <div class="flex items-center gap-2">
+                            <h3 class="font-bold text-base text-slate-900 dark:text-white">
+                                Generator Prompt Video Kartun Bertema (30 Detik & 1 Menit)
+                            </h3>
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-amber-400 text-slate-950">Fitur Baru</span>
+                        </div>
+                        <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl">
+                            Rancang naskah visual per-frame/per-aksi yang dioptimalkan untuk generator AI seperti Kling AI, Runway Gen-3, Luma Dream Machine, Sora, dan Pika dengan konsistensi karakter dan ketepatan durasi.
+                        </p>
+                    </div>
+                </div>
+                <Link
+                    href="/cartoon-prompts"
+                    class="px-5 py-2.5 rounded-xl font-bold text-xs bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-md inline-flex items-center gap-2 whitespace-nowrap transition"
+                >
+                    <Wand2 class="w-4 h-4" />
+                    <span>Mulai Bikin Prompt</span>
+                    <ArrowRight class="w-3.5 h-3.5" />
+                </Link>
             </div>
 
             <!-- Stats Bar -->

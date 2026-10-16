@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\TopicAdminController;
 use App\Http\Controllers\Admin\UsageAdminController;
 use App\Http\Controllers\Admin\UserAdminController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CartoonPromptController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\GlossaryController;
@@ -79,6 +80,18 @@ Route::middleware('auth')->group(function () {
     Route::get('/schedule', [ScheduleController::class, 'index'])->name('schedule.index');
     Route::post('/schedule', [ScheduleController::class, 'store'])->name('schedule.store');
     Route::delete('/schedule/{schedule}', [ScheduleController::class, 'destroy'])->name('schedule.destroy');
+
+    // Cartoon Video Prompt Studio (30s & 60s per-frame prompts)
+    Route::get('/cartoon-prompts', [CartoonPromptController::class, 'index'])->name('cartoon-prompts.index');
+    Route::post('/cartoon-prompts/generate', [CartoonPromptController::class, 'generate'])->name('cartoon-prompts.generate');
+    Route::get('/cartoon-prompts/{project}', [CartoonPromptController::class, 'show'])->name('cartoon-prompts.show');
+    Route::put('/cartoon-prompts/{project}', [CartoonPromptController::class, 'update'])->name('cartoon-prompts.update');
+    Route::delete('/cartoon-prompts/{project}', [CartoonPromptController::class, 'destroy'])->name('cartoon-prompts.destroy');
+    Route::get('/cartoon-prompts/{project}/export/{format}', [CartoonPromptController::class, 'export'])->name('cartoon-prompts.export');
+    Route::put('/cartoon-prompts/{project}/scenes/{scene}', [CartoonPromptController::class, 'updateScene'])->name('cartoon-prompts.scenes.update');
+    Route::post('/cartoon-prompts/{project}/scenes', [CartoonPromptController::class, 'addScene'])->name('cartoon-prompts.scenes.store');
+    Route::delete('/cartoon-prompts/{project}/scenes/{scene}', [CartoonPromptController::class, 'deleteScene'])->name('cartoon-prompts.scenes.destroy');
+    Route::post('/cartoon-prompts/{project}/scenes/{scene}/regenerate', [CartoonPromptController::class, 'regenerateScenePrompt'])->name('cartoon-prompts.scenes.regenerate');
 
     // Studio & Video Generation (Requires Verified Email)
     Route::middleware('verified')->group(function () {

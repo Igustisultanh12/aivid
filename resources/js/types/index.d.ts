@@ -116,6 +116,46 @@ export interface GlossaryTerm {
     phonetic_pronunciation?: string | null;
 }
 
+export interface CartoonPromptScene {
+    id: number;
+    cartoon_prompt_project_id: string;
+    scene_number: number;
+    start_second: number;
+    end_second: number;
+    duration: number;
+    title: string;
+    action_description: string;
+    visual_prompt: string;
+    camera_movement: string | null;
+    dialogue_or_narration: string | null;
+    sound_effects: string | null;
+    music_mood: string | null;
+    negative_prompt: string | null;
+    formatted_timestamp?: string;
+    created_at?: string;
+    updated_at?: string;
+}
+
+export interface CartoonPromptProject {
+    id: string;
+    user_id: number | null;
+    title: string;
+    theme: string;
+    custom_theme_title?: string | null;
+    story_premise?: string | null;
+    target_duration: number;
+    visual_style: string;
+    target_engine: string;
+    aspect_ratio: '9:16' | '16:9' | '1:1';
+    character_description?: string | null;
+    scene_count: number;
+    total_duration: number;
+    metadata?: Record<string, any> | null;
+    scenes?: CartoonPromptScene[];
+    created_at: string;
+    updated_at: string;
+}
+
 export interface PageProps {
     auth: {
         user: User | null;

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { Link, usePage } from '@inertiajs/vue3';
-import { Sparkles, Sun, Moon, Menu, X, Compass, Video, BookOpen, Layers } from 'lucide-vue-next';
+import { Sparkles, Sun, Moon, Menu, X, Compass, Video, BookOpen, Layers, Clapperboard } from 'lucide-vue-next';
 import type { PageProps } from '@/types';
 
 const page = usePage<PageProps>();
@@ -65,6 +65,18 @@ const toggleDarkMode = () => {
                 >
                     <Video class="w-4 h-4 text-violet-500" />
                     Studio AI
+                </Link>
+                <Link
+                    href="/cartoon-prompts"
+                    :class="[
+                        'px-4 py-2 rounded-xl text-sm font-semibold transition flex items-center gap-1.5',
+                        $page.component === 'CartoonPrompt/Index'
+                            ? 'text-violet-700 dark:text-violet-300 bg-violet-100/60 dark:bg-violet-900/30'
+                            : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60'
+                    ]"
+                >
+                    <Clapperboard class="w-4 h-4 text-amber-500" />
+                    Prompt Kartun
                 </Link>
                 <Link
                     href="/gallery"
@@ -166,6 +178,10 @@ const toggleDarkMode = () => {
             </Link>
             <Link href="/studio" class="block px-4 py-3 rounded-xl text-base font-semibold text-slate-800 dark:text-slate-100">
                 Studio AI
+            </Link>
+            <Link href="/cartoon-prompts" class="block px-4 py-3 rounded-xl text-base font-semibold text-slate-800 dark:text-slate-100 flex items-center justify-between">
+                <span>Prompt Kartun (30s & 60s)</span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase bg-amber-500 text-slate-950">Baru</span>
             </Link>
             <Link href="/gallery" class="block px-4 py-3 rounded-xl text-base font-semibold text-slate-800 dark:text-slate-100">
                 Galeri Komunitas

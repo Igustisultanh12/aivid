@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { Link, usePage } from '@inertiajs/vue3';
-import { Sparkles, Sun, Moon, LayoutDashboard, Video, Film, Bookmark, Calendar, Shield, LogOut, ChevronDown, User as UserIcon } from 'lucide-vue-next';
+import { Sparkles, Sun, Moon, LayoutDashboard, Video, Film, Bookmark, Calendar, Shield, LogOut, ChevronDown, User as UserIcon, Clapperboard } from 'lucide-vue-next';
 import Toast from '@/Components/Toast.vue';
 import type { PageProps } from '@/types';
 
@@ -76,6 +76,18 @@ const toggleDarkMode = () => {
                         >
                             <Video class="w-4 h-4 text-orange-500" />
                             Studio Buat Video
+                        </Link>
+                        <Link
+                            href="/cartoon-prompts"
+                            :class="[
+                                'px-3.5 py-2 rounded-xl text-sm font-semibold transition flex items-center gap-2',
+                                $page.url.startsWith('/cartoon-prompts')
+                                    ? 'text-violet-700 dark:text-violet-300 bg-violet-100/60 dark:bg-violet-900/30'
+                                    : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60'
+                            ]"
+                        >
+                            <Clapperboard class="w-4 h-4 text-amber-500" />
+                            Prompt Kartun
                         </Link>
                         <Link
                             href="/library"
