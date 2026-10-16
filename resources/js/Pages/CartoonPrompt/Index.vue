@@ -76,10 +76,10 @@ const props = defineProps<{
     geminiConfigured: boolean;
 }>();
 
-// Form for generating new cartoon prompts
+// Form for generating new cartoon prompts (Defaults to authentic Hindu stories)
 const form = useForm({
     title: '',
-    theme: 'fable',
+    theme: 'ramayana_mahabharata',
     custom_theme_title: '',
     story_premise: '',
     target_duration: 30 as 30 | 60,
@@ -93,9 +93,11 @@ const form = useForm({
 const isGenerating = ref(false);
 const activeTab = ref<'studio' | 'saved'>(props.activeProject ? 'studio' : 'studio');
 const copiedFrameId = ref<number | null>(null);
+const copiedDialogueId = ref<number | null>(null);
 const copiedAll = ref(false);
 const copiedNegativeId = ref<number | null>(null);
 const toastMessage = ref<string | null>(null);
+const showAdvancedOptions = ref(false);
 
 // Editing single scene
 const editingSceneId = ref<number | null>(null);
@@ -111,20 +113,14 @@ const editSceneForm = useForm({
     duration: 5,
 });
 
-// Initialize form defaults based on theme
+// Initialize form defaults based on Hindu theme
 const onThemeChange = (newThemeId: string) => {
     form.theme = newThemeId;
     const selectedTheme = props.themes.find(t => t.id === newThemeId);
-    if (selectedTheme && newThemeId !== 'custom') {
-        if (!form.title || props.themes.some(t => t.default_title === form.title)) {
-            form.title = selectedTheme.default_title;
-        }
-        if (!form.character_description || props.themes.some(t => t.default_character === form.character_description)) {
-            form.character_description = selectedTheme.default_character;
-        }
-        if (!form.story_premise || props.themes.some(t => t.default_premise === form.story_premise)) {
-            form.story_premise = selectedTheme.default_premise;
-        }
+    if (selectedTheme && newThemeId !== 'custom' && newThemeId !== 'custom_hindu') {
+        form.title = selectedTheme.default_title;
+        form.character_description = selectedTheme.default_character;
+        form.story_premise = selectedTheme.default_premise;
     }
 };
 
@@ -165,6 +161,19 @@ const copyNegativePrompt = (scene: CartoonPromptScene) => {
     setTimeout(() => {
         if (copiedNegativeId.value === scene.id) {
             copiedNegativeId.value = null;
+        }
+    }, 2500);
+};
+
+// Copy dialogue or narration
+const copyDialogue = (scene: CartoonPromptScene) => {
+    if (!scene.dialogue_or_narration) return;
+    navigator.clipboard.writeText(scene.dialogue_or_narration);
+    copiedDialogueId.value = scene.id;
+    showToast(`Dialog Frame #${scene.scene_number} berhasil disalin!`);
+    setTimeout(() => {
+        if (copiedDialogueId.value === scene.id) {
+            copiedDialogueId.value = null;
         }
     }, 2500);
 };
@@ -290,7 +299,7 @@ const deleteProject = () => {
 
 // Auto-fill initial values if form is empty
 if (!form.title) {
-    onThemeChange('fable');
+    onThemeChange('ramayana_mahabharata');
 }
 </script>
 
@@ -328,16 +337,16 @@ if (!form.title) {
                 <div class="space-y-3 max-w-2xl z-10">
                     <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/20 text-xs font-bold text-amber-300 backdrop-blur-md">
                         <Clapperboard class="w-4 h-4 text-amber-300 animate-pulse" />
-                        <span>Cartoon Video Prompt Generator</span>
+                        <span>Cartoon Video Prompt Generator • Cerita Hindu</span>
                         <span class="px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 text-[10px] font-extrabold uppercase">30s & 60s</span>
                     </div>
 
                     <h1 class="text-3xl sm:text-4xl font-extrabold font-serif tracking-tight text-white leading-tight">
-                        Generator Prompt Video Kartun Bertema
+                        Generator Prompt Video Kartun Cerita Hindu
                     </h1>
 
                     <p class="text-sm sm:text-base text-purple-200 leading-relaxed">
-                        Hasilkan rangkaian prompt video AI per-frame/per-aksi berdurasi tepat <strong>30 Detik</strong> atau <strong>1 Menit</strong>. Dioptimalkan khusus untuk video generator terkini seperti <em>Kling AI, Runway Gen-3, Luma Dream Machine, Sora,</em> dan <em>Pika</em> dengan konsistensi karakter utuh.
+                        Hasilkan rangkaian prompt video AI per-frame/per-aksi berdurasi tepat <strong>30 Detik (6 Frame)</strong> atau <strong>1 Menit (12 Frame)</strong> khusus cerita dan nilai luhur Hindu Nusantara. Alur frame-ke-frame mengalir runtut, saling menyambung, dengan sinkronisasi dialog dan konsistensi visual utuh untuk AI Video Generator (<em>Kling AI, Runway Gen-3, Luma Dream Machine, Sora, Pika</em>).
                     </p>
 
                     <!-- Engine Status Badges -->
@@ -568,9 +577,17 @@ if (!form.title) {
                                     {{ scene.scene_number }}
                                 </div>
                                 <div>
-                                    <div class="flex items-center gap-2">
+                                    <div class="flex flex-wrap items-center gap-2">
                                         <span class="px-2.5 py-0.5 rounded-full bg-violet-100 dark:bg-violet-950/70 text-violet-700 dark:text-violet-300 text-xs font-bold font-mono">
                                             ⏱️ {{ scene.start_second }}s - {{ scene.end_second }}s (Durasi: {{ scene.duration }}s)
+                                        </span>
+                                        <span v-if="scene.scene_number > 1" class="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 text-xs font-semibold flex items-center gap-1">
+                                            <CheckCircle2 class="w-3 h-3 text-emerald-500" />
+                                            <span>Menyambung Frame {{ scene.scene_number - 1 }}</span>
+                                        </span>
+                                        <span v-else class="px-2.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/70 text-amber-700 dark:text-amber-300 text-xs font-semibold flex items-center gap-1">
+                                            <Sparkles class="w-3 h-3 text-amber-500" />
+                                            <span>Opening / Hook Frame 1</span>
                                         </span>
                                     </div>
                                     <h3 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white mt-0.5">
@@ -594,6 +611,19 @@ if (!form.title) {
                                     <Check v-if="copiedFrameId === scene.id" class="w-3.5 h-3.5" />
                                     <Copy v-else class="w-3.5 h-3.5" />
                                     <span>{{ copiedFrameId === scene.id ? 'Tersalin!' : 'Salin Prompt' }}</span>
+                                </button>
+
+                                <!-- Copy Dialogue -->
+                                <button
+                                    v-if="scene.dialogue_or_narration"
+                                    type="button"
+                                    @click="copyDialogue(scene)"
+                                    class="px-3 py-2 rounded-xl text-xs font-bold inline-flex items-center gap-1.5 transition border border-emerald-300 dark:border-emerald-700/70 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/40"
+                                    title="Salin Kalimat Dialog / Narasi Frame Ini"
+                                >
+                                    <Check v-if="copiedDialogueId === scene.id" class="w-3.5 h-3.5 text-emerald-500" />
+                                    <Volume2 v-else class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                                    <span>{{ copiedDialogueId === scene.id ? 'Dialog Tersalin!' : 'Salin Dialog' }}</span>
                                 </button>
 
                                 <!-- Regenerate Scene -->
@@ -785,30 +815,38 @@ if (!form.title) {
                 </div>
             </div>
 
-            <!-- Creation Studio Form Section -->
-            <div class="p-8 sm:p-10 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl space-y-8">
-                <div class="border-b border-slate-200 dark:border-slate-800 pb-5">
-                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-100 dark:bg-violet-950/70 text-violet-700 dark:text-violet-300 text-xs font-bold mb-2">
-                        <Wand2 class="w-3.5 h-3.5" />
-                        <span>Studio Desain Prompt Kartun</span>
+            <!-- Creation Studio Form Section (Simplified & 100% Hindu-Exclusive) -->
+            <div class="p-6 sm:p-10 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl space-y-8">
+                <!-- Section Header -->
+                <div class="border-b border-slate-200 dark:border-slate-800 pb-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-100 dark:bg-amber-950/70 text-amber-800 dark:text-amber-300 text-xs font-bold mb-2">
+                            <Sparkles class="w-3.5 h-3.5 text-amber-500" />
+                            <span>Khusus Cerita Hindu & Nilai Dharma</span>
+                        </div>
+                        <h2 class="text-2xl sm:text-3xl font-extrabold font-serif text-slate-900 dark:text-white">
+                            Form Request Prompt Video Kartun Hindu
+                        </h2>
+                        <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+                            Pilih durasi dan tema cerita Hindu. Mesin akan merancang prompt frame-demi-frame yang <strong>saling menyambung runtut (kontinuitas ketat)</strong> lengkap dengan dialog dan visual prompt AI.
+                        </p>
                     </div>
-                    <h2 class="text-2xl sm:text-3xl font-extrabold font-serif text-slate-900 dark:text-white">
-                        Konfigurasi Cerita & Pilihan Waktu Video
-                    </h2>
-                    <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
-                        Tentukan durasi (30 detik atau 1 menit), tema kartun, gaya visual, dan karakter utama. Mesin AI akan menyusun breakdown prompt adegan demi adegan secara runtut.
-                    </p>
+
+                    <div class="flex items-center gap-2 text-xs text-slate-500 bg-slate-50 dark:bg-slate-800/60 px-4 py-2.5 rounded-2xl border border-slate-200 dark:border-slate-700/60 self-start md:self-auto">
+                        <CheckCircle2 class="w-4 h-4 text-emerald-500 shrink-0" />
+                        <span>Prompt siap pakai untuk <strong>Kling AI, Runway, Luma & Sora</strong></span>
+                    </div>
                 </div>
 
                 <form @submit.prevent="submitGenerate" class="space-y-8">
-                    <!-- 1. Pilihan Waktu Video (30 Detik vs 1 Menit) -->
+                    <!-- LANGKAH 1: Pilihan Durasi Video (30 Detik vs 1 Menit) -->
                     <div class="space-y-3">
                         <label class="block text-sm font-extrabold text-slate-900 dark:text-white flex items-center justify-between">
                             <span class="flex items-center gap-2">
                                 <Clock class="w-4 h-4 text-amber-500" />
-                                1. Pilihan Durasi Video Kartun (Wajib)
+                                1. Pilihan Durasi Video (Wajib)
                             </span>
-                            <span class="text-xs text-violet-600 dark:text-violet-400 font-semibold">Pilih salah satu durasi target</span>
+                            <span class="text-xs text-violet-600 dark:text-violet-400 font-semibold">Tentukan panjang video</span>
                         </label>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -830,13 +868,13 @@ if (!form.title) {
                                 <div class="space-y-1">
                                     <div class="flex items-center gap-2">
                                         <h3 class="font-extrabold text-lg text-slate-900 dark:text-white">30 Detik (Video Kilat)</h3>
-                                        <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-amber-500 text-slate-950">Populer</span>
+                                        <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-amber-500 text-slate-950">6 Frame</span>
                                     </div>
                                     <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                                        Format video pendek ideal untuk TikTok, Instagram Reels, dan YouTube Shorts. Menghasilkan <strong>6 Frame / Aksi</strong> (@ 5 detik per adegan) dengan alur cepat, padat, dan hook kuat.
+                                        Format video ringkas untuk TikTok, Reels, dan YouTube Shorts. Menghasilkan <strong>6 Prompt Frame/Aksi</strong> (@ 5 detik per adegan) dengan hook kuat dan akhir tuntas di detik ke-30.
                                     </p>
                                     <div class="pt-1 flex items-center gap-2 text-[11px] font-semibold text-amber-700 dark:text-amber-400">
-                                        <span>✓ 6 Prompt Terpisah</span>
+                                        <span>✓ 6 Prompt Kontinu</span>
                                         <span>•</span>
                                         <span>✓ Detik 0 s.d 30 Tuntas</span>
                                     </div>
@@ -860,14 +898,14 @@ if (!form.title) {
                                 </div>
                                 <div class="space-y-1">
                                     <div class="flex items-center gap-2">
-                                        <h3 class="font-extrabold text-lg text-slate-900 dark:text-white">1 Menit (60 Detik)</h3>
-                                        <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-violet-600 text-white">Cerita Utuh</span>
+                                        <h3 class="font-extrabold text-lg text-slate-900 dark:text-white">1 Menit (Cerita Utuh)</h3>
+                                        <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-violet-600 text-white">12 Frame</span>
                                     </div>
                                     <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                                        Format cerita kartun komprehensif. Menghasilkan <strong>12 Frame / Aksi</strong> (@ 5 detik per adegan) dengan struktur 3-act (Pengenalan, Masalah, Eksplorasi, Klimaks, dan Resolusi).
+                                        Format cerita kartun mendalam. Menghasilkan <strong>12 Prompt Frame/Aksi</strong> (@ 5 detik per adegan) dengan alur utuh: Pengenalan, Masalah, Tantangan, Puncak, dan Resolusi Shanti.
                                     </p>
                                     <div class="pt-1 flex items-center gap-2 text-[11px] font-semibold text-violet-700 dark:text-violet-400">
-                                        <span>✓ 12 Prompt Terpisah</span>
+                                        <span>✓ 12 Prompt Kontinu</span>
                                         <span>•</span>
                                         <span>✓ Detik 0 s.d 60 Tuntas</span>
                                     </div>
@@ -876,11 +914,14 @@ if (!form.title) {
                         </div>
                     </div>
 
-                    <!-- 2. Pilihan Tema Kartun -->
+                    <!-- LANGKAH 2: Pilihan Tema Cerita Hindu -->
                     <div class="space-y-3">
-                        <label class="block text-sm font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
-                            <Sparkles class="w-4 h-4 text-purple-500" />
-                            2. Pilih Tema Kartun Animasi
+                        <label class="block text-sm font-extrabold text-slate-900 dark:text-white flex items-center justify-between">
+                            <span class="flex items-center gap-2">
+                                <Sparkles class="w-4 h-4 text-purple-500" />
+                                2. Pilih Tema Cerita Hindu (Otomatis Mengisi Judul & Karakter)
+                            </span>
+                            <span class="text-xs text-amber-600 dark:text-amber-400 font-semibold">Khusus cerita bernilai Dharma</span>
                         </label>
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -888,166 +929,179 @@ if (!form.title) {
                                 v-for="t in themes"
                                 :key="t.id"
                                 @click="onThemeChange(t.id)"
-                                class="p-4 rounded-2xl border-2 cursor-pointer transition-all duration-200 flex flex-col justify-between gap-2"
+                                class="p-4 rounded-2xl border-2 cursor-pointer transition-all duration-200 flex flex-col justify-between gap-2 relative overflow-hidden group"
                                 :class="form.theme === t.id
-                                    ? 'border-violet-600 bg-violet-50 dark:bg-violet-950/40 text-violet-950 dark:text-violet-100 shadow-sm'
+                                    ? 'border-violet-600 bg-violet-50/80 dark:bg-violet-950/40 text-violet-950 dark:text-violet-100 shadow-md shadow-violet-500/10'
                                     : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 bg-slate-50/50 dark:bg-slate-800/40'"
                             >
                                 <div>
-                                    <div class="flex items-center justify-between mb-1">
-                                        <h4 class="font-extrabold text-sm text-slate-900 dark:text-white">{{ t.name }}</h4>
-                                        <div class="w-2 h-2 rounded-full" :class="form.theme === t.id ? 'bg-violet-600' : 'bg-transparent'"></div>
+                                    <div class="flex items-center justify-between gap-2 mb-1.5">
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-lg">
+                                                {{ t.id === 'ramayana_mahabharata' ? '🏹' : (t.id === 'dharma_philosophy' ? '🪷' : (t.id === 'hindu_traditions' ? '🎋' : (t.id === 'deva_wisdom' ? '🐘' : '📜'))) }}
+                                            </span>
+                                            <h4 class="font-extrabold text-sm text-slate-900 dark:text-white leading-tight">{{ t.name }}</h4>
+                                        </div>
+                                        <div class="w-3 h-3 rounded-full border-2 flex items-center justify-center shrink-0" :class="form.theme === t.id ? 'border-violet-600 bg-violet-600' : 'border-slate-300 dark:border-slate-600'">
+                                            <div v-if="form.theme === t.id" class="w-1 h-1 rounded-full bg-white"></div>
+                                        </div>
                                     </div>
-                                    <p class="text-xs text-slate-500 dark:text-slate-400 leading-normal">{{ t.description }}</p>
+                                    <p class="text-xs text-slate-500 dark:text-slate-400 leading-normal line-clamp-3">{{ t.description }}</p>
+                                </div>
+
+                                <div class="pt-2 border-t border-slate-200/60 dark:border-slate-700/60 flex items-center justify-between text-[11px]">
+                                    <span class="text-slate-400 font-medium truncate max-w-[190px]">Contoh: {{ t.default_title }}</span>
+                                    <span v-if="form.theme === t.id" class="text-violet-600 dark:text-violet-400 font-bold shrink-0">Terpilih ✓</span>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Custom Theme Title input if custom selected -->
-                        <div v-if="form.theme === 'custom'" class="pt-2">
-                            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Judul Tema Bebas / Kustom Anda</label>
+                        <div v-if="form.theme === 'custom' || form.theme === 'custom_hindu'" class="pt-2 p-4 rounded-2xl bg-amber-50/60 dark:bg-amber-950/20 border border-amber-300 dark:border-amber-800/60 space-y-2">
+                            <label class="block text-xs font-bold text-amber-900 dark:text-amber-300">Tuliskan Topik / Judul Cerita Hindu Pilihan Anda</label>
                             <input
                                 v-model="form.custom_theme_title"
                                 type="text"
-                                placeholder="Contoh: Petualangan Kancil Berteman dengan Semut Merah"
+                                placeholder="Contoh: Kisah Bhisma Mengajarkan Keadilan dan Dharma kepada Pandawa"
                                 class="w-full px-4 py-3 rounded-2xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm"
                             />
                         </div>
                     </div>
 
-                    <!-- 3. Gaya Visual Animasi -->
-                    <div class="space-y-3">
-                        <label class="block text-sm font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
-                            <Sliders class="w-4 h-4 text-teal-500" />
-                            3. Gaya Visual Animasi (Style Rendering)
-                        </label>
+                    <!-- LANGKAH 3: Gaya Visual & Rasio Layar (Kompak & Simpel) -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-1">
+                        <!-- Gaya Visual Animasi (2 Kolom) -->
+                        <div class="lg:col-span-2 space-y-2">
+                            <label class="block text-sm font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                                <Sliders class="w-4 h-4 text-teal-500" />
+                                3. Gaya Visual Animasi
+                            </label>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                            <div
-                                v-for="style in visualStyles"
-                                :key="style.id"
-                                @click="form.visual_style = style.id"
-                                class="p-3.5 rounded-2xl border-2 cursor-pointer transition flex flex-col justify-between gap-2"
-                                :class="form.visual_style === style.id
-                                    ? 'border-violet-600 bg-violet-50/70 dark:bg-violet-950/40 shadow-sm'
-                                    : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 bg-slate-50/50 dark:bg-slate-800/40'"
-                            >
-                                <div>
-                                    <div class="flex items-center justify-between gap-1 mb-1">
-                                        <span class="text-xs font-bold text-slate-900 dark:text-white">{{ style.name }}</span>
-                                        <span class="px-1.5 py-0.5 rounded text-[10px] font-extrabold bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300">
-                                            {{ style.badge }}
-                                        </span>
-                                    </div>
-                                    <p class="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2">{{ style.description }}</p>
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                                <div
+                                    v-for="style in visualStyles"
+                                    :key="style.id"
+                                    @click="form.visual_style = style.id"
+                                    class="p-3 rounded-2xl border-2 cursor-pointer transition flex flex-col justify-between gap-1 text-center"
+                                    :class="form.visual_style === style.id
+                                        ? 'border-violet-600 bg-violet-50/80 dark:bg-violet-950/50 shadow-sm'
+                                        : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 bg-slate-50/50 dark:bg-slate-800/40'"
+                                >
+                                    <span class="text-xs font-bold text-slate-900 dark:text-white truncate">{{ style.badge }}</span>
+                                    <span class="text-[10px] text-slate-500 dark:text-slate-400 truncate">{{ style.name }}</span>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- 4. Target Engine & Rasio Aspek -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Target Engine -->
-                        <div class="space-y-2">
-                            <label class="block text-sm font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
-                                <Video class="w-4 h-4 text-orange-500" />
-                                4. Target AI Video Generator (Optimasi Sintaks)
-                            </label>
-                            <select
-                                v-model="form.target_engine"
-                                class="w-full px-4 py-3 rounded-2xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm font-semibold"
-                            >
-                                <option v-for="eng in targetEngines" :key="eng.id" :value="eng.id">
-                                    {{ eng.name }}
-                                </option>
-                            </select>
-                            <p class="text-[11px] text-slate-500">
-                                Sintaks prompt visual bahasa Inggris akan disesuaikan dengan karakteristik model AI pilihan.
-                            </p>
-                        </div>
-
-                        <!-- Rasio Aspek -->
+                        <!-- Format Rasio Layar (1 Kolom) -->
                         <div class="space-y-2">
                             <label class="block text-sm font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
                                 <Film class="w-4 h-4 text-emerald-500" />
-                                5. Format Rasio Aspek Layar
+                                Format Rasio Aspek
                             </label>
                             <div class="grid grid-cols-3 gap-2">
                                 <button
                                     type="button"
                                     @click="form.aspect_ratio = '9:16'"
-                                    class="py-2.5 px-3 rounded-xl border-2 text-xs font-bold transition text-center"
+                                    class="py-2.5 px-2 rounded-xl border-2 text-xs font-bold transition text-center"
                                     :class="form.aspect_ratio === '9:16'
                                         ? 'border-violet-600 bg-violet-100/60 dark:bg-violet-950/60 text-violet-700 dark:text-violet-300'
                                         : 'border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300'"
                                 >
-                                    📱 9:16 Vertikal
+                                    📱 9:16
                                 </button>
                                 <button
                                     type="button"
                                     @click="form.aspect_ratio = '16:9'"
-                                    class="py-2.5 px-3 rounded-xl border-2 text-xs font-bold transition text-center"
+                                    class="py-2.5 px-2 rounded-xl border-2 text-xs font-bold transition text-center"
                                     :class="form.aspect_ratio === '16:9'
                                         ? 'border-violet-600 bg-violet-100/60 dark:bg-violet-950/60 text-violet-700 dark:text-violet-300'
                                         : 'border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300'"
                                 >
-                                    🖥️ 16:9 Sinematik
+                                    🖥️ 16:9
                                 </button>
                                 <button
                                     type="button"
                                     @click="form.aspect_ratio = '1:1'"
-                                    class="py-2.5 px-3 rounded-xl border-2 text-xs font-bold transition text-center"
+                                    class="py-2.5 px-2 rounded-xl border-2 text-xs font-bold transition text-center"
                                     :class="form.aspect_ratio === '1:1'
                                         ? 'border-violet-600 bg-violet-100/60 dark:bg-violet-950/60 text-violet-700 dark:text-violet-300'
                                         : 'border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300'"
                                 >
-                                    ⏹️ 1:1 Persegi
+                                    ⏹️ 1:1
                                 </button>
                             </div>
                         </div>
                     </div>
 
-                    <!-- 5. Judul, Karakter, & Premis Cerita -->
-                    <div class="space-y-4 pt-2">
-                        <div>
-                            <label class="block text-sm font-extrabold text-slate-900 dark:text-white mb-1">
-                                Judul Cerita Kartun
-                            </label>
-                            <input
-                                v-model="form.title"
-                                type="text"
-                                placeholder="Tuliskan judul kartun yang menarik..."
-                                class="w-full px-4 py-3 rounded-2xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm"
-                            />
-                        </div>
+                    <!-- LANGKAH 4 (OPSIONAL): Sesuaikan Judul & Detail Karakter -->
+                    <div class="pt-2 border-t border-slate-200/80 dark:border-slate-800">
+                        <button
+                            type="button"
+                            @click="showAdvancedOptions = !showAdvancedOptions"
+                            class="inline-flex items-center gap-2 text-xs font-bold text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 transition py-1"
+                        >
+                            <Sliders class="w-3.5 h-3.5" />
+                            <span>{{ showAdvancedOptions ? 'Sembunyikan Kustomisasi Detail' : '⚙️ Sesuaikan Judul, Karakter & Alur (Opsional)' }}</span>
+                            <ChevronUp v-if="showAdvancedOptions" class="w-3.5 h-3.5" />
+                            <ChevronDown v-else class="w-3.5 h-3.5" />
+                        </button>
 
-                        <div>
-                            <label class="block text-sm font-extrabold text-slate-900 dark:text-white mb-1 flex items-center justify-between">
-                                <span>Deskripsi Karakter Utama (Menjaga Konsistensi Visual)</span>
-                                <span class="text-xs font-normal text-violet-600 dark:text-violet-400">Deskripsi ini akan diulang pada tiap prompt frame</span>
-                            </label>
-                            <textarea
-                                v-model="form.character_description"
-                                rows="2"
-                                placeholder="Contoh: Kancil cilik bermata bulat jeli mengenakan syal daun hijau cerah, bertingkah lincah dan jenaka..."
-                                class="w-full px-4 py-3 rounded-2xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm"
-                            ></textarea>
-                        </div>
+                        <div v-if="showAdvancedOptions" class="mt-4 p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                                    Judul Cerita Kartun (Sudah Diisi Otomatis Sesuai Tema)
+                                </label>
+                                <input
+                                    v-model="form.title"
+                                    type="text"
+                                    placeholder="Tuliskan judul kartun Hindu..."
+                                    class="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm"
+                                />
+                            </div>
 
-                        <div>
-                            <label class="block text-sm font-extrabold text-slate-900 dark:text-white mb-1">
-                                Sinopsis / Premis Cerita Singkat
-                            </label>
-                            <textarea
-                                v-model="form.story_premise"
-                                rows="2"
-                                placeholder="Ceritakan alur cerita kartun secara singkat yang ingin dibagi menjadi frame..."
-                                class="w-full px-4 py-3 rounded-2xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm"
-                            ></textarea>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 flex items-center justify-between">
+                                    <span>Karakter Utama (Visual Anchor Konsisten Tiap Frame)</span>
+                                    <span class="text-[11px] text-violet-600 dark:text-violet-400">Diulang di setiap prompt visual</span>
+                                </label>
+                                <textarea
+                                    v-model="form.character_description"
+                                    rows="2"
+                                    placeholder="Contoh: Sang Hanuman cilik berbulu putih salju kemilau mengenakan mahkota emas permata..."
+                                    class="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm"
+                                ></textarea>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                                    Sinopsis / Alur Cerita Singkat
+                                </label>
+                                <textarea
+                                    v-model="form.story_premise"
+                                    rows="2"
+                                    placeholder="Ceritakan gambaran alur yang ingin dipecah per-frame..."
+                                    class="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm"
+                                ></textarea>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                                    Target AI Video Generator (Optimasi Sintaks)
+                                </label>
+                                <select
+                                    v-model="form.target_engine"
+                                    class="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-semibold"
+                                >
+                                    <option v-for="eng in targetEngines" :key="eng.id" :value="eng.id">
+                                        {{ eng.name }}
+                                    </option>
+                                </select>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Generate Submit Button -->
+                    <!-- Tombol Generate Utama (Satu Klik Langsung Jadi!) -->
                     <div class="pt-4">
                         <button
                             type="submit"
@@ -1058,13 +1112,13 @@ if (!form.title) {
                             <Wand2 v-else class="w-5 h-5 text-amber-200" />
                             <span>
                                 {{ isGenerating || form.processing
-                                    ? `Sedang Menyusun Naskah Frame demi Frame (${form.target_duration} Detik)...`
-                                    : `Hasilkan Rangkaian Prompt Kartun (${form.target_duration} Detik • ${form.target_duration === 30 ? '6 Frame' : '12 Frame'})`
+                                    ? `Sedang Menyusun Naskah Runtut ${form.target_duration} Detik (${form.target_duration === 30 ? '6' : '12'} Frame)...`
+                                    : `✨ Hasilkan Prompt Video Kartun Hindu (${form.target_duration} Detik • ${form.target_duration === 30 ? '6 Frame' : '12 Frame'})`
                                 }}
                             </span>
                         </button>
                         <p class="text-center text-xs text-slate-500 dark:text-slate-400 mt-2">
-                            Setiap frame adegan akan langsung dilengkapi prompt visual AI, deskripsi aksi karakter, instruksi kamera, dialog, SFX, dan musik.
+                            Alur adegan dari Frame 1 sampai {{ form.target_duration === 30 ? '6' : '12' }} dijamin menyambung mulus dengan sinkronisasi dialog, SFX, dan musik gamelan/spiritual Hindu.
                         </p>
                     </div>
                 </form>

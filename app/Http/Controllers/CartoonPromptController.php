@@ -74,15 +74,19 @@ class CartoonPromptController extends Controller
     {
         $validated = $request->validate([
             'title' => ['nullable', 'string', 'max:150'],
-            'theme' => ['required', 'string', 'in:fable,dharma_kids,comedy,fantasy,anime_chibi,sci_fi,custom'],
+            'theme' => ['required', 'string', 'in:ramayana_mahabharata,dharma_philosophy,hindu_traditions,deva_wisdom,custom_hindu,fable,dharma_kids,comedy,fantasy,anime_chibi,sci_fi,custom'],
             'custom_theme_title' => ['nullable', 'string', 'max:150'],
             'story_premise' => ['nullable', 'string', 'max:1000'],
             'target_duration' => ['required', 'integer', 'in:30,60'],
-            'visual_style' => ['required', 'string'],
-            'target_engine' => ['required', 'string'],
-            'aspect_ratio' => ['required', 'string', 'in:9:16,16:9,1:1'],
+            'visual_style' => ['nullable', 'string'],
+            'target_engine' => ['nullable', 'string'],
+            'aspect_ratio' => ['nullable', 'string', 'in:9:16,16:9,1:1'],
             'character_description' => ['nullable', 'string', 'max:1000'],
         ]);
+
+        $validated['visual_style'] = $validated['visual_style'] ?? 'pixar_3d';
+        $validated['target_engine'] = $validated['target_engine'] ?? 'universal';
+        $validated['aspect_ratio'] = $validated['aspect_ratio'] ?? '9:16';
 
         $result = $this->promptService->generatePrompts($validated);
 

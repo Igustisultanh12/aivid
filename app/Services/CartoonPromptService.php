@@ -22,126 +22,84 @@ class CartoonPromptService
             'id' => 'pixar_3d',
             'name' => '3D Pixar & Disney Animation',
             'badge' => '3D Render',
-            'description' => 'Gaya render 3D ekspresif khas Pixar/Disney, mata besar bercahaya, tekstur lembut, dan pencahayaan sinematik hangat.',
-            'style_prompt' => '3D Disney Pixar animation style, highly detailed 3D CGI render, expressive large glossy eyes, soft subsurface scattering skin, velvety textures, vibrant warm cinematic lighting, raytraced Octane Render aesthetic, whimsical cartoon charm, masterpiece 4k',
-            'negative' => 'photorealistic, realistic human, ugly, deformed, low quality, glitch, creepy eyes, 2d flat, live action, washed out',
+            'description' => 'Gaya render 3D ekspresif Pixar/Disney, pencahayaan sinematik hangat, kehalusan tekstur kain dan ornamen suci Hindu berkilau.',
+            'style_prompt' => '3D Disney Pixar animation style, highly detailed 3D CGI render, expressive large glossy eyes, soft subsurface scattering skin, velvety silk textures, vibrant warm cinematic lighting, raytraced Octane Render aesthetic, sacred Hindu cultural ornament details, masterpiece 4k',
+            'negative' => 'photorealistic, realistic live-action human, ugly, deformed, distorted limbs, low quality, glitch, creepy eyes, 2d flat, washed out, morphing',
         ],
         'ghibli_anime' => [
             'id' => 'ghibli_anime',
             'name' => 'Studio Ghibli 2D Anime',
             'badge' => '2D Anime',
-            'description' => 'Gaya anime klasik Hayao Miyazaki, lukisan latar cat air rimbun yang hangat, garis bersih, dan suasana hembusan angin alami.',
-            'style_prompt' => 'Studio Ghibli anime style, directed by Hayao Miyazaki, hand-painted lush watercolor background, soft expressive cel-shading, delicate ink lineart, warm golden hour atmospheric lighting, flying flower petals, cozy nostalgic aesthetic, masterpiece 4k',
-            'negative' => '3d cgi render, realistic, glossy plastic, grotesque, dull colors, oversaturated neon, harsh 3d shadows',
+            'description' => 'Gaya anime klasik Hayao Miyazaki, lukisan latar cat air rimbun kuil dan pura Hindu yang asri, garis bersih, dan suasana hembusan angin alami.',
+            'style_prompt' => 'Studio Ghibli anime style, directed by Hayao Miyazaki, hand-painted lush watercolor background, sacred Balinese Hindu pura temple courtyard, soft expressive cel-shading, delicate ink lineart, warm golden hour atmospheric lighting, floating frangipani petals, cozy nostalgic aesthetic, masterpiece 4k',
+            'negative' => '3d cgi render, realistic, glossy plastic, grotesque, dull colors, oversaturated neon, harsh 3d shadows, deformed fingers',
         ],
         'classic_disney_2d' => [
             'id' => 'classic_disney_2d',
             'name' => 'Classic 2D Disney Hand-Drawn',
             'badge' => 'Tradisional 2D',
-            'description' => 'Animasi seluloid klasik tahun 90-an dengan goresan luwes, squash & stretch khas kartun bioskop legendaris.',
-            'style_prompt' => 'Classic 1990s golden age traditional Disney 2D animation, hand-drawn character design, expressive cartoon squash-and-stretch anatomy, rich gouache painted background, clean ink lines, fluid theatrical animation look, vibrant storybook illustration',
-            'negative' => '3d computer generated, hyperrealistic, muddy textures, robotic stiff pose, blurry sketch, vector flat art',
+            'description' => 'Animasi seluloid klasik tahun 90-an dengan goresan luwes, squash & stretch khas kartun bioskop legendaris bertema spiritual.',
+            'style_prompt' => 'Classic 1990s golden age traditional Disney 2D animation, hand-drawn character design, expressive cartoon squash-and-stretch anatomy, rich gouache painted temple background, clean ink lines, fluid theatrical animation look, vibrant storybook illustration',
+            'negative' => '3d computer generated, hyperrealistic, muddy textures, robotic stiff pose, blurry sketch, vector flat art, flickering',
         ],
         'chibi_3d' => [
             'id' => 'chibi_3d',
             'name' => 'Cute Chibi 3D Stylized',
             'badge' => 'Chibi Gemas',
-            'description' => 'Proporsi kepala bulat menggemaskan, mata bulat berkilau, tekstur mainan vinil lembut dengan warna-warna pastel ceria.',
-            'style_prompt' => 'Super cute 3D Chibi style, miniature adorable proportions, oversized head with giant sparkling eyes, smooth soft vinyl toy shaders, pastel vibrant tones, soft ambient occlusion studio lighting, kawaii aesthetics, 3D blender cute render, 4k resolution',
-            'negative' => 'scary, realistic proportions, gloomy, dark shadows, rough messy sketch, mature gritty look',
-        ],
-        'flat_vector' => [
-            'id' => 'flat_vector',
-            'name' => 'Modern Flat Vector Motion',
-            'badge' => 'Vector Motion',
-            'description' => 'Desain kartun vektor modern bernuansa motion graphics, bentuk geometris tegas, warna kontras tinggi yang dinamis.',
-            'style_prompt' => 'Modern premium flat vector cartoon motion graphics, clean geometric silhouettes, bold vibrant color blocking, minimalist stylish shapes, crisp digital illustration, dynamic graphic novel flair, trendy editorial animation',
-            'negative' => '3d realistic render, photorealism, grunge textures, chaotic pencil strokes, low resolution',
-        ],
-        'claymation' => [
-            'id' => 'claymation',
-            'name' => 'Claymation Stop-Motion',
-            'badge' => 'Stop-Motion',
-            'description' => 'Karakter lilin plastisin ala studio Aardman (Shaun the Sheep) dengan tekstur sidik jari halus dan pencahayaan studio miniatur.',
-            'style_prompt' => 'Artisanal claymation stop-motion animation, Aardman Studios style, sculptured plasticine clay characters with subtle fingerprint textures, tactile handcrafted miniature set, warm directional desk lamp lighting, shallow depth of field, charming stop-motion frame rate',
-            'negative' => 'smooth digital 2d vector, slick 3d cgi, realistic photography, sharp digital pixels',
-        ],
-        'comic_book' => [
-            'id' => 'comic_book',
-            'name' => 'Comic Book & Webtoon Action',
-            'badge' => 'Komik Aksi',
-            'description' => 'Garis tinta komik yang tebal dan dinamis, efek halftone Ben-Day dots, serta pose kartun aksi dramatis penuh energi.',
-            'style_prompt' => 'Dynamic cartoon comic book style, bold ink contours, Ben-Day halftone screen tones, dramatic cel-shaded lighting, vibrant animated action poses, kinetic speed lines, Into the Spider-Verse inspired cartoon aesthetic, vibrant 4k',
-            'negative' => 'bland flat painting, blurry realism, lack of lines, dull washed out colors, low contrast',
+            'description' => 'Proporsi kepala bulat menggemaskan, mata bulat berkilau, tekstur mainan vinil lembut dengan warna-warna pastel ceria bernuansa suci.',
+            'style_prompt' => 'Super cute 3D Chibi style, miniature adorable proportions, oversized head with giant sparkling eyes, smooth soft vinyl toy shaders, pastel vibrant tones, soft ambient occlusion studio lighting, sacred Hindu iconography, kawaii aesthetics, 3D blender cute render, 4k resolution',
+            'negative' => 'scary, realistic proportions, gloomy, dark shadows, rough messy sketch, mature gritty look, morphing bodies',
         ],
     ];
 
     /**
-     * Cartoon Themes.
+     * Specifically Hindu Story Themes (No fables or non-Hindu fairy tales).
      */
     public const THEMES = [
-        'fable' => [
-            'id' => 'fable',
-            'name' => 'Fabel & Dongeng Satwa Nusantara',
+        'ramayana_mahabharata' => [
+            'id' => 'ramayana_mahabharata',
+            'name' => 'Kisah Epik Ramayana & Mahabharata Cilik',
             'icon' => 'Sparkles',
-            'description' => 'Kisah cerdik Kancil, Merak, Harimau Bijak, dan satwa hutan tropis dengan kelucuan serta pesan moral yang mendalam.',
-            'default_title' => 'Kisah Cerdik Kancil & Buah Apel Emas di Hutan Ajaib',
-            'default_character' => 'Kancil cilik bermata jeli mengenakan syal daun hijau cerah, bertingkah gesit dan ramah',
-            'default_premise' => 'Kancil menemukan pohon apel emas misterius dan harus bekerja sama dengan hewan hutan untuk memetiknya tanpa saling berebut.',
+            'description' => 'Kisah kepahlawanan dan kesetiaan suci tokoh-tokoh Hindu: Sang Hanuman, Panca Pandawa, Sri Rama, dan Krishna dalam menegakkan panji Dharma.',
+            'default_title' => 'Kisah Kesetiaan Sang Hanuman Cilik Mencari Tanaman Obat Sanjiwani',
+            'default_character' => 'Sang Hanuman cilik berbulu putih salju kemilau, mengenakan mahkota emas permata dan selendang sutra merah jingga berkilau, berwajah tulus pemberani dengan ekor lentur lincah',
+            'default_premise' => 'Hanuman cilik terbang melintasi langit senja dengan gagah berani untuk mencari tanaman obat suci Sanjiwani di tebing Gunung Dronagiri demi menolong sesama yang membutuhkan pertolongan.',
         ],
-        'dharma_kids' => [
-            'id' => 'dharma_kids',
-            'name' => 'Kartun Budi Pekerti & Nilai Luhur Dharma',
+        'dharma_philosophy' => [
+            'id' => 'dharma_philosophy',
+            'name' => 'Filosofi Luhur & Budi Pekerti Hindu (Tri Hita Karana & Tri Kaya Parisudha)',
             'icon' => 'Heart',
-            'description' => 'Cerita edukatif anak tentang Tri Hita Karana (menyayangi alam, berbuat baik sesama, dan bersyukur), ketulusan, dan karma baik.',
-            'default_title' => 'Petualangan Wayan Cilik & Penjaga Hutan Suci',
-            'default_character' => 'Wayan cilik berudeng kuning cerah, berpakaian kain poleng khas Bali yang lucu dan tersenyum ramah',
-            'default_premise' => 'Wayan belajar bahwa sebutir bibit pohon beringin yang dirawat dengan kasih sayang dapat menyelamatkan mata air desa dari kekeringan.',
+            'description' => 'Cerita edukatif anak mempraktikkan Tri Kaya Parisudha (berpikir, berkata, dan berbuat suci), kasih sayang pada alam, dan kebaikan Karma Phala.',
+            'default_title' => 'Belajar Tri Kaya Parisudha: Kesucian Pikiran, Perkataan, dan Perbuatan',
+            'default_character' => 'Pandita cilik berpakaian serba putih suci dengan selendang kuning keemasan, tersenyum teduh penuh welas asih membawa lontar kebajikan',
+            'default_premise' => 'Tiga sahabat cilik mempraktikkan Manacika (pikiran bersih), Wacika (tutur kata santun jujur), dan Kayika (tindakan nyata menolong alam dan sesama) di sebuah ashram desa yang damai.',
         ],
-        'comedy' => [
-            'id' => 'comedy',
-            'name' => 'Komedi Kartun Sehari-hari (Slapstick Lucu)',
-            'icon' => 'Smile',
-            'description' => 'Tingkah kocak anak-anak, hewan peliharaan usil, atau insiden dapur jenaka yang memancing tawa hangat penonton.',
-            'default_title' => 'Kucing Oren si Pencuri Kue Kukus yang Bernasib Sial',
-            'default_character' => 'Kucing oren gembul berwajah jahil dengan ekor gemuk dan mata memelas yang pandai berakting',
-            'default_premise' => 'Si Kucing Oren berusaha menyelinap ke meja makan untuk mencicipi kue kukus lezat, namun setiap rencananya berakhir dengan kekonyolan.',
-        ],
-        'fantasy' => [
-            'id' => 'fantasy',
-            'name' => 'Petualangan Fantasi & Negeri Ajaib',
+        'hindu_traditions' => [
+            'id' => 'hindu_traditions',
+            'name' => 'Tradisi & Hari Suci Hindu Nusantara (Galungan, Nyepi, Saraswati)',
             'icon' => 'Compass',
-            'description' => 'Ekspedisi seru mencari pusaka ajaib di atas awan, menunggangi naga pelangi, atau menjelajahi gua kristal bercahaya.',
-            'default_title' => 'Pencarian Kompas Bintang di Atas Awan Pelangi',
-            'default_character' => 'Anak penjelajah cilik berjaket bulu biru dengan tas selempang ajaib dan teropong kuningan',
-            'default_premise' => 'Dua sahabat cilik menaiki perahu daun terbang untuk mencari kompas bintang yang dapat mengembalikan pelangi ke langit malam.',
+            'description' => 'Kemuliaan makna Hari Suci Galungan & Kuningan, keheningan Catur Brata Penyepian, hari turunnya ilmu suci Saraswati, dan keindahan persembahan Canang Sari.',
+            'default_title' => 'Kemuliaan Hari Suci Galungan: Kemenangan Dharma Atas Adharma',
+            'default_character' => 'Wayan dan Ni Luh cilik berpakaian adat Bali madya serba putih dan kuning anggun, berudeng rapi, membawa canang sari harum bertabur bunga kenanga dan dupa mengepul wangi',
+            'default_premise' => 'Keluarga menyambut hari suci Galungan dengan merangkai penjor megah dari janur kelapa di depan pura keluarga, memanjatkan puja syukur atas tegaknya kebajikan di muka bumi.',
         ],
-        'anime_chibi' => [
-            'id' => 'anime_chibi',
-            'name' => 'Anime Chibi Petualangan Gemas',
+        'deva_wisdom' => [
+            'id' => 'deva_wisdom',
+            'name' => 'Kisah Kebijaksanaan Dewa & Avatara Hindu',
             'icon' => 'Wand2',
-            'description' => 'Karakter chibi menggemaskan berambut warna-warni dengan ekspresi dramatis komikal dan kilauan sihir magis.',
-            'default_title' => 'Kedai Mochi Sihir si Peri Beruang Salju',
-            'default_character' => 'Peri beruang salju chibi bertopi koki mini dengan sendok kayu ajaib yang memancarkan serbuk bintang',
-            'default_premise' => 'Si peri beruang salju meracik mochi bintang yang dapat membuat siapapun yang memakannya bisa melayang gembira di udara.',
+            'description' => 'Kisah ketulusan Dewa Ganesha menghormati orang tua, Sang Garuda mencari Tirta Amerta, dan kebijaksanaan Avatara pelindung alam semesta.',
+            'default_title' => 'Kisah Dewa Ganesha Cilik: Kasih Tulus Berbakti kepada Orang Tua',
+            'default_character' => 'Sang Ganesha cilik berkepala gajah lucu menggemaskan berbelalai lentur, bermahkota keemasan megah, memegang mangkuk modak manis, berhati bijak penuh senyuman',
+            'default_premise' => 'Ganesha cilik membuktikan bahwa mengelilingi kedua orang tuanya (Dewa Siwa dan Dewi Parwati) dengan rasa hormat dan cinta tulus sama mulianya dengan mengelilingi seluruh alam semesta.',
         ],
-        'sci_fi' => [
-            'id' => 'sci_fi',
-            'name' => 'Kartun Fiksi Ilmiah & Robot Cilik',
-            'icon' => 'Tv',
-            'description' => 'Petualangan antariksa anak-anak bersama robot ramah, roket bertenaga buah tropis, dan planet neon futuristik.',
-            'default_title' => 'Ekspedisi Robo-Kancil Menyelamatkan Satelit Tertawa',
-            'default_character' => 'Robot mungil berwarna putih-oranye dengan antena berkedip dan layar dada yang menampilkan ekspresi emosi pixel lucu',
-            'default_premise' => 'Robo-Kancil terbang ke orbit rendah untuk memperbaiki satelit antariksa yang tersangkut debu komet bercahaya neon.',
-        ],
-        'custom' => [
-            'id' => 'custom',
-            'name' => 'Tema Bebas / Kustom Sendiri',
+        'custom_hindu' => [
+            'id' => 'custom_hindu',
+            'name' => 'Tema & Cerita Hindu Pilihan Sendiri',
             'icon' => 'Film',
-            'description' => 'Tuliskan ide tema, cerita fabel, dongeng, atau naskah kartun bebas sesuai imajinasi dan kebutuhan kreatif Anda.',
-            'default_title' => 'Kisah Kartun Pilihan Saya',
-            'default_character' => 'Karakter kartun utama yang ekspresif, lincah, dan penuh semangat',
-            'default_premise' => 'Petualangan seru dan sarat makna di dunia kartun animasi penuh warna.',
+            'description' => 'Tuliskan topik cerita, itihasa, purana, atau nilai kebajikan Hindu khusus yang ingin Anda jadikan naskah video kartun.',
+            'default_title' => 'Cerita Ajaran Suci Hindu Pilihan',
+            'default_character' => 'Karakter kesatria cilik berbudi luhur yang memegang teguh ajaran Dharma',
+            'default_premise' => 'Kisah edukatif anak yang mengangkat nilai luhur ajaran suci Hindu dan kebajikan universal bagi kedamaian dunia.',
         ],
     ];
 
@@ -153,7 +111,7 @@ class CartoonPromptService
             'id' => 'universal',
             'name' => 'Universal (Kling, Runway, Sora, Luma, Pika)',
             'description' => 'Sintaks prompt seimbang yang kompatibel untuk seluruh platform AI Video generasi terbaru.',
-            'suffix' => ', highly dynamic cartoon animation motion, 4k ultra detailed cinematic sequence, fluid 30fps movement',
+            'suffix' => ', highly dynamic cartoon animation motion, smooth continuous action, fluid 24fps character movement, 4k ultra detailed cinematic sequence',
         ],
         'kling_ai' => [
             'id' => 'kling_ai',
@@ -185,15 +143,33 @@ class CartoonPromptService
      * Camera motion presets for cartoon frames.
      */
     public const CAMERA_MOTIONS = [
-        'establishing_wide' => 'Cinematic wide establishing shot, gentle slow pan left',
-        'dynamic_push_in' => 'Dynamic low-angle push-in zoom focusing on character action',
-        'tracking_run' => 'Smooth horizontal tracking shot following character movement',
-        'close_up_reaction' => 'Expressive close-up shot with subtle camera tilt up, shallow depth of field',
-        'crane_high_angle' => 'High-angle crane shot descending into the scene, revealing environment',
-        'dolly_zoom_climax' => 'Dramatic dolly zoom vertigo effect capturing the comical/epic climax',
-        'orbit_around' => 'Smooth 45-degree orbit around the main character with atmospheric rim light',
-        'slow_zoom_out' => 'Peaceful slow zoom out revealing the picturesque cartoon landscape',
+        'establishing_wide' => 'Cinematic wide establishing shot, gentle slow pan left, revealing the sacred temple architecture',
+        'dynamic_push_in' => 'Dynamic low-angle push-in zoom focusing on character action and sacred symbols',
+        'tracking_run' => 'Smooth horizontal tracking shot following character movement with natural momentum',
+        'close_up_reaction' => 'Expressive close-up shot with subtle camera tilt up, shallow depth of field f/2.2',
+        'crane_high_angle' => 'High-angle crane shot descending into the sacred courtyard, atmospheric incense smoke',
+        'dolly_zoom_climax' => 'Dramatic slow dolly zoom capturing the noble spiritual climax with radiant aura',
+        'orbit_around' => 'Smooth 45-degree orbit around the main character with warm golden rim illumination',
+        'slow_zoom_out' => 'Peaceful slow zoom out revealing the harmonious sacred landscape at sunset, Om Shanti',
     ];
+
+    /**
+     * Normalize theme keys to Hindu-only themes.
+     */
+    public static function normalizeThemeKey(string $themeKey): string
+    {
+        $map = [
+            'fable' => 'ramayana_mahabharata',
+            'comedy' => 'hindu_traditions',
+            'sci_fi' => 'deva_wisdom',
+            'fantasy' => 'deva_wisdom',
+            'anime_chibi' => 'ramayana_mahabharata',
+            'dharma_kids' => 'dharma_philosophy',
+            'custom' => 'custom_hindu',
+        ];
+
+        return $map[$themeKey] ?? (isset(self::THEMES[$themeKey]) ? $themeKey : 'ramayana_mahabharata');
+    }
 
     /**
      * Generate structured cartoon video prompts.
@@ -203,8 +179,9 @@ class CartoonPromptService
         $duration = (int) ($validated['target_duration'] ?? 30);
         $duration = in_array($duration, [30, 60], true) ? $duration : 30;
 
-        $themeKey = $validated['theme'] ?? 'fable';
-        $themeMeta = self::THEMES[$themeKey] ?? self::THEMES['fable'];
+        $rawThemeKey = $validated['theme'] ?? 'ramayana_mahabharata';
+        $themeKey = self::normalizeThemeKey($rawThemeKey);
+        $themeMeta = self::THEMES[$themeKey] ?? self::THEMES['ramayana_mahabharata'];
 
         $styleKey = $validated['visual_style'] ?? 'pixar_3d';
         $styleMeta = self::VISUAL_STYLES[$styleKey] ?? self::VISUAL_STYLES['pixar_3d'];
@@ -245,10 +222,10 @@ class CartoonPromptService
             if ($aiResult['success'] && !empty($aiResult['scenes'])) {
                 return $aiResult;
             }
-            Log::info('Gemini prompt generation returned fallback. Generating procedural cartoon sequence.');
+            Log::info('Gemini prompt generation returned fallback. Generating procedural Hindu cartoon sequence.');
         }
 
-        // Procedural generator engine (100% reliable, zero error, tailored for 30s or 60s)
+        // Procedural generator engine (100% reliable, zero error, tailored for Hindu stories with strict continuity)
         return $this->generateProceduralCartoonSequence(
             $duration,
             $themeKey,
@@ -262,7 +239,7 @@ class CartoonPromptService
     }
 
     /**
-     * Generate prompts using Gemini 3.8 Flash LLM with structured output schema.
+     * Generate prompts using Gemini 3.8 Flash LLM with strict Hindu story rules and frame-to-frame continuity.
      */
     protected function generateWithGemini(
         string $geminiKey,
@@ -279,38 +256,36 @@ class CartoonPromptService
         $frameDuration = 5.0; // 5 seconds per frame
 
         $prompt = <<<PROMPT
-Anda adalah Direktur Sutradara dan Ahli Prompt Animasi Kartun AI bertaraf dunia.
-Tugas Anda adalah merancang rangkaian prompt video per-frame/per-adegan (action breakdown) untuk membuat video kartun pendek berdurasi TEPAT {$duration} DETIK.
+Anda adalah Sutradara Animasi dan Ahli Prompt Video AI Khusus Konten Edukasi Spiritual Hindu ("Ruang Dharma").
+Tugas Anda adalah merancang rangkaian prompt video per-frame/per-adegan (action breakdown) untuk membuat video kartun anak edukatif berdurasi TEPAT {$duration} DETIK.
+
+ATURAN UTAMA & WAJIB (STRICT REQUIREMENTS):
+1. KONTEN KHUSUS HINDU (TIDAK BOLEH fabel hewan biasa, dongeng umum, robot sci-fi, atau komedi tanpa nilai Dharma):
+   - Wajib mengangkat ajaran suci, filosofi, tradisi, atau epik Hindu (Ramayana, Mahabharata, Tri Hita Karana, Tri Kaya Parisudha, Karma Phala, Hari Suci Galungan/Nyepi/Saraswati, Dewa Ganesha, Sang Hanuman).
+   - Nilai moral berlandaskan Dharma (kebenaran), Satya (kejujuran), Ahimsa (tanpa kekerasan), dan Bhakti (cinta kasih suci).
+
+2. KONTINUITAS KETAT FRAME-DEMI-FRAME (SEAMLESS NARRATIVE & TEMPORAL CONTINUITY):
+   - Alur cerita dari Frame 1 sampai Frame {$sceneCount} HARUS 100% MENYAMBUNG dan mengalir tanpa melompat.
+   - Akhir pergerakan di frame sebelumnya harus menjadi titik awal frame berikutnya (match-cut action).
+   - Pembicaraan (narasi/dialog) harus selaras dan tersinkronisasi sempurna dengan apa yang dilakukan karakter pada detik tersebut.
+
+3. KONSISTENSI VISUAL ANCHOR TINGGI:
+   - Karakter utama "{$character}" WAJIB diulang dengan atribut pakaian, warna busana adat, wajah, dan aksesoris yang persis sama di setiap visual_prompt.
+   - Setting lokasi (Pura, candi, ashram, atau gunung suci) harus konsisten dari frame ke frame.
+
+4. SYNTAX PROMPT AI VIDEO LENGKAP:
+   - visual_prompt HARUS dalam BAHASA INGGRIS tingkat tinggi yang lengkap untuk model video AI ({$engineMeta['name']}).
+   - Struktur prompt visual:
+     "[Frame X of {$sceneCount}: Continuous shot] {$styleMeta['style_prompt']}. Character Anchor: {$character}. Exact Kinetic Action: (deskripsi pergerakan fisik karakter secara mendalam). Sacred Setting: (latar kuil/pura/lingkungan suci Hindu). Camera: (pergerakan kamera, 35mm lens, f/2.4, 24fps motion). Lighting: (warm sacred golden hour lighting, volumetric rays). {$styleMeta['style_prompt']}{$engineMeta['suffix']}"
 
 PARAMETER PROYEK:
-- Judul Cerita: "{$title}"
+- Judul: "{$title}"
 - Tema: {$themeKey}
-- Premis Cerita: "{$premise}"
-- Deskripsi Karakter Utama (KONSISTENSI WAJIB): "{$character}"
-- Gaya Visual Animasi: {$styleMeta['name']}
-- Prompt Gaya Utama: "{$styleMeta['style_prompt']}"
-- Target Video Generator: {$engineMeta['name']}
-- Format Rasio Aspek: {$aspectRatio}
-- Total Durasi: TEPAT {$duration} DETIK.
-- Jumlah Frame/Aksi: TEPAT {$sceneCount} adegan berurutan, masing-masing berdurasi {$frameDuration} detik (5.0s per frame).
-
-STRUKTUR FRAME (ALUR CERITA KARTUN 3-ACT YANG DINAMIS):
-Setiap frame mewakili klip video 5 detik:
-1. Frame 1 (00:00 - 00:05): Hook Pembuka / Establishing Shot (Karakter diperkenalkan dengan aksi menarik dan ekspresif).
-2. Frame 2 (00:05 - 00:10): Kejadian Pemantik / Inciting Incident (Karakter menemukan sesuatu atau menghadapi tantangan awal).
-3. Frame 3 s/d Frame {$sceneCount} - 2: Eskalasi Aksi Kartun, Kelucuan / Usaha Seru, dan Interaksi Lingkungan.
-4. Frame {$sceneCount} - 1: Puncak Aksi / Klimaks Kartun (Momen paling dramatis, lucu, atau menakjubkan).
-5. Frame {$sceneCount} (Detik terakhir menuju {$duration}s): Resolusi / Ending Bahagia / Pesan Moral & Pose Penutup Ikonik.
-
-PANDUAN PROMPT VISUAL (SANGAT PENTING):
-- visual_prompt HARUS ditulis dalam BAHASA INGGRIS tingkat tinggi yang dioptimalkan untuk AI Video Generator (Kling, Runway, Sora, Luma).
-- Wajib menyertakan deskripsi visual karakter yang konsisten: "{$character}".
-- Cantumkan style tokens: "{$styleMeta['style_prompt']}".
-- Cantumkan camera motion dan pergerakan karakter secara deskriptif dan dinamis.
-- action_description ditulis dalam BAHASA INDONESIA yang jelas dan hidup menggambarkan apa yang terjadi di layar.
-- dialogue_or_narration berisi dialog singkat atau narasi suara karakter/narator.
-- sound_effects berisi efek suara kartun (contoh: *Boing!*, *Swoosh*, *Plop*, *Laughter*).
-- music_mood mendeskripsikan nuansa musik instrumen pengiring.
+- Premis: "{$premise}"
+- Karakter: "{$character}"
+- Gaya: {$styleMeta['name']}
+- Rasio: {$aspectRatio}
+- Durasi: TEPAT {$duration} DETIK ({$sceneCount} frame @ {$frameDuration}s).
 
 Kembalikan jawaban HANYA dalam JSON valid:
 {
@@ -327,12 +302,12 @@ Kembalikan jawaban HANYA dalam JSON valid:
       "end_second": 5.0,
       "duration": 5.0,
       "title": "Nama Adegan 1",
-      "action_description": "Deskripsi aksi karakter dalam bahasa Indonesia",
-      "visual_prompt": "English visual prompt with character, environment, action, camera motion, style tokens",
+      "action_description": "Deskripsi aksi karakter dalam bahasa Indonesia yang menyambung",
+      "visual_prompt": "English visual prompt with complete continuity, character anchor, kinetic action, camera motion, and style tokens",
       "camera_movement": "Cinematic wide establishing shot, gentle slow pan right",
-      "dialogue_or_narration": "Dialog atau narasi pendukung",
-      "sound_effects": "SFX kartun",
-      "music_mood": "Cheerful orchestral cartoon",
+      "dialogue_or_narration": "Dialog atau narasi yang menyambung dengan tema Hindu",
+      "sound_effects": "*Temple bell chime!* *Gentle breeze!*",
+      "music_mood": "Sacred peaceful gamelan suling and orchestral blend",
       "negative_prompt": "{$styleMeta['negative']}"
     }
   ]
@@ -340,14 +315,9 @@ Kembalikan jawaban HANYA dalam JSON valid:
 PROMPT;
 
         try {
-            $rawModel = $this->geminiService->model('text');
-            $http = $this->geminiService;
-
-            // Generate using GeminiService internal mechanism
             $result = $this->callGeminiApi($geminiKey, $prompt);
 
             if ($result && !empty($result['scenes']) && is_array($result['scenes'])) {
-                // Ensure correct sequential timestamps
                 $this->realignSceneTimestamps($result['scenes'], $duration, $sceneCount);
                 return [
                     'success' => true,
@@ -406,8 +376,8 @@ PROMPT;
     }
 
     /**
-     * Creative Procedural Cartoon Sequence Generator.
-     * Guaranteed to return high-quality, rich 30s or 60s per-frame prompts without any external dependencies.
+     * Creative Procedural Hindu Cartoon Sequence Generator with strict continuity.
+     * Guaranteed 100% interconnected frame-by-frame storyline without error.
      */
     public function generateProceduralCartoonSequence(
         int $duration,
@@ -422,7 +392,7 @@ PROMPT;
         $sceneCount = $duration === 30 ? 6 : 12;
         $frameDuration = 5.0;
 
-        $themeTemplates = $this->getThemeNarrativeBank($themeKey, $title, $premise, $character);
+        $themeTemplates = $this->getHinduThemeNarrativeBank($themeKey, $title, $premise, $character);
 
         $scenes = [];
         $actionsBank = $duration === 30 ? $themeTemplates['actions_30s'] : $themeTemplates['actions_60s'];
@@ -434,26 +404,28 @@ PROMPT;
             $endSec = round(($i + 1) * $frameDuration, 2);
 
             $actionData = $actionsBank[$i] ?? [
-                'title' => "Adegan " . ($i + 1) . ": Aksi Petualangan Kartun",
-                'action_id' => "Karakter melanjutkan petualangannya dengan penuh energi dan tawa gembira.",
-                'action_en' => "The main character bounds forward cheerfully across the vibrant cartoon landscape, smiling brightly.",
-                'dialogue' => "Ayo, sedikit lagi kita sampai!",
-                'sfx' => "*Boing!* *Whoosh!*",
-                'music' => "Upbeat and playful cartoon rhythm",
+                'title' => "Frame " . sprintf('%02d', $i + 1) . ": Kelanjutan Dharma",
+                'action_id' => "Karakter melanjutkan langkah bajiknya dengan penuh keteguhan hati di jalan Dharma.",
+                'action_en' => "The character steps forward gracefully in adherence to sacred Dharma, glowing aura surrounding them.",
+                'dialogue' => "Kebaikan yang kita tanam hari ini akan berbuah kedamaian esok hari.",
+                'sfx' => "*Gentle temple bell chime!*",
+                'music' => "Peaceful Balinese gamelan suling and gentle strings",
             ];
 
             $cameraMotion = $cameraCycle[$i % count($cameraCycle)];
 
-            // Build English AI visual prompt
+            // Highly detailed industry-standard AI video prompt with continuous framing tokens
             $visualPrompt = sprintf(
-                "%s. Character: %s. Action: %s. Setting: %s, %s. Camera: %s. Lighting: %s. %s%s",
+                "[Frame %d of %d: Continuous sequence action from previous shot] %s. Character Anchor: %s. Action Dynamics: %s. Sacred Setting: %s, %s. Cinematography: %s, 35mm cinematic lens, f/2.4 shallow depth of field, fluid 24fps motion. Lighting: %s. %s%s",
+                $i + 1,
+                $sceneCount,
                 $styleMeta['style_prompt'],
                 $character,
                 $actionData['action_en'],
                 $themeTemplates['environment'],
-                $aspectRatio === '9:16' ? 'vertical 9:16 composition for mobile' : ($aspectRatio === '16:9' ? 'cinematic 16:9 widescreen composition' : 'square 1:1 format'),
+                $aspectRatio === '9:16' ? 'vertical 9:16 portrait composition for mobile screens' : ($aspectRatio === '16:9' ? 'cinematic 16:9 widescreen composition' : 'square 1:1 format'),
                 $cameraMotion,
-                $actionData['lighting'] ?? 'warm golden sunlight with colorful rim illumination',
+                $actionData['lighting'] ?? 'sacred golden hour morning sunlight, atmospheric soft incense smoke and drifting petals',
                 $styleMeta['style_prompt'],
                 $engineMeta['suffix']
             );
@@ -489,7 +461,7 @@ PROMPT;
     }
 
     /**
-     * Regenerate a single scene prompt with creative variations.
+     * Regenerate a single scene prompt with creative variations matching Hindu spirituality.
      */
     public function regenerateSingleScene(CartoonPromptProject $project, CartoonPromptScene $scene): CartoonPromptScene
     {
@@ -500,53 +472,54 @@ PROMPT;
         $cameraMotions = array_values(self::CAMERA_MOTIONS);
         $randomCamera = $cameraMotions[array_rand($cameraMotions)];
 
-        // Enhanced dynamic variations
         $variations = [
             [
-                'title' => 'Momen Aksi Dinamis Karakter',
-                'action_id' => 'Karakter utama melompat dengan riang gembira, matanya berbinar melihat keajaiban di sekitarnya.',
-                'action_en' => 'The main character jumps with pure childlike joy, eyes sparkling with wonder as vibrant sparkles float around.',
-                'sfx' => '*Boing!* *Twinkle!*',
-                'music' => 'Playful whimsical flute and marimba melody',
+                'title' => 'Momen Kebaktian & Doa Suci (Bhakti)',
+                'action_id' => 'Karakter menangkupkan kedua telapak tangan di depan dada dalam sikap Anjali Mudra, memancarkan aura ketenangan dan rasa syukur yang mendalam.',
+                'action_en' => 'The character gracefully folds hands together in sacred Anjali Mudra at heart level, eyes closed peacefully with a gentle sincere smile, glowing golden aura radiating.',
+                'sfx' => '*Resonant temple bell chime!* *Soft gong sound!*',
+                'music' => 'Meditative Balinese gamelan suling with celestial flute harmony',
             ],
             [
-                'title' => 'Reaksi Terkejut & Kelucuan Spontan',
-                'action_id' => 'Karakter terhenyak lucu dengan mulut terbuka lebar, telinga bergoyang gemas sebelum tersenyum lebar.',
-                'action_en' => 'The character pauses in comedic surprise with wide expressive eyes, doing a funny cartoon double-take then breaking into a warm grin.',
-                'sfx' => '*Gasp!* *Cartoon slide whistle!*',
-                'music' => 'Comedic brass punch with energetic tempo',
+                'title' => 'Langkah Berani Menegakkan Kebenaran (Dharma)',
+                'action_id' => 'Karakter melangkah mantap ke depan dengan sorot mata penuh ketulusan dan tekad luhur, kain selendangnya berkibar ditiup angin sepoi-sepoi.',
+                'action_en' => 'The character strides forward with determined posture and eyes full of noble devotion, silk sash fluttering in the mountain breeze, sacred temple background.',
+                'sfx' => '*Wind whoosh!* *Chime sparkle!*',
+                'music' => 'Uplifting cinematic orchestral gamelan swell',
             ],
             [
-                'title' => 'Gerakan Heroik & Pose Penuh Semangat',
-                'action_id' => 'Karakter berpose penuh percaya diri di bawah cahaya mentari hangat, siap melanjutkan petualangan.',
-                'action_en' => 'The character strikes a confident, heroic cute pose in glowing morning sunlight, nodding enthusiastically.',
-                'sfx' => '*Whoosh!* *Chime!*',
-                'music' => 'Uplifting orchestral swell with cheerful brass',
+                'title' => 'Persembahan Tulus Canang Sari',
+                'action_id' => 'Karakter meletakkan canang sari harum berisi bunga kamboja segar ke atas pelinggih batu suci dengan kedua tangan penuh hormat.',
+                'action_en' => 'The character gently places a fragrant woven palm leaf canang sari with colorful blossoms onto a carved volcanic stone shrine with utmost respect.',
+                'sfx' => '*Gentle incense waft sound!* *Water droplet sparkle!*',
+                'music' => 'Serene bamboo bell chimes and warm string harmony',
             ],
             [
-                'title' => 'Eksplorasi Lingkungan yang Mengagumkan',
-                'action_id' => 'Karakter menyusuri jalan setapak ajaib bertabur bunga warna-warni yang bergoyang ditiup angin sepoi-sepoi.',
-                'action_en' => 'The character explores a magical blooming pathway, colorful petals drifting in a gentle warm breeze.',
-                'sfx' => '*Rustle!* *Soft wind chime!*',
-                'music' => 'Gentle acoustic strings and magical celeste',
+                'title' => 'Pancaran Kedamaian Universal (Shanti)',
+                'action_id' => 'Karakter tersenyum teduh memandang fajar keemasan yang menyinari pura, kelopak bunga melati dan dupa melayang menenangkan jiwa.',
+                'action_en' => 'The character gazes in peaceful wonder at the radiant golden sunrise bathing the temple gate, jasmine petals and fragrant mist curling softly.',
+                'sfx' => '*Morning bird song!* *Temple bell toll!*',
+                'music' => 'Profoundly peaceful sacred flute melody, Om Shanti',
             ],
         ];
 
         $var = $variations[array_rand($variations)];
 
         $newVisualPrompt = sprintf(
-            "%s. Character: %s. Action: %s. Setting: Colorful lush cartoon world with glowing ambient particles, %s. Camera: %s. Lighting: Dynamic volumetric golden rim lighting. %s%s",
+            "[Frame %d of %d: Continuity variation] %s. Character Anchor: %s. Action Dynamics: %s. Sacred Setting: Sacred Balinese Hindu pura temple courtyard with volcanic stone carvings, %s. Cinematography: %s, 35mm lens, f/2.4 depth of field, 24fps. Lighting: Sacred golden hour warm sunlight, volumetric incense rays. %s%s",
+            $scene->scene_number,
+            $project->scene_count,
             $styleMeta['style_prompt'],
-            $project->character_description ?: 'Expressive energetic cartoon protagonist',
+            $project->character_description ?: 'Virtuous young Hindu character in traditional sacred attire',
             $var['action_en'],
-            $aspectRatio === '9:16' ? 'vertical 9:16 portrait view' : 'widescreen 16:9 view',
+            $aspectRatio === '9:16' ? 'vertical 9:16 portrait composition' : 'widescreen 16:9 composition',
             $randomCamera,
             $styleMeta['style_prompt'],
             $engineMeta['suffix']
         );
 
         $scene->update([
-            'title' => $var['title'] . ' (Variasi Baru)',
+            'title' => $var['title'],
             'action_description' => $var['action_id'],
             'visual_prompt' => $newVisualPrompt,
             'camera_movement' => $randomCamera,
@@ -577,338 +550,338 @@ PROMPT;
     }
 
     /**
-     * Rich Story & Narrative Bank for Procedural Generation.
+     * Purely Hindu Narrative Bank with High Temporal & Plot Continuity.
      */
-    protected function getThemeNarrativeBank(string $themeKey, string $title, string $premise, string $character): array
+    protected function getHinduThemeNarrativeBank(string $themeKey, string $title, string $premise, string $character): array
     {
         switch ($themeKey) {
-            case 'fable':
+            case 'ramayana_mahabharata':
                 return [
-                    'environment' => 'vibrant tropical rainforest with oversized mushrooms, hanging vines, and golden sunbeams filtering through dense canopy',
+                    'environment' => 'sacred Mount Dronagiri foothills with lush medicinal flora, misty cliffs, golden sunbeams, and traditional ancient Hindu stone carved reliefs',
                     'actions_30s' => [
                         [
-                            'title' => 'Detik 0-5: Hook & Pengenalan Kancil',
-                            'action_id' => 'Kancil melongok dari balik semak dedaunan raksasa, telinganya bergoyang lucu mendengar kicauan burung merdu.',
-                            'action_en' => 'The clever little mouse deer peeks out from oversized tropical ferns, ears wiggling adorably, sniffing the morning air with curious bright eyes.',
-                            'dialogue' => 'Wah, pagi yang cerah di hutan tropis!',
-                            'sfx' => '*Rustle!* *Chirp chirp!*',
-                            'music' => 'Gentle cheerful xylophone and wooden percussion',
+                            'title' => 'Frame 01 (00:00 - 00:05): Hook - Hanuman Siap Meluncur',
+                            'action_id' => 'Hanuman cilik berdiri gagah di puncak batu karang Gunung Gandhamadana, merapatkan kedua telapak tangan dalam sikap hormat, lalu merentangkan tangannya bersiap terbang.',
+                            'action_en' => 'Little Hanuman stands heroically atop a jagged stone pinnacle, hands folded in brief reverent Anjali Mudra prayer, then spreads arms wide with wind billowing his saffron sash as he coils his legs to leap.',
+                            'dialogue' => 'Demi kesetiaan pada Sri Rama dan pertolongan sesama, aku akan membawa tanaman Sanjiwani!',
+                            'sfx' => '*Wind gust whoosh!* *Sacred conch shell call in distance!*',
+                            'music' => 'Epic heroic orchestral gamelan overture with powerful drums',
                         ],
                         [
-                            'title' => 'Detik 5-10: Menemukan Pohon Apel Emas',
-                            'action_id' => 'Kancil berjalan jinjit di atas batang pohon tumbang, matanya melebar takjub melihat buah apel emas berkilauan.',
-                            'action_en' => 'The mouse deer tiptoes gracefully along a mossy fallen log, jaw dropping in funny cartoon astonishment at a giant golden apple glowing on a high branch.',
-                            'dialogue' => 'Lihat itu! Apel emas legendaris!',
-                            'sfx' => '*Tiptoe sound!* *Sparkle shine chime!*',
-                            'music' => 'Curious and wondrous pizzicato strings',
+                            'title' => 'Frame 02 (00:05 - 00:10): Terbang Melintasi Samudra Awan',
+                            'action_id' => '[Menyambung langsung dari Frame 1] Hanuman melesat tinggi menembus kabut awan emas, meluncur secepat kilat dengan pandangan jeli mencari lereng gunung yang bercahaya.',
+                            'action_en' => '[Continues directly from Frame 1] Hanuman soars through golden billowing clouds at lightning speed, white fur glistening in morning light, eyes focused forward scanning the peaks below.',
+                            'dialogue' => 'Di sana lereng Gunung Dronagiri! Cahaya suci tanaman obat itu mulai terlihat.',
+                            'sfx' => '*High-speed wind roar!* *Divine shimmer sound!*',
+                            'music' => 'Dynamic fast-paced heroic flight rhythm with soaring brass and flute',
                         ],
                         [
-                            'title' => 'Detik 10-15: Tantangan & Ide Cerdik',
-                            'action_id' => 'Kancil meletakkan telunjuk di dagunya berpikir keras, lalu bola lampu imajinasi kartun menyala di atas kepalanya.',
-                            'action_en' => 'The mouse deer taps its chin comically in deep thought, then jumps up with a brilliant idea, pointing excitedly towards a vine swing.',
-                            'dialogue' => 'Aha! Aku punya akal cerdik!',
-                            'sfx' => '*Cartoon ding!* *Spring boing!*',
-                            'music' => 'Quickening playful marimba rhythm',
+                            'title' => 'Frame 03 (00:10 - 00:15): Mendarat di Tebing Tanaman Suci',
+                            'action_id' => '[Menyambung langsung dari Frame 2] Hanuman mendarat dengan anggun di teras tebing bebatuan, debu suci terpencar lembut saat kakinya menjejak tanah berbunga keemasan.',
+                            'action_en' => '[Continues directly from Frame 2] Hanuman descends gracefully onto a mossy cliff ledge, landing softly on one knee, glowing golden Sanjiwani herbs shimmering in the rock crevices around him.',
+                            'dialogue' => 'Berkat dewata, tanaman obat suci ini tumbuh subur dan bercahaya!',
+                            'sfx' => '*Soft landing thump!* *Magical crystal sparkle!*',
+                            'music' => 'Wondrous emotional melody with temple bells and harp',
                         ],
                         [
-                            'title' => 'Detik 15-20: Aksi Ayunan Menegangkan',
-                            'action_id' => 'Kancil menggenggam sulur tanaman dan berayun kencang melintasi udara seperti akrobat sirkus cilik.',
-                            'action_en' => 'The mouse deer grabs a sturdy jungle vine and swings heroically through the air, laughing as green leaves swirl in its wake.',
-                            'dialogue' => 'Satu, dua, tiga... Meluncur!',
-                            'sfx' => '*Whoosh!* *Tarzan-style comedic shout!*',
-                            'music' => 'Energetic cartoon orchestral crescendo',
+                            'title' => 'Frame 04 (00:15 - 00:20): Memohon Izin dengan Ketulusan Hati',
+                            'action_id' => '[Menyambung langsung dari Frame 3] Menghindari keserakahan, Hanuman berlutut penuh hormat memohon izin kepada Dewa penjaga alam sebelum memetik tanaman penyembuh.',
+                            'action_en' => '[Continues directly from Frame 3] Hanuman kneels reverently before the glowing flora, bowing his head in sincere humility, asking permission with utmost devotion rather than taking by force.',
+                            'dialogue' => 'Wahai Hyang Giri, izinkan hamba memetik anugerah ini demi menyelamatkan nyawa saudara kita.',
+                            'sfx' => '*Divine choral hum!* *Gentle breeze rustling leaves!*',
+                            'music' => 'Sacred spiritual choir and serene Balinese bamboo suling',
                         ],
                         [
-                            'title' => 'Detik 20-25: Memetik dan Berbagi dengan Teman',
-                            'action_id' => 'Kancil berhasil mendarat empuk di tumpukan lumut bersama apel emas, lalu membagikannya kepada burung pipit yang lapar.',
-                            'action_en' => 'The mouse deer lands softly into a plush moss patch with the golden fruit, warmly breaking it into pieces to share with cute forest birds.',
-                            'dialogue' => 'Makanan paling enak adalah yang dinikmati bersama sahabat.',
-                            'sfx' => '*Plop!* *Heart chime!*',
-                            'music' => 'Warm heartwarming violin and acoustic guitar harmony',
+                            'title' => 'Frame 05 (00:20 - 00:25): Mengangkat Puncak Tebing Penuh Berkah',
+                            'action_id' => '[Menyambung langsung dari Frame 4] Seluruh lereng memancarkan cahaya berkah hangat; Hanuman mengangkat bukit kecil penyembuh tersebut dengan senyuman gembira.',
+                            'action_en' => '[Continues directly from Frame 4] Radiant divine golden aura envelopes the cliff; Hanuman gently hoists the sacred herbal mound on his palm, smiling with radiant purity and joyous strength.',
+                            'dialogue' => 'Doa yang tulus selalu membuka jalan kebajikan dan keajaiban!',
+                            'sfx' => '*Majestic power chime!* *Harmonic ringing tone!*',
+                            'music' => 'Triumphant glorious orchestral crescendo with triumphant trumpets',
                         ],
                         [
-                            'title' => 'Detik 25-30: Refleksi & Penutup Bahagia',
-                            'action_id' => 'Kancil mengedipkan mata ke arah penonton sambil melambaikan tangan, tersenyum bangga di tengah pelangi hutan.',
-                            'action_en' => 'The mouse deer winks playfully at the camera, giving a cute thumbs-up as a bright rainbow forms in the mist behind, smiling happily.',
-                            'dialogue' => 'Kecerdikan sejati adalah yang membawa kebaikan untuk semua!',
-                            'sfx' => '*Sparkle wink ding!* *Happy fanfare!*',
-                            'music' => 'Triumphant joyful orchestral finale',
+                            'title' => 'Frame 06 (00:25 - 00:30): Resolusi & Salam Kedamaian Dharma',
+                            'action_id' => '[Menyambung langsung dari Frame 5] Hanuman terbang kembali ke arah penonton sambil tersenyum tulus mengatupkan satu tangan di dada, pelangi suci membentang di langit senja.',
+                            'action_en' => '[Continues directly from Frame 5] Hanuman glides smoothly toward the camera over a majestic rainbow mist, nodding with a peaceful heroic smile, hands held in peace gesture.',
+                            'dialogue' => 'Tegakkan Dharma dengan ketulusan dan keberanian. Om Shanti Shanti Shanti Om.',
+                            'sfx' => '*Resonant temple bell finale!* *Peaceful chime reverberation!*',
+                            'music' => 'Deeply moving sacred Balinese gamelan and choir finale',
                         ],
                     ],
-                    'actions_60s' => $this->buildTwelveSceneSequence('fable', $character),
+                    'actions_60s' => $this->buildTwelveHinduSceneSequence('ramayana_mahabharata', $character),
                 ];
 
-            case 'dharma_kids':
+            case 'dharma_philosophy':
                 return [
-                    'environment' => 'picturesque Balinese village temple gate with frangipani trees, green terraced rice fields, and gentle morning mist',
+                    'environment' => 'peaceful traditional Balinese Hindu ashram village with banyan trees, lotus pond, carved stone shrines, and golden morning sunlight',
                     'actions_30s' => [
                         [
-                            'title' => 'Detik 0-5: Salam Pagi Penuh Syukur',
-                            'action_id' => 'Wayan cilik meletakkan kedua telapak tangan di depan dada (Anjali Mudra) sambil tersenyum hangat menyambut fajar.',
-                            'action_en' => 'Cute young Balinese boy in traditional sarong bows with hands folded gracefully in Anjali Mudra greeting, morning golden sunlight kissing temple stone carved statues.',
-                            'dialogue' => 'Om Swastyastu! Selamat pagi alam semesta yang indah.',
-                            'sfx' => '*Gentle temple bell chime!*',
-                            'music' => 'Calm soothing gamelan suling and bamboo chime melody',
+                            'title' => 'Frame 01 (00:00 - 00:05): Hook - Pagi Suci di Pelataran Ashram',
+                            'action_id' => 'Pandita cilik duduk bersila tenang di bale bengong dekat kolam teratai, menghirup udara pagi yang segar sembari mengatupkan tangan dalam puja Tri Sandhya.',
+                            'action_en' => 'Young pandita boy sits cross-legged in peaceful meditation beside a blooming lotus pond, hands held gracefully in Anjali Mudra greeting the morning sun.',
+                            'dialogue' => 'Pagi yang damai. Mari kita mulai hari ini dengan kesucian Tri Kaya Parisudha.',
+                            'sfx' => '*Gentle water ripple!* *Soft bronze bell chime!*',
+                            'music' => 'Serene meditative bamboo flute (suling) and soft harp',
                         ],
                         [
-                            'title' => 'Detik 5-10: Membawa Bibit Pohon Suci',
-                            'action_id' => 'Wayan membawa pot tanah kecil berisi tunas pohon beringin muda dengan riang melintasi pematang sawah hijau.',
-                            'action_en' => 'The boy walks briskly along lush green rice terrace paths carrying a small clay pot with a tender green sprout, butterflies fluttering around his udeng headband.',
-                            'dialogue' => 'Hari ini kita akan menanam bibit harapan untuk mata air desa.',
-                            'sfx' => '*Chirping cicadas!* *Footstep grass crunch!*',
-                            'music' => 'Uplifting traditional acoustic gamelan rhythm',
+                            'title' => 'Frame 02 (00:05 - 00:10): Manacika - Kesucian Pikiran',
+                            'action_id' => '[Menyambung langsung dari Frame 1] Pandita cilik membuka mata dengan tatapan jernih, memandang sekuntum teratai putih yang mekar tanpa terkotori lumpur.',
+                            'action_en' => '[Continues directly from Frame 1] The boy opens eyes with a tranquil expression, gently gazing at a pure white lotus blossom rising unstained from pond waters.',
+                            'dialogue' => 'Pertama: Manacika Parisudha. Menjaga pikiran tetap bersih, tanpa iri hati atau amarah.',
+                            'sfx' => '*Water droplet plop!* *Wind chime whisper!*',
+                            'music' => 'Gentle warm acoustic gamelan progression',
                         ],
                         [
-                            'title' => 'Detik 10-15: Sahabat Satwa yang Membantu',
-                            'action_id' => 'Seekor anak monyet lucu berbulu abu-abu melompat turun dari dahan dan membantu menggali tanah dengan ranting kayu.',
-                            'action_en' => 'A friendly little cartoon monkey with big round eyes swings down playfully, helping the boy dig soft moist earth with a miniature wooden trowel.',
-                            'dialogue' => 'Terima kasih sahabat kecilku, kita jaga bumi bersama!',
-                            'sfx' => '*Monkey joyful chatter!* *Dirt dig sound!*',
-                            'music' => 'Playful interactive percussion and marimba',
+                            'title' => 'Frame 03 (00:10 - 00:15): Wacika - Kesucian Perkataan',
+                            'action_id' => '[Menyambung langsung dari Frame 2] Bangkit melangkah ke jalan setapak, pandita cilik menyapa sahabatnya yang sedang belajar dengan senyuman dan sapaan santun.',
+                            'action_en' => '[Continues directly from Frame 2] The boy steps onto a cobblestone path, warmly greeting a young friend reading palm-leaf scriptures with a kind smile and gentle bow.',
+                            'dialogue' => 'Kedua: Wacika Parisudha. Berkata jujur, menyejukkan hati, dan tidak menyakiti sesama.',
+                            'sfx' => '*Light footsteps on stone!* *Friendly soft greeting voice!*',
+                            'music' => 'Playful uplifting strings and xylophone harmony',
                         ],
                         [
-                            'title' => 'Detik 15-20: Menanam dengan Ketulusan Hati',
-                            'action_id' => 'Wayan menanam bibit ke dalam tanah dan menyiramnya dengan air kelapa suci, tunas seketika memancarkan pendar cahaya keemasan.',
-                            'action_en' => 'The boy gently pats the fertile soil around the seedling, pouring fresh clear water from a coconut shell, magical golden aura shimmering from the roots.',
-                            'dialogue' => 'Tumbuhlah kuat dan teduh, lindungi semua makhluk hidup.',
-                            'sfx' => '*Water splash!* *Magical sprout sparkle!*',
-                            'music' => 'Inspiring orchestral gamelan fusion swell',
+                            'title' => 'Frame 04 (00:15 - 00:20): Kayika - Perbuatan Luhur Nyata',
+                            'action_id' => '[Menyambung langsung dari Frame 3] Keduanya melihat anak burung yang terjatuh dari dahan pohon kamboja, lalu bersama-sama mengangkatnya dengan lembut kembali ke sarang.',
+                            'action_en' => '[Continues directly from Frame 3] Both children spot a little bird on the grass, carefully cradling it with both hands and safely returning it to its nest in the frangipani branch.',
+                            'dialogue' => 'Ketiga: Kayika Parisudha. Perbuatan baik nyata, mengasihi semua makhluk ciptaan Tuhan.',
+                            'sfx' => '*Bird gentle chirp!* *Leaves rustling softly!*',
+                            'music' => 'Heartwarming inspiring orchestral swell with acoustic guitar',
                         ],
                         [
-                            'title' => 'Detik 20-25: Pesan Luhur Tri Hita Karana',
-                            'action_id' => 'Pohon tumbuh dengan cepat memayungi Wayan dan hewan-hewan desa yang berkumpul damai di bawahnya.',
-                            'action_en' => 'The young tree blossoms into a beautiful canopy, birds, monkeys, and deer resting peacefully together in harmonious coexistence beneath the shade.',
-                            'dialogue' => 'Ketika kita mengasihi alam, alam akan menjaga kita selamanya.',
-                            'sfx' => '*Gentle breeze whoosh!* *Birds singing in harmony!*',
-                            'music' => 'Heartwarming majestic instrumental chorus',
+                            'title' => 'Frame 05 (00:20 - 00:25): Buah Manis Hukum Karma Phala',
+                            'action_id' => '[Menyambung langsung dari Frame 4] Pohon kamboja bergoyang lembut menjatuhkan bunga-bunga harum, anak burung berkicau riang memancarkan pendar kehangatan.',
+                            'action_en' => '[Continues directly from Frame 4] Frangipani blossoms shower gently over the children, golden sunlight filtering through leaves, reflecting the joy of selfless virtue.',
+                            'dialogue' => 'Hukum Karma Phala mengajarkan: siapa menanam kebajikan, pasti memetik kebahagiaan.',
+                            'sfx' => '*Flower shower flutter!* *Golden harmonic bell!*',
+                            'music' => 'Lush joyful gamelan orchestral crescendo',
                         ],
                         [
-                            'title' => 'Detik 25-30: Penutup Doa Damai',
-                            'action_id' => 'Wayan tersenyum damai menangkupkan tangan, kelopak bunga kamboja melayang lembut menutupi layar.',
-                            'action_en' => 'The boy smiles serenely at the viewer with folded palms, fragrant frangipani blossoms drifting gently across the screen, radiant sunset glow.',
-                            'dialogue' => 'Om Shanti Shanti Shanti Om. Damai di hati, damai di dunia.',
-                            'sfx' => '*Resonant brass gong!* *Soft wind chime!*',
-                            'music' => 'Deeply peaceful meditative gamelan outro',
+                            'title' => 'Frame 06 (00:25 - 00:30): Penutup - Doa Kedamaian Semesta',
+                            'action_id' => '[Menyambung langsung dari Frame 5] Kedua anak berdiri berdampingan mengatupkan tangan ke arah kamera, tersenyum damai saat latar pura disinari fajar keemasan.',
+                            'action_en' => '[Continues directly from Frame 5] Both children stand side by side, bowing politely with palms pressed together, radiant warm smile towards viewers.',
+                            'dialogue' => 'Jadilah pribadi yang suci pikiran, kata, dan perbuatan. Om Shanti Shanti Shanti Om.',
+                            'sfx' => '*Resonant temple gong chime!* *Sacred chime finish!*',
+                            'music' => 'Deep spiritual chorus and Balinese suling finale',
                         ],
                     ],
-                    'actions_60s' => $this->buildTwelveSceneSequence('dharma_kids', $character),
+                    'actions_60s' => $this->buildTwelveHinduSceneSequence('dharma_philosophy', $character),
                 ];
 
-            case 'comedy':
+            case 'hindu_traditions':
                 return [
-                    'environment' => 'lively cartoon traditional village kitchen with stacked clay pots, wooden steamers, and floating aroma lines',
+                    'environment' => 'vibrant Balinese village street lined with majestic curved penjor bamboo poles decorated with yellow young coconut leaves (janur) leading to a grand candi bentar temple gate',
                     'actions_30s' => [
                         [
-                            'title' => 'Detik 0-5: Misi Rahasia si Kucing Oren',
-                            'action_id' => 'Kucing oren gembul mengendap-endap dengan kacamata hitam mini di balik tudung saji bambu, mengincar piring kue.',
-                            'action_en' => 'A chubby orange tabby cat wears miniature funny sunglasses, sneaking on tiptoes behind a woven food cover, targeting a steaming plate of cakes.',
-                            'dialogue' => '*Meow meong*... Target terdeteksi di atas meja!',
-                            'sfx' => '*Pink Panther-style stealth tiptoe!*',
-                            'music' => 'Sneaky playful jazz cartoon rhythm',
+                            'title' => 'Frame 01 (00:00 - 00:05): Hook - Semarak Hari Raya Galungan',
+                            'action_id' => 'Wayan cilik menatap takjub deretan penjor bambu tinggi melengkung yang dihiasi janur kuning keemasan berkilauan di sepanjang jalan desa.',
+                            'action_en' => 'Little Wayan dressed in immaculate white traditional Balinese safari shirt and yellow udeng headcloth gazes up in wonder at majestic curved penjor poles lining the stone village road.',
+                            'dialogue' => 'Rahajeng Rahina Galungan! Hari kemenangan Dharma atas Adharma telah tiba.',
+                            'sfx' => '*Festive temple gong chime!* *Breeze fluttering coconut palm leaves!*',
+                            'music' => 'Celebratory traditional Balinese gamelan Gong Kebyar with bright brass',
                         ],
                         [
-                            'title' => 'Detik 5-10: Gerakan Akrobatik yang Gagal',
-                            'action_id' => 'Kucing melompat tinggi berniat mendarat di kursi, namun kakinya terpeleset kulit pisang kartun.',
-                            'action_en' => 'The cat leaps dramatically in slow-motion, but its back paws comically slip on a bright yellow cartoon banana peel, legs spinning like windmills.',
-                            'dialogue' => 'Aduh duh duh... Rem blong!',
-                            'sfx' => '*Slipping rubber screech!* *Cartoon slide whistle!*',
-                            'music' => 'Frantic comedic brass and slide trombone',
+                            'title' => 'Frame 02 (00:05 - 00:10): Menghaturkan Canang Sari Harum',
+                            'action_id' => '[Menyambung langsung dari Frame 1] Ni Luh mendekat membawa baki anyaman bambu berisi canang sari segar bertabur bunga kenanga, kamboja, dan pacar air.',
+                            'action_en' => '[Continues directly from Frame 1] Little sister Ni Luh steps up carrying a woven bamboo tray of fresh fragrant canang sari offerings filled with colorful flowers and burning incense stick.',
+                            'dialogue' => 'Setiap kelopak bunga pada Canang Sari melambangkan rasa syukur dan ketulusan hati kita.',
+                            'sfx' => '*Incense fragrant crackle!* *Footsteps on stone path!*',
+                            'music' => 'Gentle harmonious gamelan melody with warm bells',
                         ],
                         [
-                            'title' => 'Detik 10-15: Kekacauan Dapur Menggelikan',
-                            'action_id' => 'Kucing mendarat tepat di atas wajan tepung, membuat tepung putih meledak menutupi wajahnya seperti badut.',
-                            'action_en' => 'The cat crash-lands into a wooden flour bowl, a big comical puff of white flour exploding, leaving the cat looking like a bewildered snowman.',
-                            'dialogue' => 'Uhuk uhuk! Sejak kapan aku jadi kucing salju?',
-                            'sfx' => '*Poof!* *Cough sound!* *Cymbal crash!*',
-                            'music' => 'Fast-paced circus cartoon gallop',
+                            'title' => 'Frame 03 (00:10 - 00:15): Meletakkan Sesaji di Pelinggih Suci',
+                            'action_id' => '[Menyambung langsung dari Frame 2] Keduanya bersama-sama meletakkan canang sari ke atas pelinggih batu berukir di depan gapura pura keluarga.',
+                            'action_en' => '[Continues directly from Frame 2] Both children place the canang sari with both hands onto a black volcanic stone family temple shrine adorned with yellow sacred cloth.',
+                            'dialogue' => 'Kami haturkan rasa syukur atas berkah kesehatan, kedamaian, dan keselamatan hidup.',
+                            'sfx' => '*Soft shrine placement sound!* *Wafting incense smoke!*',
+                            'music' => 'Solemn peaceful acoustic gamelan suling and strings',
                         ],
                         [
-                            'title' => 'Detik 15-20: Pengejaran Sapu Terbang Mbok Made',
-                            'action_id' => 'Mbok Made datang memegang sapu lidi sambil tertawa geli, mengejar si kucing oren yang berlari zig-zag.',
-                            'action_en' => 'A kindly cartoon village grandmother chuckles warmly, chasing the white-floured orange cat who scampers in hilarious zigzag cartoon speed trails.',
-                            'dialogue' => 'Heh Meng! Mau kue minta baik-baik, jangan mencuri!',
-                            'sfx' => '*Bong-bong-bong footsteps!* *Laughter sound!*',
-                            'music' => 'Zany slapstick chase music with banjos and horns',
+                            'title' => 'Frame 04 (00:15 - 00:20): Percikan Tirta Suci Penyucian',
+                            'action_id' => '[Menyambung langsung dari Frame 3] Pandita sepuh memercikkan air suci (Tirta) menggunakan pucuk daun ilalang ke kepala anak-anak yang menunduk khidmat.',
+                            'action_en' => '[Continues directly from Frame 3] An elder priest in white sprinkles glistening holy water (Tirta) using sacred grass onto the children\'s heads, water droplets glowing in sunlight.',
+                            'dialogue' => 'Tirta suci membersihkan pikiran, perkataan, dan raga kita agar senantiasa teguh di jalan kebenaran.',
+                            'sfx' => '*Water droplet splash chime!* *Priest soft sacred mantra chant!*',
+                            'music' => 'Transcendent spiritual chorus with sacred bell resonance',
                         ],
                         [
-                            'title' => 'Detik 20-25: Akhirnya Diberi Makan dengan Senang',
-                            'action_id' => 'Kucing duduk manis dengan wajah melas andalannya, dan Mbok Made menyuapinya sepotong kue kukus hangat.',
-                            'action_en' => 'The cat sits upright doing giant cute teary anime puppy eyes, and the grandmother happily hands him a delicious warm sweet treat on a banana leaf.',
-                            'dialogue' => 'Nyam nyam... Kalau minta baik-baik ternyata langsung dikasih!',
-                            'sfx' => '*Purr purr!* *Munching smacks!*',
-                            'music' => 'Sweet heartwarming cartoon waltz',
+                            'title' => 'Frame 05 (00:20 - 00:25): Biji Beras Bija di Kening Kesucian',
+                            'action_id' => '[Menyambung langsung dari Frame 4] Wayan dan Ni Luh saling tersenyum bahagia dengan butiran beras suci (Bija) terpasang di dahi mereka, melambangkan kemakmuran batin.',
+                            'action_en' => '[Continues directly from Frame 4] The children smile joyously at each other with sacred raw rice grains (Bija) pressed onto their foreheads and throats, radiating spiritual bliss.',
+                            'dialogue' => 'Hati terasa begitu damai dan tentram ketika kita senantiasa bersyukur.',
+                            'sfx' => '*Chime twinkle!* *Happy laughter echo!*',
+                            'music' => 'Joyful celebratory gamelan orchestral harmony',
                         ],
                         [
-                            'title' => 'Detik 25-30: Perut Kenyang dan Kedipan Usil',
-                            'action_id' => 'Kucing oren tidur terlentang dengan perut bulat kenyang, mengacungkan jempol ke kamera sambil tersenyum lebar.',
-                            'action_en' => 'The round-bellied cat reclines happily like a king on a woven mat, tapping its full tummy and giving a cheeky cartoon wink to viewers.',
-                            'dialogue' => 'Ingat kawan: mintalah dengan sopan, jangan pakai drama terpeleset!',
-                            'sfx' => '*Satisfied burp chime!* *Funny ding!*',
-                            'music' => 'Jovial brass horn comedy ending chord',
+                            'title' => 'Frame 06 (00:25 - 00:30): Resolusi & Salam Rahajeng Galungan',
+                            'action_id' => '[Menyambung langsung dari Frame 5] Keduanya mengatupkan tangan di depan candi bentar pura megah, mengucapkan salam damai bagi seluruh umat manusia.',
+                            'action_en' => '[Continues directly from Frame 5] The children fold their hands in formal prayer greeting before the towering stone temple split-gate, warm sunset glowing behind the penjor poles.',
+                            'dialogue' => 'Semoga Dharma senantiasa menang dalam diri kita semua. Om Shanti Shanti Shanti Om.',
+                            'sfx' => '*Grand temple gong toll!* *Evening breeze whoosh!*',
+                            'music' => 'Grand majestic Balinese gamelan finale with deep brass resonance',
                         ],
                     ],
-                    'actions_60s' => $this->buildTwelveSceneSequence('comedy', $character),
+                    'actions_60s' => $this->buildTwelveHinduSceneSequence('hindu_traditions', $character),
                 ];
 
-            default:
+            default: // deva_wisdom or custom_hindu
                 return [
-                    'environment' => 'colorful wondrous cartoon adventure land filled with glowing flora, sparkling crystal formations, and warm ambient sunlight',
+                    'environment' => 'heavenly sacred Mount Kailash landscape with golden pavilions, blooming blue lotus lakes, and divine radiant cloud formations',
                     'actions_30s' => [
                         [
-                            'title' => 'Detik 0-5: Pembuka Petualangan yang Menakjubkan',
-                            'action_id' => 'Karakter utama melangkah keluar ke padang rumput bercahaya dengan tatapan penuh rasa ingin tahu dan keberanian.',
-                            'action_en' => 'The protagonist steps forward into a vibrant glowing meadow, eyes shining with boundless adventurous spirit, soft breeze rustling clothing.',
-                            'dialogue' => 'Petualangan terbesar selalu dimulai dari satu langkah berani!',
-                            'sfx' => '*Whoosh!* *Magical twinkle!*',
-                            'music' => 'Uplifting cinematic fantasy cartoon theme',
+                            'title' => 'Frame 01 (00:00 - 00:05): Hook - Kebijaksanaan Sang Ganesha Cilik',
+                            'action_id' => 'Ganesha cilik berkepala gajah lucu tersenyum cerdas memegang mangkuk modak manis, memandang saudaranya Kartikeya yang sedang menunggangi burung merak.',
+                            'action_en' => 'Little Lord Ganesha with cute elephant head and golden jewel crown smiles warmly holding a bowl of sweet golden modak sweets, watching brother Kartikeya prepare on his peacock.',
+                            'dialogue' => 'Siapapun yang mengelilingi dunia paling cepat akan mendapatkan buah kebijaksanaan dewata.',
+                            'sfx' => '*Divine bell chime!* *Peacock flap whoosh!*',
+                            'music' => 'Playful celestial Indian-Balinese fusion orchestral rhythm',
                         ],
                         [
-                            'title' => 'Detik 5-10: Menemukan Petunjuk Misteri',
-                            'action_id' => 'Karakter menemukan peta kuno bercahaya di atas batu kristal dan memperhatikannya dengan ekspresi takjub.',
-                            'action_en' => 'The character discovers an ancient glowing cartoon scroll hovering above a magical crystal pedestal, examining it with joyful wonder.',
-                            'dialogue' => 'Lihat peta ini, jalannya terbuka untuk kita!',
-                            'sfx' => '*Chime!* *Energy hum!*',
-                            'music' => 'Curious and adventurous woodwind cadence',
+                            'title' => 'Frame 02 (00:05 - 00:10): Kartikeya Melesat Keliling Dunia',
+                            'action_id' => '[Menyambung langsung dari Frame 1] Kartikeya terbang melesat mengelilingi tujuh benua dan samudra, sementara Ganesha cilik tetap tenang berpikir jernih.',
+                            'action_en' => '[Continues directly from Frame 1] Kartikeya zooms away across outer planetary skies, while little Ganesha pauses with his index finger on chin, pondering with profound divine wit.',
+                            'dialogue' => 'Kakakku terbang mengelilingi jagat raya fisik dengan kecepatan kilat...',
+                            'sfx' => '*Sonic flight whoosh!* *Chime ding!*',
+                            'music' => 'Curious playful marimba and sitar tempo',
                         ],
                         [
-                            'title' => 'Detik 10-15: Menghadapi Rintangan dengan Tawa',
-                            'action_id' => 'Karakter melompati batu-batu apung di atas sungai pelangi dengan gerakan lincah dan tawa ceria.',
-                            'action_en' => 'The character hops playfully across floating stepping stones above a luminescent rainbow river, balancing with comedic grace.',
-                            'dialogue' => 'Lompat ke kiri, lompat ke kanan... Berhasil!',
-                            'sfx' => '*Boing!* *Splash twinkle!*',
-                            'music' => 'Dynamic kinetic orchestral sprint',
+                            'title' => 'Frame 03 (00:10 - 00:15): Melangkah Penuh Hormat kepada Orang Tua',
+                            'action_id' => '[Menyambung langsung dari Frame 2] Ganesha cilik melangkah anggun mendekati tahta Dewa Siwa dan Dewi Parwati yang sedang duduk bersanding penuh kasih.',
+                            'action_en' => '[Continues directly from Frame 2] Little Ganesha walks with gentle respectful steps toward the throne where parents Lord Shiva and Goddess Parvati sit with loving smiles.',
+                            'dialogue' => 'Namun bagiku, semesta yang paling agung dan suci ada di hadapanku.',
+                            'sfx' => '*Soft footsteps on cloud!* *Lotus petal flutter!*',
+                            'music' => 'Heartwarming spiritual melody with sweet flute and strings',
                         ],
                         [
-                            'title' => 'Detik 15-20: Bekerja Sama dengan Teman Setia',
-                            'action_id' => 'Sahabat karakter mengulurkan tangan membantu menariknya ke tebing atas saat hampir terpeleset.',
-                            'action_en' => 'A loyal animated companion reaches down from the grassy cliff ledge, gripping hands and hoisting the character up with a triumph shout.',
-                            'dialogue' => 'Pegang tanganku! Bersama kita tidak terkalahkan!',
-                            'sfx' => '*Grip whoosh!* *Cheering shout!*',
-                            'music' => 'Triumphant heroic brass crescendo',
+                            'title' => 'Frame 04 (00:15 - 00:20): Mengelilingi Orang Tua dengan Kasih Tulus (Pradaksina)',
+                            'action_id' => '[Menyambung langsung dari Frame 3] Ganesha cilik berjalan mengitari kedua orang tuanya (Pradaksina) tiga kali dengan kedua tangan terkatup penuh rasa hormat.',
+                            'action_en' => '[Continues directly from Frame 3] Little Ganesha circles around his divine parents with hands pressed in deep prayer, radiant golden halos connecting parent and child.',
+                            'dialogue' => 'Ibu dan Ayah adalah sumber dari seluruh kehidupan, cinta, dan alam semesta itu sendiri.',
+                            'sfx' => '*Warm sacred hum!* *Sparkling aura chime!*',
+                            'music' => 'Deeply emotional orchestral swell celebrating parental love',
                         ],
                         [
-                            'title' => 'Detik 20-25: Menemukan Puncak Keindahan',
-                            'action_id' => 'Keduanya berdiri di puncak bukit memandang kastil awan megah dengan kembang api kebaikan meletup di langit.',
-                            'action_en' => 'Both characters gaze in awe from the scenic hilltop at a majestic cloud castle, colorful pastel fireworks exploding peacefully in the sky.',
-                            'dialogue' => 'Semua kerja keras dan kejujuran berbuah manis!',
-                            'sfx' => '*Firework whistle!* *Pop sparkles!*',
-                            'music' => 'Grand emotional cinematic cartoon swell',
+                            'title' => 'Frame 05 (00:20 - 00:25): Berkah dan Pujian Dewata Semesta',
+                            'action_id' => '[Menyambung langsung dari Frame 4] Dewa Siwa dan Dewi Parwati tersenyum bangga memeluk Ganesha cilik, hujan kelopak bunga emas turun dari langit kahyangan.',
+                            'action_en' => '[Continues directly from Frame 4] Lord Shiva and Parvati embrace little Ganesha with supreme pride, golden flower petals raining down as devas cheer in divine approval.',
+                            'dialogue' => 'Bakti tulus kepada orang tua bernilai lebih mulia daripada mengelilingi seluruh penjuru bumi.',
+                            'sfx' => '*Celestial shower chime!* *Trumpet fanfare!*',
+                            'music' => 'Triumphant glorious heavenly orchestral climax',
                         ],
                         [
-                            'title' => 'Detik 25-30: Salam Kemenangan & Pesan Moral',
-                            'action_id' => 'Karakter menoleh ke arah penonton, tersenyum lebar dan mengangkat jempol sebagai penutup cerita yang hangat.',
-                            'action_en' => 'The character faces the audience with a beaming warm smile, waving enthusiastically as credits aura shines around the frame.',
-                            'dialogue' => 'Percayalah pada kebaikan hatimu, sampai jumpa di petualangan berikutnya!',
-                            'sfx' => '*Heart chime!* *Victory fanfare!*',
-                            'music' => 'Uplifting grand cartoon finale flourish',
+                            'title' => 'Frame 06 (00:25 - 00:30): Resolusi & Doa Kebijaksanaan',
+                            'action_id' => '[Menyambung langsung dari Frame 5] Ganesha cilik tersenyum manis ke arah penonton mengangkat tangan kanannya dalam mudra berkah keselamatan (Abhaya Mudra).',
+                            'action_en' => '[Continues directly from Frame 5] Little Ganesha faces viewers with joyful sparkling eyes, raising right hand in Abhaya Mudra blessing of protection and wisdom.',
+                            'dialogue' => 'Hormatilah orang tuamu dengan tulus, niscaya jalan hidupmu senantiasa terang. Om Shanti Shanti Shanti Om.',
+                            'sfx' => '*Grand sacred gong bell chime!* *Soft Om resonance!*',
+                            'music' => 'Sacred peaceful Hindu flute and temple bell outro',
                         ],
                     ],
-                    'actions_60s' => $this->buildTwelveSceneSequence($themeKey, $character),
+                    'actions_60s' => $this->buildTwelveHinduSceneSequence('deva_wisdom', $character),
                 ];
         }
     }
 
     /**
-     * Build 12 structured 5-second scenes totaling exactly 60 seconds (1 Minute).
+     * Build 12 structured 5-second scenes totaling exactly 60 seconds (1 Minute) specifically for Hindu stories.
      */
-    protected function buildTwelveSceneSequence(string $themeKey, string $character): array
+    protected function buildTwelveHinduSceneSequence(string $themeKey, string $character): array
     {
         return [
             [
-                'title' => 'Frame 01 (00:00 - 00:05): Hook Pembuka yang Menawan',
-                'action_id' => 'Karakter utama terbangun di pagi hari dengan senyuman lebar, membuka jendela pondok kayu yang menghadap pemandangan magis.',
-                'action_en' => 'The protagonist awakens cheerfully, throwing open rustic wooden cottage shutters to reveal a breathtaking panoramic cartoon vista bathed in morning sunlight.',
-                'dialogue' => 'Pagi yang luar biasa! Hari baru, petualangan baru!',
-                'sfx' => '*Shutter creek!* *Morning rooster/bird call!*',
-                'music' => 'Warm acoustic opening melody with flute',
+                'title' => 'Frame 01 (00:00 - 00:05): Hook - Pengenalan Tokoh Suci di Pagi Hari',
+                'action_id' => 'Karakter utama terbangun di ashram suci, mengatupkan tangan dalam puja Tri Sandhya menyambut sang surya terbit di ufuk timur.',
+                'action_en' => '[Scene 01 of 12] The virtuous character begins the day beside an ancient Balinese temple shrine, hands in sacred Anjali Mudra greeting golden morning sunrise.',
+                'dialogue' => 'Om Swastyastu. Pagi yang suci untuk memulai langkah kebajikan di jalan Dharma.',
+                'sfx' => '*Sacred bronze bell chime!* *Morning songbird melody!*',
+                'music' => 'Calm Balinese bamboo suling and acoustic strings opening',
             ],
             [
-                'title' => 'Frame 02 (00:05 - 00:10): Persiapan dan Perlengkapan Unik',
-                'action_id' => 'Karakter mengemas ransel kecilnya dengan barang-barang lucu (botol air bambu, kompas buah, dan bekal kue manis).',
-                'action_en' => 'The character playfully packs a colorful backpack, tossing in whimsical cartoon supplies while doing a happy little dance.',
-                'dialogue' => 'Bekal sudah siap, topi sudah rapi, saatnya berangkat!',
-                'sfx' => '*Zip!* *Bag thump!* *Jingle chime!*',
-                'music' => 'Playful marching tempo with marimba',
+                'title' => 'Frame 02 (00:05 - 00:10): Niat Suci Menjalankan Amanat Dharma',
+                'action_id' => '[Menyambung langsung dari Frame 1] Beranjak dari tempat duduknya, karakter merapikan pakaian adat putih suci dan mengambil lontar suci petunjuk kebajikan.',
+                'action_en' => '[Continues directly from Frame 1] Stepping smoothly onto the courtyard stones, the character checks a sacred palm-leaf scripture with a calm focused expression.',
+                'dialogue' => 'Hari ini kita akan mengamalkan Tri Hita Karana demi menjaga keharmonisan alam dan sesama.',
+                'sfx' => '*Soft footsteps on stone!* *Rustle of palm leaf!*',
+                'music' => 'Uplifting gentle gamelan rhythm with marimba',
             ],
             [
-                'title' => 'Frame 03 (00:10 - 00:15): Perjalanan Melintasi Hutan Ajaib',
-                'action_id' => 'Karakter berjalan riang di jalan setapak, menyapa bunga-bunga kartun yang bernyanyi dan bergoyang ditiup angin.',
-                'action_en' => 'The character skips happily along a magical forest path, waving at singing colorful blossoms that sway to the rhythm.',
-                'dialogue' => 'Halo bunga-bunga cantik, semoga hari kalian menyenangkan!',
-                'sfx' => '*Boing steps!* *Sweet musical chime!*',
-                'music' => 'Bouncy rhythmic cartoon woodwind ensemble',
+                'title' => 'Frame 03 (00:10 - 00:15): Perjalanan Melintasi Pematang Sawah Suci',
+                'action_id' => '[Menyambung langsung dari Frame 2] Karakter berjalan riang menyusuri jalan pematang sawah berundak hijau, menyapa petani desa dengan senyuman santun.',
+                'action_en' => '[Continues directly from Frame 2] Walking along lush green terraced rice fields (Subak), the character bows politely to village elders, yellow udeng cloth bright in the sun.',
+                'dialogue' => 'Hubungan yang harmonis dengan sesama manusia adalah wujud nyata Pawongan.',
+                'sfx' => '*Cicada chirps!* *Water flowing in stone aqueduct!*',
+                'music' => 'Bouncy rhythmic traditional flute and percussive harmony',
             ],
             [
-                'title' => 'Frame 04 (00:15 - 00:20): Insiden Pemantik / Teka-teki Pertama',
-                'action_id' => 'Di tengah jalan, karakter menemukan jembatan gantung tua yang putus salah satu talinya karena tertiup angin kencang.',
-                'action_en' => 'The character halts at a scenic wooden suspension bridge over a sparkling canyon, noticing a detached rope swaying gently in the breeze.',
-                'dialogue' => 'Waduh, jembatannya terputus! Bagaimana caraku menyeberang?',
-                'sfx' => '*Creaking rope!* *Sudden comical brake sound!*',
-                'music' => 'Curious mystery tension with pizzicato strings',
+                'title' => 'Frame 04 (00:15 - 00:20): Ujian Kebajikan & Insiden di Hutan Pura',
+                'action_id' => '[Menyambung langsung dari Frame 3] Tiba di gerbang hutan pura, karakter mendapati mata air suci tersumbat oleh ranting pohon tumbang yang menghalangi aliran air ke desa.',
+                'action_en' => '[Continues directly from Frame 3] Approaching a moss-covered forest spring, the character notices fallen tree branches choking the sacred water flow to the village.',
+                'dialogue' => 'Mata air desa tersumbat! Jika dibiarkan, sawah dan warga akan kekurangan air bersih.',
+                'sfx' => '*Splashing water trickle!* *Creaking wood sound!*',
+                'music' => 'Curious and slightly dramatic strings with light tension',
             ],
             [
-                'title' => 'Frame 05 (00:20 - 00:25): Munculnya Sahabat Tak Terduga',
-                'action_id' => 'Seekor satwa hutan cilik yang lucu muncul dari balik dedaunan membawakan sulur rotan kuat untuk membantu.',
-                'action_en' => 'An adorable cartoon creature with big glassy eyes emerges from the ferns carrying a strong woven jungle vine, chirping happily.',
-                'dialogue' => 'Hai sahabat kecil, kamu mau membantuku memperbaiki jembatan?',
-                'sfx' => '*Creature cute squeak!* *Rustle!*',
-                'music' => 'Warm friendship theme with soft harp',
+                'title' => 'Frame 05 (00:20 - 00:25): Mengajak Sahabat Gotong Royong (Paras Paros)',
+                'action_id' => '[Menyambung langsung dari Frame 4] Karakter memanggil sahabat-sahabat ashram cilik, dan mereka berkumpul dengan semangat kebersamaan saling mengulurkan tangan.',
+                'action_en' => '[Continues directly from Frame 4] The character waves to friends who run forward enthusiastically, rolling up sleeves in joyful traditional teamwork (Gotong Royong).',
+                'dialogue' => 'Mari kita bersatu! Dengan semangat Paras Paros Sarpanaya, beban berat menjadi ringan.',
+                'sfx' => '*Friendly shouting voice!* *Footsteps running on grass!*',
+                'music' => 'Energetic positive cooperation rhythm with wooden bells',
             ],
             [
-                'title' => 'Frame 06 (00:25 - 00:30): Gotong Royong Memperbaiki Jembatan',
-                'action_id' => 'Keduanya bekerja sama mengikat sulur dengan simpul kuat, saling bertukar tawa dan tos tangan kartun.',
-                'action_en' => 'Both characters tie the vine together in comical synchronized teamwork, ending with an energetic cartoon high-five.',
-                'dialogue' => 'Tarik bersama-sama! Satu, dua, tiga... Kuat sekali!',
-                'sfx' => '*Rope tighten whoosh!* *High-five clap sound!*',
-                'music' => 'Energetic positive cooperation rhythm',
+                'title' => 'Frame 06 (00:25 - 00:30): Bekerja Sama Mengangkat Rintangan',
+                'action_id' => '[Menyambung langsung dari Frame 5] Bersama-sama, mereka menarik ranting kayu besar dengan tali rotan, saling memberi aba-aba dengan senyuman dan tawa ceria.',
+                'action_en' => '[Continues directly from Frame 5] The children pull the fallen log together using strong woven vines, timing their pulls with joyous synchronized cartoon energy.',
+                'dialogue' => 'Satu, dua, tiga... Tarik! Kebersamaan adalah kekuatan Dharma.',
+                'sfx' => '*Wood creak whoosh!* *High-five slap sound!*',
+                'music' => 'Lively rhythmic Balinese gamelan fusion with cheerful horns',
             ],
             [
-                'title' => 'Frame 07 (00:30 - 00:35): Menyeberangi Jurang Penuh Keberanian',
-                'action_id' => 'Karakter melangkah mantap menyeberangi jembatan yang kini kokoh, memandang air terjun pelangi di bawahnya.',
-                'action_en' => 'The character marches confidently across the restored bridge, looking down at a mesmerizing rainbow waterfall spraying glistening mist.',
-                'dialogue' => 'Lihat ke bawah! Sungguh pemandangan yang tiada duanya!',
-                'sfx' => '*Waterfall roar in background!* *Wind whoosh!*',
-                'music' => 'Inspiring orchestral crescendo',
+                'title' => 'Frame 07 (00:30 - 00:35): Air Suci Mengalir Jernih Kembali',
+                'action_id' => '[Menyambung langsung dari Frame 6] Kayu berhasil disingkirkan, air mata air yang jernih memancar deras dan berkilauan mengaliri parit-parit sawah.',
+                'action_en' => '[Continues directly from Frame 6] Crystal clear water bursts forth through the stone channel, sparkling with rainbow droplets as small fish swim joyously.',
+                'dialogue' => 'Lihat! Tirta suci kehidupan kembali mengalir lancar ke seluruh penjuru desa.',
+                'sfx' => '*Rushing clear water roar!* *Sparkling bubble sounds!*',
+                'music' => 'Inspiring orchestral crescendo with flute flourishes',
             ],
             [
-                'title' => 'Frame 08 (00:35 - 00:40): Memasuki Lembah Rahasia',
-                'action_id' => 'Mereka tiba di lembah tersembunyi yang dipenuhi pohon kristal buah bercahaya dalam berbagai warna pastel.',
-                'action_en' => 'They step into a hidden mythical valley filled with luminescent crystal trees bearing fruit in soft pastel hues, glowing gently.',
-                'dialogue' => 'Ini dia Lembah Impian yang sering diceritakan kakek!',
-                'sfx' => '*Magical shimmer sound!* *Chime harmonic!*',
-                'music' => 'Wondrous celestial bells and strings',
+                'title' => 'Frame 08 (00:35 - 00:40): Menghaturkan Canang Sari Rasa Syukur',
+                'action_id' => '[Menyambung langsung dari Frame 7] Sebagai wujud terima kasih pada alam (Palemahan), karakter meletakkan canang sari harum di dekat pancuran mata air suci.',
+                'action_en' => '[Continues directly from Frame 7] The character kneels gently beside the pristine spring, placing a fresh flower canang sari on a stone ledge in grateful reverence.',
+                'dialogue' => 'Menjaga kelestarian alam adalah wujud cinta kasih kita kepada Sang Pencipta.',
+                'sfx' => '*Incense crackle!* *Gentle water cascade!*',
+                'music' => 'Heartwarming emotional melody with strings and bells',
             ],
             [
-                'title' => 'Frame 09 (00:40 - 00:45): Rintangan Lucu di Puncak Lembah',
-                'action_id' => 'Karakter dikejutkan oleh hembusan angin usil yang menerbangkan topinya ke atas dahan pohon tertinggi.',
-                'action_en' => 'A playful cartoon gust of wind swoops in, blowing the character\'s hat high up into a tall bouncy mushroom branch.',
-                'dialogue' => 'Eits! Topiku jangan kabur dong!',
-                'sfx' => '*Whoosh gust!* *Cartoon slide whistle up!*',
-                'music' => 'Fast comedic chase tempo with brass',
+                'title' => 'Frame 09 (00:40 - 00:45): Burung dan Satwa Datang Minum Damai',
+                'action_id' => '[Menyambung langsung dari Frame 8] Burung-burung pipit dan satwa hutan turun minum dengan damai di tepi aliran air tanpa rasa takut kepada anak-anak.',
+                'action_en' => '[Continues directly from Frame 8] Colorful songbirds and gentle forest deer sip the clear fresh water alongside the smiling children in complete harmony.',
+                'dialogue' => 'Semua makhluk hidup hidup rukun dan berdampingan dalam kedamaian semesta.',
+                'sfx' => '*Sweet bird singing in chorus!* *Gentle wind whoosh!*',
+                'music' => 'Lush atmospheric orchestral swell with serene flute',
             ],
             [
-                'title' => 'Frame 10 (00:45 - 00:50): Klimaks Aksi Melompat Cerdas',
-                'action_id' => 'Karakter memanfaatkan jamur pegas untuk melompat tinggi ke udara, menangkap topinya sambil berputar 360 derajat.',
-                'action_en' => 'The character bounces off a giant springy mushroom, flying high in a 360-degree comical spin, snatching the hat with a triumphant grin.',
-                'dialogue' => 'Kena kau! Hup!',
-                'sfx' => '*Boiiiing!* *Sparkle catch sound!*',
-                'music' => 'Thrilling acrobatic brass flourish',
+                'title' => 'Frame 10 (00:45 - 00:50): Petang Menjelang di Pelataran Pura',
+                'action_id' => '[Menyambung langsung dari Frame 9] Matahari sore melukiskan langit jingga keemasan saat anak-anak melangkah pulang menuju pelataran candi bentar pura agung.',
+                'action_en' => '[Continues directly from Frame 9] The children walk back together toward the majestic candi bentar temple gate bathed in glorious golden sunset hues.',
+                'dialogue' => 'Hari yang dipenuhi perbuatan baik selalu meninggalkan kebahagiaan mendalam di hati.',
+                'sfx' => '*Evening temple gong toll!* *Distant breeze!*',
+                'music' => 'Grand noble gamelan orchestral theme',
             ],
             [
-                'title' => 'Frame 11 (00:50 - 00:55): Resolusi dan Berbagi Kebahagiaan',
-                'action_id' => 'Mendarat mulus di pelukan sahabatnya, mereka duduk bersama menikmati buah kristal manis sambil memandang langit senja jingga.',
-                'action_en' => 'Landing softly on moss, both characters sit together sharing sweet glowing fruit, watching the majestic sunset paint the sky in orange and violet.',
-                'dialogue' => 'Tidak ada rintangan yang tak bisa dilewati jika kita selalu ceria dan berusaha.',
-                'sfx' => '*Sweet munch smacks!* *Calm evening breeze!*',
-                'music' => 'Gentle emotional acoustic guitar and cello',
+                'title' => 'Frame 11 (00:50 - 00:55): Berkumpul dalam Puja Shanti Bersama',
+                'action_id' => '[Menyambung langsung dari Frame 10] Warga desa menyambut anak-anak dengan senyuman hangat, semua duduk bersila bersama memanjatkan doa kedamaian.',
+                'action_en' => '[Continues directly from Frame 10] Villagers and children gather in the temple courtyard, all seated cross-legged with hands in Anjali Mudra, incense smoke curling upward.',
+                'dialogue' => 'Kebaikan kecil yang dilakukan dengan tulus akan membawa kedamaian bagi seluruh semesta.',
+                'sfx' => '*Resonant bronze bell chime!* *Deep bell reverberation!*',
+                'music' => 'Deep spiritual chorus with serene gamelan bells',
             ],
             [
-                'title' => 'Frame 12 (00:55 - 01:00): Penutup 1 Menit & Pesan Kebaikan',
-                'action_id' => 'Karakter menoleh ke arah penonton, tersenyum lebar dengan mata berbinar, melambaikan tangan bersama sahabatnya saat layar perlahan memudar.',
-                'action_en' => 'Both characters stand side-by-side, waving happily with big warm cartoon smiles at the camera as golden twilight dust envelopes the frame.',
-                'dialogue' => 'Terima kasih sudah menemani petualangan 1 menit ini. Tetaplah berbuat baik dan ceria setiap hari!',
-                'sfx' => '*Chime sparkle finale!* *Warm celebratory chime!*',
-                'music' => 'Grand heartwarming cartoon orchestral finale',
+                'title' => 'Frame 12 (00:55 - 01:00): Resolusi 1 Menit & Salam Luhur',
+                'action_id' => '[Menyambung langsung dari Frame 11] Karakter utama menoleh ke arah penonton, tersenyum teduh dan mengatupkan kedua tangan di depan dada menutup kisah 1 menit.',
+                'action_en' => '[Continues directly from Frame 11] The young protagonist bows with a luminous peaceful smile toward camera, sunset glow crowning the temple towers.',
+                'dialogue' => 'Semoga semua makhluk senantiasa hidup damai dan berbahagia. Om Shanti Shanti Shanti Om.',
+                'sfx' => '*Grand temple gong resonance finale!* *Peaceful chime decay!*',
+                'music' => 'Grand sacred Balinese gamelan and choir orchestral finale',
             ],
         ];
     }

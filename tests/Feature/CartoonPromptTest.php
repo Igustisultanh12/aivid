@@ -35,25 +35,26 @@ class CartoonPromptTest extends TestCase
         $response->assertRedirect('/login');
     }
 
-    public function test_user_can_generate_30_second_cartoon_prompts(): void
+    public function test_user_can_generate_30_second_hindu_cartoon_prompts_with_continuity(): void
     {
         $user = User::factory()->create();
 
         $response = $this->actingAs($user)->post('/cartoon-prompts/generate', [
-            'title' => 'Kisah Cerdik Kancil & Apel Emas',
-            'theme' => 'fable',
+            'title' => 'Kisah Kesetiaan Sang Hanuman Cilik',
+            'theme' => 'ramayana_mahabharata',
             'target_duration' => 30,
             'visual_style' => 'pixar_3d',
             'target_engine' => 'kling_ai',
             'aspect_ratio' => '9:16',
-            'character_description' => 'Kancil kecil cerdik bersyal hijau',
-            'story_premise' => 'Kancil mencari buah apel emas di atas pohon tinggi',
+            'character_description' => 'Sang Hanuman cilik berbulu putih salju mengenakan mahkota emas permata',
+            'story_premise' => 'Hanuman cilik terbang melintasi langit senja mencari tanaman obat suci Sanjiwani',
         ]);
 
         $project = CartoonPromptProject::where('user_id', $user->id)->first();
 
         $this->assertNotNull($project);
-        $this->assertEquals('Kisah Cerdik Kancil & Apel Emas', $project->title);
+        $this->assertEquals('Kisah Kesetiaan Sang Hanuman Cilik', $project->title);
+        $this->assertEquals('ramayana_mahabharata', $project->theme);
         $this->assertEquals(30, $project->target_duration);
         $this->assertEquals(6, $project->scene_count);
         $this->assertEquals(30.0, (float) $project->total_duration);
@@ -66,28 +67,43 @@ class CartoonPromptTest extends TestCase
         $this->assertEquals(5.0, (float) $firstScene->end_second);
         $this->assertNotEmpty($firstScene->visual_prompt);
         $this->assertStringContainsString('3D Disney Pixar animation style', $firstScene->visual_prompt);
+        $this->assertStringContainsString('Hanuman', $firstScene->visual_prompt);
+
+        // Verify narrative continuity across scenes
+        $scenes = $project->scenes->sortBy('scene_number')->values();
+        for ($i = 1; $i < count($scenes); $i++) {
+            $prev = $scenes[$i - 1];
+            $curr = $scenes[$i];
+
+            // Continuity of time
+            $this->assertEquals((float) $prev->end_second, (float) $curr->start_second);
+
+            // Continuity markers in prompt
+            $this->assertStringContainsString('Continuous', $curr->visual_prompt);
+            $this->assertStringContainsString('Hanuman', $curr->visual_prompt);
+        }
 
         // Check last scene reaches 30s
-        $lastScene = $project->scenes->last();
+        $lastScene = $scenes->last();
         $this->assertEquals(6, $lastScene->scene_number);
         $this->assertEquals(30.0, (float) $lastScene->end_second);
 
         $response->assertRedirect(route('cartoon-prompts.index', ['project_id' => $project->id]));
     }
 
-    public function test_user_can_generate_60_second_cartoon_prompts(): void
+    public function test_user_can_generate_60_second_hindu_cartoon_prompts(): void
     {
         $user = User::factory()->create();
 
         $response = $this->actingAs($user)->post('/cartoon-prompts/generate', [
-            'title' => 'Petualangan 1 Menit Bima Cilik',
-            'theme' => 'dharma_kids',
+            'title' => 'Kemuliaan Hari Suci Galungan',
+            'theme' => 'hindu_traditions',
             'target_duration' => 60,
             'visual_style' => 'ghibli_anime',
             'target_engine' => 'runway_gen3',
             'aspect_ratio' => '16:9',
-            'character_description' => 'Bima cilik berambut ikal dengan gada emas mini',
-            'story_premise' => 'Bima menjaga kelestarian mata air desa dari kekeringan',
+            'character_description' => 'Wayan dan Ni Luh cilik berpakaian adat Bali serba putih madya berudeng rapi',
+            'story_premise' => 'Keluarga menyambut hari suci Galungan dengan merangkai penjor megah di depan pura keluarga',
         ]);
 
         $project = CartoonPromptProject::where('user_id', $user->id)->first();
@@ -103,6 +119,30 @@ class CartoonPromptTest extends TestCase
         $this->assertEquals(12, $lastScene->scene_number);
         $this->assertEquals(60.0, (float) $lastScene->end_second);
         $this->assertStringContainsString('Studio Ghibli anime style', $lastScene->visual_prompt);
+
+        $response->assertRedirect(route('cartoon-prompts.index', ['project_id' => $project->id]));
+    }
+
+    public function test_user_can_generate_with_simplified_request(): void
+    {
+        $user = User::factory()->create();
+
+        // Simplified payload with only duration and theme
+        $response = $this->actingAs($user)->post('/cartoon-prompts/generate', [
+            'theme' => 'deva_wisdom',
+            'target_duration' => 30,
+        ]);
+
+        $project = CartoonPromptProject::where('user_id', $user->id)->first();
+
+        $this->assertNotNull($project);
+        $this->assertEquals(30, $project->target_duration);
+        $this->assertEquals(6, $project->scene_count);
+        $this->assertNotEmpty($project->title);
+        $this->assertNotEmpty($project->character_description);
+        $this->assertEquals('pixar_3d', $project->visual_style);
+        $this->assertEquals('universal', $project->target_engine);
+        $this->assertEquals('9:16', $project->aspect_ratio);
 
         $response->assertRedirect(route('cartoon-prompts.index', ['project_id' => $project->id]));
     }
@@ -143,8 +183,8 @@ class CartoonPromptTest extends TestCase
         $user = User::factory()->create();
         $project = CartoonPromptProject::create([
             'user_id' => $user->id,
-            'title' => 'Proyek Kartun',
-            'theme' => 'fable',
+            'title' => 'Proyek Kartun Ramayana',
+            'theme' => 'ramayana_mahabharata',
             'target_duration' => 30,
             'visual_style' => 'pixar_3d',
             'target_engine' => 'universal',
@@ -188,13 +228,13 @@ class CartoonPromptTest extends TestCase
         $user = User::factory()->create();
         $project = CartoonPromptProject::create([
             'user_id' => $user->id,
-            'title' => 'Proyek Kartun',
-            'theme' => 'fable',
+            'title' => 'Proyek Kartun Hanuman',
+            'theme' => 'ramayana_mahabharata',
             'target_duration' => 30,
             'visual_style' => 'pixar_3d',
             'target_engine' => 'universal',
             'aspect_ratio' => '9:16',
-            'character_description' => 'Kancil lucu bersyal merah',
+            'character_description' => 'Sang Hanuman cilik berbulu putih salju',
             'scene_count' => 1,
             'total_duration' => 5.0,
         ]);
@@ -215,7 +255,7 @@ class CartoonPromptTest extends TestCase
         $response->assertRedirect();
         $scene->refresh();
         $this->assertNotEquals('Initial prompt', $scene->visual_prompt);
-        $this->assertStringContainsString('Kancil lucu bersyal merah', $scene->visual_prompt);
+        $this->assertStringContainsString('Sang Hanuman cilik berbulu putih salju', $scene->visual_prompt);
     }
 
     public function test_user_can_add_and_delete_scene(): void
@@ -224,7 +264,7 @@ class CartoonPromptTest extends TestCase
         $project = CartoonPromptProject::create([
             'user_id' => $user->id,
             'title' => 'Proyek Kartun',
-            'theme' => 'fable',
+            'theme' => 'ramayana_mahabharata',
             'target_duration' => 30,
             'visual_style' => 'pixar_3d',
             'target_engine' => 'universal',
@@ -270,7 +310,7 @@ class CartoonPromptTest extends TestCase
         $project = CartoonPromptProject::create([
             'user_id' => $user->id,
             'title' => 'Petualangan Kartun Ekspor',
-            'theme' => 'fable',
+            'theme' => 'ramayana_mahabharata',
             'target_duration' => 30,
             'visual_style' => 'pixar_3d',
             'target_engine' => 'universal',
@@ -286,15 +326,15 @@ class CartoonPromptTest extends TestCase
             'end_second' => 5.0,
             'duration' => 5.0,
             'title' => 'Frame 1',
-            'action_description' => 'Aksi awal kancil melompat',
-            'visual_prompt' => '3D Disney Pixar cute mouse deer leaping in sunlit tropical glade',
+            'action_description' => 'Aksi awal Hanuman melompat',
+            'visual_prompt' => '3D Disney Pixar cute young Hanuman leaping through sacred temple courtyard',
         ]);
 
         // Test TXT export
         $txtResponse = $this->actingAs($user)->get("/cartoon-prompts/{$project->id}/export/txt");
         $txtResponse->assertStatus(200);
         $this->assertStringContainsString('PROMPT STORYBOARD VIDEO KARTUN', $txtResponse->getContent());
-        $this->assertStringContainsString('3D Disney Pixar cute mouse deer leaping', $txtResponse->getContent());
+        $this->assertStringContainsString('3D Disney Pixar cute young Hanuman leaping', $txtResponse->getContent());
 
         // Test JSON export
         $jsonResponse = $this->actingAs($user)->get("/cartoon-prompts/{$project->id}/export/json");
