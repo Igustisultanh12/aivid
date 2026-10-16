@@ -86,6 +86,8 @@ const form = useForm({
 
 // UI states
 const isGenerating = ref(false);
+const isRegeneratingAll = ref(false);
+const regeneratingSceneId = ref<number | null>(null);
 const activeTab = ref<'studio' | 'saved'>('studio');
 const copiedFrameId = ref<number | null>(null);
 const copiedDialogueId = ref<number | null>(null);
@@ -135,11 +137,11 @@ const submitGenerate = () => {
     });
 };
 
-// Copy single scene prompt
+// Copy single scene unified prompt
 const copyScenePrompt = (scene: CartoonPromptScene) => {
     navigator.clipboard.writeText(scene.visual_prompt);
     copiedFrameId.value = scene.id;
-    showToast(`Prompt Frame #${scene.scene_number} berhasil disalin!`);
+    showToast(`Prompt Lengkap Frame #${scene.scene_number} berhasil disalin!`);
     setTimeout(() => {
         if (copiedFrameId.value === scene.id) {
             copiedFrameId.value = null;
@@ -246,11 +248,32 @@ const saveEditedScene = (scene: CartoonPromptScene) => {
 // Regenerate single scene prompt
 const regenerateScene = (scene: CartoonPromptScene) => {
     if (!props.activeProject) return;
+    regeneratingSceneId.value = scene.id;
 
     router.post(`/cartoon-prompts/${props.activeProject.id}/scenes/${scene.id}/regenerate`, {}, {
         preserveScroll: true,
+        onFinish: () => {
+            regeneratingSceneId.value = null;
+        },
         onSuccess: () => {
             showToast(`Prompt Frame #${scene.scene_number} berhasil diregenerasi.`);
+        },
+    });
+};
+
+// Regenerate entire project (all frames)
+const regenerateEntireProject = () => {
+    if (!props.activeProject) return;
+    if (!confirm(`Regenerasi ulang seluruh ${props.activeProject.scenes?.length || 6} frame naskah untuk proyek "${props.activeProject.title}"?`)) return;
+
+    isRegeneratingAll.value = true;
+    router.post(`/cartoon-prompts/${props.activeProject.id}/regenerate`, {}, {
+        preserveScroll: true,
+        onFinish: () => {
+            isRegeneratingAll.value = false;
+        },
+        onSuccess: () => {
+            showToast('Seluruh rangkaian naskah berhasil diregenerasi ulang!');
         },
     });
 };
@@ -341,7 +364,7 @@ if (!form.title) {
                         </h1>
 
                         <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                            Rancang rangkaian prompt video AI per-frame berdurasi tepat <strong>30 detik (6 frame)</strong> atau <strong>1 menit (12 frame)</strong> khusus kisah suci Hindu Nusantara. Alur frame menyambung runtut, sinkronisasi dialog, dan konsistensi karakter utuh untuk <em>Kling AI, Runway Gen-3, Luma, Sora, & Pika</em>.
+                            Rancang rangkaian prompt video AI per-frame berdurasi tepat <strong>30 detik (6 frame)</strong> atau <strong>1 menit (12 frame)</strong> dalam <strong>Bahasa Indonesia</strong> khusus kisah suci Hindu Nusantara. Setiap frame menyatukan aksi visual, arah kamera, dialog, SFX, musik, dan negative prompt menjadi <strong>satu prompt utuh</strong> dengan alur berlanjut mulus untuk <em>Kling AI, Runway Gen-3, Luma, Sora, & Pika</em>.
                         </p>
 
                         <div class="pt-1 flex flex-wrap items-center gap-2 text-xs">
@@ -474,6 +497,18 @@ if (!form.title) {
                                 <span>{{ copiedAll ? 'Semua Tersalin!' : 'Salin Semua Prompt' }}</span>
                             </button>
 
+                            <!-- Regenerate All Prompts (Right next to Salin Semua Prompt, per Gambar 2) -->
+                            <button
+                                type="button"
+                                @click="regenerateEntireProject"
+                                :disabled="isRegeneratingAll"
+                                class="px-4 py-2.5 rounded-xl font-bold text-xs inline-flex items-center gap-2 border border-amber-300 dark:border-amber-700/80 bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-200 hover:bg-amber-100 dark:hover:bg-amber-900/40 transition shadow-sm disabled:opacity-50"
+                                title="Regenerasi seluruh rangkaian prompt naskah proyek ini"
+                            >
+                                <RefreshCw class="w-4 h-4 text-amber-600 dark:text-amber-400" :class="{ 'animate-spin': isRegeneratingAll }" />
+                                <span>{{ isRegeneratingAll ? 'Meregenerasi...' : 'Regenerasi Naskah' }}</span>
+                            </button>
+
                             <!-- Export TXT -->
                             <a
                                 :href="`/cartoon-prompts/${activeProject.id}/export/txt`"
@@ -584,19 +619,31 @@ if (!form.title) {
 
                             <!-- Scene Actions -->
                             <div class="flex items-center gap-1.5 self-end sm:self-auto">
-                                <!-- Copy Single Prompt -->
+                                <!-- Copy Single Unified Prompt -->
                                 <button
                                     type="button"
                                     @click="copyScenePrompt(scene)"
-                                    class="px-3 py-1.5 rounded-xl text-xs font-bold inline-flex items-center gap-1.5 transition shadow-sm"
+                                    class="px-3.5 py-1.5 rounded-xl text-xs font-bold inline-flex items-center gap-1.5 transition shadow-sm"
                                     :class="copiedFrameId === scene.id
                                         ? 'bg-emerald-600 text-white'
                                         : 'btn-primary'"
-                                    title="Salin Prompt Visual Frame Ini"
+                                    title="Salin Satu Prompt Lengkap Frame Ini (Aksi + Kamera + Dialog + SFX + BGM + Negative)"
                                 >
                                     <Check v-if="copiedFrameId === scene.id" class="w-3.5 h-3.5" />
                                     <Copy v-else class="w-3.5 h-3.5" />
                                     <span>{{ copiedFrameId === scene.id ? 'Tersalin!' : 'Salin Prompt' }}</span>
+                                </button>
+
+                                <!-- Regenerate Scene (Right next to Salin Prompt) -->
+                                <button
+                                    type="button"
+                                    @click="regenerateScene(scene)"
+                                    :disabled="regeneratingSceneId === scene.id"
+                                    class="px-3 py-1.5 rounded-xl text-xs font-bold inline-flex items-center gap-1.5 transition border border-amber-300 dark:border-amber-700/70 bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-200 hover:bg-amber-100 dark:hover:bg-amber-900/40 disabled:opacity-50"
+                                    title="Regenerasi prompt frame ini dengan variasi baru"
+                                >
+                                    <RefreshCw class="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" :class="{ 'animate-spin': regeneratingSceneId === scene.id }" />
+                                    <span>{{ regeneratingSceneId === scene.id ? 'Memproses...' : 'Regenerate' }}</span>
                                 </button>
 
                                 <!-- Copy Dialogue -->
@@ -610,16 +657,6 @@ if (!form.title) {
                                     <Check v-if="copiedDialogueId === scene.id" class="w-3.5 h-3.5 text-emerald-500" />
                                     <Volume2 v-else class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                                     <span>{{ copiedDialogueId === scene.id ? 'Tersalin!' : 'Salin Dialog' }}</span>
-                                </button>
-
-                                <!-- Regenerate Scene -->
-                                <button
-                                    type="button"
-                                    @click="regenerateScene(scene)"
-                                    class="p-2 rounded-xl text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
-                                    title="Regenerasi Prompt Frame Ini"
-                                >
-                                    <RefreshCw class="w-3.5 h-3.5 text-amber-500" />
                                 </button>
 
                                 <!-- Edit Scene -->
@@ -644,77 +681,54 @@ if (!form.title) {
                             </div>
                         </div>
 
-                        <!-- Read Mode -->
-                        <div v-if="editingSceneId !== scene.id" class="space-y-3.5">
-                            <!-- Action Description -->
-                            <div class="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/60 text-slate-800 dark:text-slate-200 text-xs sm:text-sm leading-relaxed">
-                                <span class="font-bold text-amber-700 dark:text-amber-400 block text-xs uppercase tracking-wider mb-1 flex items-center gap-1.5">
-                                    <span>🎬</span> Aksi & Peristiwa Karakter:
-                                </span>
-                                {{ scene.action_description }}
-                            </div>
-
-                            <!-- Visual AI Prompt Code Box -->
-                            <div class="space-y-1">
-                                <div class="flex items-center justify-between text-xs text-slate-500 px-1">
-                                    <span class="font-bold text-violet-600 dark:text-violet-400 flex items-center gap-1 text-[11px] uppercase tracking-wider">
-                                        <Wand2 class="w-3 h-3" />
-                                        Prompt Visual AI (Bahasa Inggris)
-                                    </span>
-                                    <span class="text-[10px] text-slate-400 font-mono">Format Siap Pakai AI</span>
+                        <!-- Read Mode: SATU PROMPT UTUH (Bahasa Indonesia) -->
+                        <div v-if="editingSceneId !== scene.id" class="space-y-3">
+                            <!-- Unified Complete AI Video Prompt (Bahasa Indonesia) -->
+                            <div class="space-y-1.5">
+                                <div class="flex flex-wrap items-center justify-between gap-2 px-1 text-xs">
+                                    <div class="flex items-center gap-2">
+                                        <span class="font-bold text-violet-700 dark:text-violet-300 flex items-center gap-1.5 text-xs uppercase tracking-wider">
+                                            <Wand2 class="w-3.5 h-3.5 text-violet-500" />
+                                            Prompt Lengkap Video AI (Bahasa Indonesia)
+                                        </span>
+                                        <span class="px-2 py-0.5 rounded-full bg-violet-100 dark:bg-violet-950/70 text-violet-700 dark:text-violet-300 text-[10px] font-bold">
+                                            Satu Prompt Utuh
+                                        </span>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        @click="copyScenePrompt(scene)"
+                                        class="text-[11px] font-bold text-violet-600 dark:text-violet-400 hover:underline inline-flex items-center gap-1"
+                                    >
+                                        <Check v-if="copiedFrameId === scene.id" class="w-3 h-3 text-emerald-500" />
+                                        <Copy v-else class="w-3 h-3" />
+                                        <span>{{ copiedFrameId === scene.id ? 'Tersalin ke Clipboard!' : 'Salin Seluruh Prompt' }}</span>
+                                    </button>
                                 </div>
-                                <div class="p-4 rounded-2xl bg-slate-950 text-slate-200 font-mono text-xs sm:text-sm leading-relaxed border border-slate-800 shadow-inner relative group select-all">
+
+                                <div class="p-4 sm:p-5 rounded-2xl bg-slate-950 text-slate-100 font-mono text-xs sm:text-[13px] leading-relaxed border border-slate-800 shadow-inner relative group select-all whitespace-pre-wrap">
                                     {{ scene.visual_prompt }}
                                 </div>
                             </div>
 
-                            <!-- Context Details Grid (Camera, Audio, SFX, BGM) -->
-                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 text-xs">
-                                <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-700/60">
-                                    <span class="font-bold text-slate-400 uppercase text-[10px] block mb-1 flex items-center gap-1">
-                                        <Camera class="w-3 h-3 text-slate-500" />
-                                        Kamera:
-                                    </span>
-                                    <span class="text-slate-700 dark:text-slate-300 font-medium">{{ scene.camera_movement || 'Cinematic tracking shot' }}</span>
-                                </div>
-
-                                <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-700/60">
-                                    <span class="font-bold text-slate-400 uppercase text-[10px] block mb-1 flex items-center gap-1">
-                                        <Volume2 class="w-3 h-3 text-emerald-500" />
-                                        Dialog:
-                                    </span>
-                                    <span class="text-slate-800 dark:text-slate-200 italic font-medium">"{{ scene.dialogue_or_narration || '-' }}"</span>
-                                </div>
-
-                                <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-700/60">
-                                    <span class="font-bold text-slate-400 uppercase text-[10px] block mb-1 flex items-center gap-1">
-                                        <Play class="w-3 h-3 text-amber-500" />
-                                        SFX:
-                                    </span>
-                                    <span class="text-slate-700 dark:text-slate-300 font-medium">{{ scene.sound_effects || '-' }}</span>
-                                </div>
-
-                                <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-700/60">
-                                    <span class="font-bold text-slate-400 uppercase text-[10px] block mb-1 flex items-center gap-1">
-                                        <Music class="w-3 h-3 text-violet-500" />
-                                        Musik:
-                                    </span>
-                                    <span class="text-slate-700 dark:text-slate-300 font-medium">{{ scene.music_mood || '-' }}</span>
-                                </div>
-                            </div>
-
-                            <!-- Negative Prompt -->
-                            <div v-if="scene.negative_prompt" class="pt-1 flex items-center justify-between text-xs text-slate-500">
-                                <span class="truncate max-w-xl text-[11px]">
-                                    <strong>Negative Prompt:</strong> {{ scene.negative_prompt }}
+                            <!-- Quick Summary Pills -->
+                            <div class="flex flex-wrap items-center gap-2 pt-1 text-[11px]">
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-medium">
+                                    <Camera class="w-3 h-3 text-slate-500" />
+                                    <strong class="font-bold">Kamera:</strong> {{ scene.camera_movement || 'Cinematic tracking shot' }}
                                 </span>
-                                <button
-                                    type="button"
-                                    @click="copyNegativePrompt(scene)"
-                                    class="text-violet-600 dark:text-violet-400 hover:underline font-semibold shrink-0 ml-2 text-[11px]"
-                                >
-                                    {{ copiedNegativeId === scene.id ? 'Tersalin!' : 'Salin Negative' }}
-                                </button>
+                                <span v-if="scene.dialogue_or_narration" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-200 font-medium">
+                                    <Volume2 class="w-3 h-3 text-emerald-500" />
+                                    <strong class="font-bold">Dialog:</strong> "{{ scene.dialogue_or_narration }}"
+                                </span>
+                                <span v-if="scene.sound_effects" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-200 font-medium">
+                                    <Play class="w-3 h-3 text-amber-500" />
+                                    <strong class="font-bold">SFX:</strong> {{ scene.sound_effects }}
+                                </span>
+                                <span v-if="scene.music_mood" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-violet-50 dark:bg-violet-950/40 text-violet-800 dark:text-violet-200 font-medium">
+                                    <Music class="w-3 h-3 text-violet-500" />
+                                    <strong class="font-bold">BGM:</strong> {{ scene.music_mood }}
+                                </span>
                             </div>
                         </div>
 
@@ -752,17 +766,17 @@ if (!form.title) {
                             </div>
 
                             <div>
-                                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Visual Prompt untuk AI Video (Bahasa Inggris)</label>
+                                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Prompt Lengkap AI Video (Bahasa Indonesia)</label>
                                 <textarea
                                     v-model="editSceneForm.visual_prompt"
-                                    rows="3"
+                                    rows="6"
                                     class="w-full px-3 py-2 rounded-xl text-xs font-mono border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
                                 ></textarea>
                             </div>
 
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <div>
-                                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Gerakan Kamera</label>
+                                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Arah & Gerak Kamera</label>
                                     <input
                                         v-model="editSceneForm.camera_movement"
                                         type="text"

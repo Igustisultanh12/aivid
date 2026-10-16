@@ -211,12 +211,27 @@ class CartoonPromptController extends Controller
 
         $styleMeta = CartoonPromptService::VISUAL_STYLES[$project->visual_style] ?? CartoonPromptService::VISUAL_STYLES['pixar_3d'];
         $engineMeta = CartoonPromptService::TARGET_ENGINES[$project->target_engine] ?? CartoonPromptService::TARGET_ENGINES['universal'];
+        $cameraMovement = 'Tracking shot horizontal mulus mengikuti langkah pergerakan karakter';
+        $dialogue = 'Ayo kita lanjutkan langkah kebajikan ini bersama!';
+        $sfx = '*Denting genta pura suci berkilau!*';
+        $music = 'Alunan gamelan suling Bali yang damai';
+        $actionDesc = ($nextNumber > 1 ? "[Menyambung langsung dari Frame " . sprintf('%02d', $nextNumber - 1) . "] " : '') . "Karakter melanjutkan langkah bajiknya dengan penuh semangat dan ketulusan hati di jalan Dharma.";
 
-        $defaultPrompt = sprintf(
-            "%s. Character: %s. Action: Character engages in dynamic playful movement with joyous expression. Setting: Colorful cartoon background. Camera: Smooth tracking shot. Lighting: Warm vibrant illumination. %s%s",
+        $unifiedPrompt = $this->promptService->formatUnifiedIndonesianPrompt(
+            $nextNumber,
+            $project->scene_count + 1,
+            $startSec,
+            $endSec,
+            "Frame {$nextNumber}: Aksi Tambahan Kebajikan",
+            $actionDesc,
+            $cameraMovement,
+            $dialogue,
+            $sfx,
+            $music,
+            $styleMeta['negative'],
             $styleMeta['style_prompt'],
-            $project->character_description ?: 'Cartoon protagonist',
-            $styleMeta['style_prompt'],
+            $project->character_description ?: 'Karakter utama anak berbudi luhur berpakaian adat suci Hindu',
+            $project->aspect_ratio ?? '9:16',
             $engineMeta['suffix']
         );
 
@@ -226,13 +241,13 @@ class CartoonPromptController extends Controller
             'start_second' => $startSec,
             'end_second' => $endSec,
             'duration' => $duration,
-            'title' => "Frame {$nextNumber}: Aksi Tambahan",
-            'action_description' => "Karakter melanjutkan aksi menarik di dunia kartun dengan penuh semangat.",
-            'visual_prompt' => $defaultPrompt,
-            'camera_movement' => "Smooth tracking shot following character",
-            'dialogue_or_narration' => "Ayo kita lanjutkan!",
-            'sound_effects' => "*Whoosh!* *Boing!*",
-            'music_mood' => "Playful upbeat cartoon melody",
+            'title' => "Frame {$nextNumber}: Aksi Tambahan Kebajikan",
+            'action_description' => $actionDesc,
+            'visual_prompt' => $unifiedPrompt,
+            'camera_movement' => $cameraMovement,
+            'dialogue_or_narration' => $dialogue,
+            'sound_effects' => $sfx,
+            'music_mood' => $music,
             'negative_prompt' => $styleMeta['negative'],
         ]);
 
@@ -262,6 +277,18 @@ class CartoonPromptController extends Controller
         $project->recalculateTimeline();
 
         return back()->with('success', "Frame #{$sceneNumber} berhasil dihapus dari timeline.");
+    }
+
+    /**
+     * Regenerate all scenes prompts for a project.
+     */
+    public function regenerateProject(CartoonPromptProject $project): RedirectResponse
+    {
+        $this->authorizeProject($project);
+
+        $this->promptService->regenerateAllProjectPrompts($project);
+
+        return back()->with('success', "Seluruh rangkaian naskah ({$project->scene_count} frame) berhasil diregenerasi ulang!");
     }
 
     /**
@@ -344,17 +371,7 @@ class CartoonPromptController extends Controller
             $txt .= $scene->formatted_timestamp . " (Durasi: {$scene->duration}s) | ";
             $txt .= "{$scene->title}\n";
             $txt .= "--------------------------------------------------------------------------------\n";
-            $txt .= "[Aksi Karakter] : {$scene->action_description}\n";
-            $txt .= "[Kamera / Gerak]: {$scene->camera_movement}\n";
-            $txt .= "[Audio / Dialog]: {$scene->dialogue_or_narration}\n";
-            $txt .= "[SFX / Suara]   : {$scene->sound_effects}\n";
-            $txt .= "[Musik BGM]     : {$scene->music_mood}\n\n";
-            $txt .= "[PROMPT VISUAL AI (Salin ke Kling / Runway / Sora / Luma)]:\n";
             $txt .= "{$scene->visual_prompt}\n\n";
-            if ($scene->negative_prompt) {
-                $txt .= "[Negative Prompt]:\n";
-                $txt .= "{$scene->negative_prompt}\n\n";
-            }
         }
 
         $txt .= "================================================================================\n";

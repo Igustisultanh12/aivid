@@ -15,7 +15,7 @@ class CartoonPromptService
     ) {}
 
     /**
-     * Cartoon Visual Style Presets.
+     * Cartoon Visual Style Presets (Pure Bahasa Indonesia).
      */
     public const VISUAL_STYLES = [
         'pixar_3d' => [
@@ -23,32 +23,32 @@ class CartoonPromptService
             'name' => '3D Pixar & Disney Animation',
             'badge' => '3D Render',
             'description' => 'Gaya render 3D ekspresif Pixar/Disney, pencahayaan sinematik hangat, kehalusan tekstur kain dan ornamen suci Hindu berkilau.',
-            'style_prompt' => '3D Disney Pixar animation style, highly detailed 3D CGI render, expressive large glossy eyes, soft subsurface scattering skin, velvety silk textures, vibrant warm cinematic lighting, raytraced Octane Render aesthetic, sacred Hindu cultural ornament details, masterpiece 4k',
-            'negative' => 'photorealistic, realistic live-action human, ugly, deformed, distorted limbs, low quality, glitch, creepy eyes, 2d flat, washed out, morphing',
+            'style_prompt' => 'Gaya animasi 3D Disney Pixar, render 3D CGI sangat detail, mata besar berkilau ekspresif, kulit bersinar lembut alami, tekstur kain sutra halus, pencahayaan sinematik hangat, estetika raytraced Octane Render, ornamen budaya suci Hindu sangat detail, kualitas mahakarya 4K',
+            'negative' => 'fotorealistik, manusia asli, anatomi cacat, jari tangan rusak, glitch, buram, resolusi rendah, wajah seram, kusam, 2D datar',
         ],
         'ghibli_anime' => [
             'id' => 'ghibli_anime',
             'name' => 'Studio Ghibli 2D Anime',
             'badge' => '2D Anime',
             'description' => 'Gaya anime klasik Hayao Miyazaki, lukisan latar cat air rimbun kuil dan pura Hindu yang asri, garis bersih, dan suasana hembusan angin alami.',
-            'style_prompt' => 'Studio Ghibli anime style, directed by Hayao Miyazaki, hand-painted lush watercolor background, sacred Balinese Hindu pura temple courtyard, soft expressive cel-shading, delicate ink lineart, warm golden hour atmospheric lighting, floating frangipani petals, cozy nostalgic aesthetic, masterpiece 4k',
-            'negative' => '3d cgi render, realistic, glossy plastic, grotesque, dull colors, oversaturated neon, harsh 3d shadows, deformed fingers',
+            'style_prompt' => 'Gaya anime Studio Ghibli, arahan seni Hayao Miyazaki, lukisan latar cat air pura Hindu Bali yang asri dan rimbun, cel-shading lembut ekspresif, garis tinta bersih rapi, pencahayaan alami golden hour hangat, kelopak bunga kamboja melayang lembut, suasana damai bernuansa spiritual, kualitas mahakarya 4K',
+            'negative' => 'render 3D cgi, manusia realistis live-action, plastik berkilau kaku, warna kusam, bayangan kasar, jari rusak, buram',
         ],
         'classic_disney_2d' => [
             'id' => 'classic_disney_2d',
             'name' => 'Classic 2D Disney Hand-Drawn',
             'badge' => 'Tradisional 2D',
             'description' => 'Animasi seluloid klasik tahun 90-an dengan goresan luwes, squash & stretch khas kartun bioskop legendaris bertema spiritual.',
-            'style_prompt' => 'Classic 1990s golden age traditional Disney 2D animation, hand-drawn character design, expressive cartoon squash-and-stretch anatomy, rich gouache painted temple background, clean ink lines, fluid theatrical animation look, vibrant storybook illustration',
-            'negative' => '3d computer generated, hyperrealistic, muddy textures, robotic stiff pose, blurry sketch, vector flat art, flickering',
+            'style_prompt' => 'Gaya animasi tradisional 2D Disney klasik era 90-an, desain karakter gambar tangan luwes berkarakter, anatomi kartun ekspresif squash-and-stretch, latar belakang pelataran pura dengan sapuan cat gouache artistik, garis tinta rapi, animasi teatrikal mengalir mulus, ilustrasi buku cerita megah',
+            'negative' => '3D komputer grafis, foto realistis kaku, tekstur kotor berlumpur, pose kaku robot, sketsa kasar buram, berkedip rusak',
         ],
         'chibi_3d' => [
             'id' => 'chibi_3d',
             'name' => 'Cute Chibi 3D Stylized',
             'badge' => 'Chibi Gemas',
             'description' => 'Proporsi kepala bulat menggemaskan, mata bulat berkilau, tekstur mainan vinil lembut dengan warna-warna pastel ceria bernuansa suci.',
-            'style_prompt' => 'Super cute 3D Chibi style, miniature adorable proportions, oversized head with giant sparkling eyes, smooth soft vinyl toy shaders, pastel vibrant tones, soft ambient occlusion studio lighting, sacred Hindu iconography, kawaii aesthetics, 3D blender cute render, 4k resolution',
-            'negative' => 'scary, realistic proportions, gloomy, dark shadows, rough messy sketch, mature gritty look, morphing bodies',
+            'style_prompt' => 'Gaya 3D Chibi super imut dan menggemaskan, proporsi tubuh mini lucu, kepala membulat dengan mata besar berbinar berkilau ceria, tekstur permukaan mainan vinil halus bersinar lembut, palet warna pastel cerah, pencahayaan lembut studio ambient occlusion, ikonografi suci Hindu ramah anak, resolusi 4K',
+            'negative' => 'menyeramkan, proporsi dewasa realistis, gelap suram, bayangan tebal menakutkan, sketsa berantakan, bentuk badan rusak',
         ],
     ];
 
@@ -104,53 +104,53 @@ class CartoonPromptService
     ];
 
     /**
-     * Target AI Video Generator syntax engine presets.
+     * Target AI Video Generator syntax presets (Bahasa Indonesia).
      */
     public const TARGET_ENGINES = [
         'universal' => [
             'id' => 'universal',
             'name' => 'Universal (Kling, Runway, Sora, Luma, Pika)',
             'description' => 'Sintaks prompt seimbang yang kompatibel untuk seluruh platform AI Video generasi terbaru.',
-            'suffix' => ', highly dynamic cartoon animation motion, smooth continuous action, fluid 24fps character movement, 4k ultra detailed cinematic sequence',
+            'suffix' => ', gerakan animasi kartun sangat dinamis dan luwes, transisi adegan mulus berkesinambungan, gerak karakter 24fps mengalir alami, kualitas sinematik ultra detail 4K',
         ],
         'kling_ai' => [
             'id' => 'kling_ai',
             'name' => 'Kling AI (v1.5 / v2.0)',
             'description' => 'Dioptimalkan untuk konsistensi gerakan karakter Kling AI, instruksi kamera dinamis, dan kestabilan pose.',
-            'suffix' => ', cinematic high framerate character action, coherent physics motion, vibrant cartoon anime aesthetic, Masterpiece quality, Kling AI render',
+            'suffix' => ', aksi karakter framerate tinggi sinematik, kestabilan anatomi konsisten, estetika kartun cerah berkilau, kualitas mahakarya render Kling AI',
         ],
         'runway_gen3' => [
             'id' => 'runway_gen3',
             'name' => 'Runway Gen-3 Alpha',
             'description' => 'Menyertakan kata kunci directional kamera (dolly, pedestal, pan) dan dynamic lighting khas Runway.',
-            'suffix' => ', cinematic volumetric lighting, dynamic motion blur, hyper-expressive character facial animation, professional studio cinematic render, Gen-3 Alpha quality',
+            'suffix' => ', pencahayaan volumetrik sinematik mendalam, motion blur alami dinamis, ekspresi wajah karakter sangat hidup dan ekspresif, render studio profesional Gen-3 Alpha',
         ],
         'luma_dream_machine' => [
             'id' => 'luma_dream_machine',
             'name' => 'Luma Dream Machine',
             'description' => 'Menonjolkan kinetika momentum alami, kelembutan pergerakan objek, dan kedalaman dimensional 3D.',
-            'suffix' => ', natural physical kinetic momentum, rich character animation keyframing, wide dynamic range lighting, Dream Machine render',
+            'suffix' => ', momentum kinetik fisika alami, animasi pergerakan karakter halus bertransisi seimbang, pencahayaan wide dynamic range, render Dream Machine',
         ],
         'sora' => [
             'id' => 'sora',
             'name' => 'OpenAI Sora / Haiper',
             'description' => 'Fokus pada narasi temporal yang mengalir, interaksi karakter dengan lingkungan, dan detail render tinggi.',
-            'suffix' => ', continuous smooth camera motion, photorealistic cartoon physics, high fidelity environmental interaction, 4k 60fps presentation',
+            'suffix' => ', pergerakan kamera sinematik kontinu mulus, fisika gerak kartun konsisten tinggi, interaksi lingkungan sekitar sangat kaya dan hidup, resolusi tinggi 4K',
         ],
     ];
 
     /**
-     * Camera motion presets for cartoon frames.
+     * Camera motion presets for cartoon frames (Bahasa Indonesia).
      */
     public const CAMERA_MOTIONS = [
-        'establishing_wide' => 'Cinematic wide establishing shot, gentle slow pan left, revealing the sacred temple architecture',
-        'dynamic_push_in' => 'Dynamic low-angle push-in zoom focusing on character action and sacred symbols',
-        'tracking_run' => 'Smooth horizontal tracking shot following character movement with natural momentum',
-        'close_up_reaction' => 'Expressive close-up shot with subtle camera tilt up, shallow depth of field f/2.2',
-        'crane_high_angle' => 'High-angle crane shot descending into the sacred courtyard, atmospheric incense smoke',
-        'dolly_zoom_climax' => 'Dramatic slow dolly zoom capturing the noble spiritual climax with radiant aura',
-        'orbit_around' => 'Smooth 45-degree orbit around the main character with warm golden rim illumination',
-        'slow_zoom_out' => 'Peaceful slow zoom out revealing the harmonious sacred landscape at sunset, Om Shanti',
+        'establishing_wide' => 'Pengambilan gambar wide sinematik (establishing wide shot), kamera bergeser (pan) perlahan menampakkan kemegahan pelataran suci',
+        'dynamic_push_in' => 'Gerakan push-in zoom dinamis dari sudut rendah (low-angle) menyorot aksi karakter dan simbol suci',
+        'tracking_run' => 'Tracking shot horizontal mulus mengikuti langkah pergerakan karakter dengan kecepatan stabil alami',
+        'close_up_reaction' => 'Pengambilan gambar close-up ekspresif dengan sedikit sudut tilt naik, kedalaman ruang lembut (shallow depth of field f/2.2)',
+        'crane_high_angle' => 'Sudut pandang crane tinggi (high-angle shot) turun perlahan ke tengah pelataran pura, kepulan asap dupa melayang syahdu',
+        'dolly_zoom_climax' => 'Gerakan dolly zoom dramatis perlahan menangkap puncak keagungan spiritual dengan pendar aura kemilau',
+        'orbit_around' => 'Kamera berputar melingkar (orbit 45 derajat) mengitari karakter dengan pencahayaan rim-light keemasan hangat',
+        'slow_zoom_out' => 'Gerakan zoom out perlahan dan damai memperlihatkan keindahan lanskap pura di ufuk senja, suasana damai Om Shanti',
     ];
 
     /**
@@ -239,6 +239,66 @@ class CartoonPromptService
     }
 
     /**
+     * Format a complete, unified AI video prompt in pure Bahasa Indonesia.
+     * Integrates visual action, camera direction, dialogue, SFX, BGM, and negative prompt into ONE cohesive prompt.
+     */
+    public function formatUnifiedIndonesianPrompt(
+        int $sceneNumber,
+        int $totalScenes,
+        float $startSec,
+        float $endSec,
+        string $title,
+        string $actionDescription,
+        string $cameraMovement,
+        ?string $dialogue,
+        ?string $soundEffects,
+        ?string $musicMood,
+        ?string $negativePrompt,
+        string $stylePrompt,
+        string $characterAnchor,
+        string $aspectRatio,
+        string $engineSuffix = ''
+    ): string {
+        $startTime = sprintf('%02d:%02d', (int) floor($startSec / 60), (int) ($startSec % 60));
+        $endTime = sprintf('%02d:%02d', (int) floor($endSec / 60), (int) ($endSec % 60));
+        $aspectLabel = $aspectRatio === '9:16' ? 'Vertikal 9:16 (Format Video Pendek HP / Reels / TikTok / Shorts)' : ($aspectRatio === '16:9' ? 'Lanskap Sinematik 16:9' : 'Bujur Sangkar 1:1');
+
+        $lines = [];
+        $lines[] = "[FRAME " . sprintf('%02d', $sceneNumber) . " DARI " . sprintf('%02d', $totalScenes) . " ({$startTime} - {$endTime}) : {$title}]";
+
+        if ($sceneNumber > 1) {
+            $prevNum = sprintf('%02d', $sceneNumber - 1);
+            $lines[] = "• Kontinuitas Video : [Menyambung langsung dan berlanjut dari Frame {$prevNum}] Gerakan fisik tubuh, posisi karakter, ekspresi wajah, dan pencahayaan meneruskan detik akhir Frame {$prevNum} secara mulus tanpa melompat.";
+        } else {
+            $lines[] = "• Kontinuitas Video : [Opening Frame / Adegan Pembuka] Titik awal mula kisah kartun yang langsung memikat perhatian penonton.";
+        }
+
+        $lines[] = "• Gaya Visual & Animasi : {$stylePrompt}{$engineSuffix}.";
+        $lines[] = "• Karakter Utama (Anchor Konsisten) : {$characterAnchor}.";
+        $lines[] = "• Rasio & Komposisi Layar : {$aspectLabel}.";
+        $lines[] = "• Aksi & Peristiwa Visual : {$actionDescription}";
+        $lines[] = "• Arah & Gerak Kamera : {$cameraMovement}.";
+
+        if (!empty($dialogue) && $dialogue !== '-') {
+            $lines[] = "• Dialog / Suara Narasi : \"{$dialogue}\" (ucapan karakter diselaraskan tepat dengan gerak bibir dan ekspresi wajah).";
+        }
+
+        if (!empty($soundEffects) && $soundEffects !== '-') {
+            $lines[] = "• Efek Suara (SFX) : {$soundEffects}.";
+        }
+
+        if (!empty($musicMood) && $musicMood !== '-') {
+            $lines[] = "• Musik Pengiring (BGM) : {$musicMood}.";
+        }
+
+        if (!empty($negativePrompt)) {
+            $lines[] = "• Negative Prompt : {$negativePrompt}.";
+        }
+
+        return implode("\n", $lines);
+    }
+
+    /**
      * Generate prompts using Gemini 3.8 Flash LLM with strict Hindu story rules and frame-to-frame continuity.
      */
     protected function generateWithGemini(
@@ -260,23 +320,16 @@ Anda adalah Sutradara Animasi dan Ahli Prompt Video AI Khusus Konten Edukasi Spi
 Tugas Anda adalah merancang rangkaian prompt video per-frame/per-adegan (action breakdown) untuk membuat video kartun anak edukatif berdurasi TEPAT {$duration} DETIK.
 
 ATURAN UTAMA & WAJIB (STRICT REQUIREMENTS):
-1. KONTEN KHUSUS HINDU (TIDAK BOLEH fabel hewan biasa, dongeng umum, robot sci-fi, atau komedi tanpa nilai Dharma):
-   - Wajib mengangkat ajaran suci, filosofi, tradisi, atau epik Hindu (Ramayana, Mahabharata, Tri Hita Karana, Tri Kaya Parisudha, Karma Phala, Hari Suci Galungan/Nyepi/Saraswati, Dewa Ganesha, Sang Hanuman).
-   - Nilai moral berlandaskan Dharma (kebenaran), Satya (kejujuran), Ahimsa (tanpa kekerasan), dan Bhakti (cinta kasih suci).
-
-2. KONTINUITAS KETAT FRAME-DEMI-FRAME (SEAMLESS NARRATIVE & TEMPORAL CONTINUITY):
+1. SEMUA PROMPT HARUS 100% DALAM BAHASA INDONESIA (DILARANG MENGGUNAKAN BAHASA INGGRIS):
+   - visual_prompt, action_description, camera_movement, dialogue, sound_effects, music_mood, dan negative_prompt SEMUANYA WAJIB DALAM BAHASA INDONESIA.
+2. JADIKAN SATU PROMPT UTUH PER FRAME:
+   - visual_prompt HARUS menggabungkan seluruh elemen menjadi SATU PROMPT UTUH: Judul & Timestamp Frame, Kontinuitas Video (menyambung frame sebelumnya), Gaya Visual, Karakter Utama, Rasio, Aksi & Peristiwa, Arah Kamera, Dialog/Narasi, Efek Suara (SFX), Musik Pengiring (BGM), dan Negative Prompt.
+3. KONTINUITAS KETAT FRAME-DEMI-FRAME (FRAME 2 WAJIB MENYAMBUNG DAN BERLANJUT DARI FRAME 1):
    - Alur cerita dari Frame 1 sampai Frame {$sceneCount} HARUS 100% MENYAMBUNG dan mengalir tanpa melompat.
-   - Akhir pergerakan di frame sebelumnya harus menjadi titik awal frame berikutnya (match-cut action).
-   - Pembicaraan (narasi/dialog) harus selaras dan tersinkronisasi sempurna dengan apa yang dilakukan karakter pada detik tersebut.
-
-3. KONSISTENSI VISUAL ANCHOR TINGGI:
-   - Karakter utama "{$character}" WAJIB diulang dengan atribut pakaian, warna busana adat, wajah, dan aksesoris yang persis sama di setiap visual_prompt.
-   - Setting lokasi (Pura, candi, ashram, atau gunung suci) harus konsisten dari frame ke frame.
-
-4. SYNTAX PROMPT AI VIDEO LENGKAP:
-   - visual_prompt HARUS dalam BAHASA INGGRIS tingkat tinggi yang lengkap untuk model video AI ({$engineMeta['name']}).
-   - Struktur prompt visual:
-     "[Frame X of {$sceneCount}: Continuous shot] {$styleMeta['style_prompt']}. Character Anchor: {$character}. Exact Kinetic Action: (deskripsi pergerakan fisik karakter secara mendalam). Sacred Setting: (latar kuil/pura/lingkungan suci Hindu). Camera: (pergerakan kamera, 35mm lens, f/2.4, 24fps motion). Lighting: (warm sacred golden hour lighting, volumetric rays). {$styleMeta['style_prompt']}{$engineMeta['suffix']}"
+   - Titik akhir pergerakan, posisi karakter, dan dialog di frame sebelumnya harus menjadi titik awal frame berikutnya (match-cut action).
+4. KONTEN KHUSUS HINDU (TIDAK BOLEH fabel hewan biasa, dongeng umum, robot sci-fi):
+   - Mengangkat ajaran suci, filosofi, tradisi, atau epik Hindu Nusantara.
+   - Nilai moral berlandaskan Dharma (kebenaran), Satya (kejujuran), Ahimsa (tanpa kekerasan), dan Bhakti (cinta kasih suci).
 
 PARAMETER PROYEK:
 - Judul: "{$title}"
@@ -303,11 +356,11 @@ Kembalikan jawaban HANYA dalam JSON valid:
       "duration": 5.0,
       "title": "Nama Adegan 1",
       "action_description": "Deskripsi aksi karakter dalam bahasa Indonesia yang menyambung",
-      "visual_prompt": "English visual prompt with complete continuity, character anchor, kinetic action, camera motion, and style tokens",
-      "camera_movement": "Cinematic wide establishing shot, gentle slow pan right",
-      "dialogue_or_narration": "Dialog atau narasi yang menyambung dengan tema Hindu",
-      "sound_effects": "*Temple bell chime!* *Gentle breeze!*",
-      "music_mood": "Sacred peaceful gamelan suling and orchestral blend",
+      "visual_prompt": "Satu prompt lengkap utuh dalam bahasa Indonesia memadukan aksi, kamera, dialog, SFX, musik, dan negative prompt",
+      "camera_movement": "Pengambilan gambar wide sinematik (establishing wide shot), kamera bergeser perlahan",
+      "dialogue_or_narration": "Dialog atau narasi bahasa Indonesia yang menyambung dengan tema Hindu",
+      "sound_effects": "*Suara genta pura berdentang syahdu!*",
+      "music_mood": "Alunan gamelan suling Bali dan orkestra damai",
       "negative_prompt": "{$styleMeta['negative']}"
     }
   ]
@@ -319,6 +372,28 @@ PROMPT;
 
             if ($result && !empty($result['scenes']) && is_array($result['scenes'])) {
                 $this->realignSceneTimestamps($result['scenes'], $duration, $sceneCount);
+
+                // Ensure every scene has the unified prompt format
+                foreach ($result['scenes'] as &$sc) {
+                    $sc['visual_prompt'] = $this->formatUnifiedIndonesianPrompt(
+                        $sc['scene_number'] ?? 1,
+                        $sceneCount,
+                        (float) ($sc['start_second'] ?? 0.0),
+                        (float) ($sc['end_second'] ?? 5.0),
+                        $sc['title'] ?? 'Adegan',
+                        $sc['action_description'] ?? '',
+                        $sc['camera_movement'] ?? 'Pengambilan gambar wide sinematik',
+                        $sc['dialogue_or_narration'] ?? null,
+                        $sc['sound_effects'] ?? null,
+                        $sc['music_mood'] ?? null,
+                        $sc['negative_prompt'] ?? $styleMeta['negative'],
+                        $styleMeta['style_prompt'],
+                        $character,
+                        $aspectRatio,
+                        $engineMeta['suffix']
+                    );
+                }
+
                 return [
                     'success' => true,
                     'title' => $result['title'] ?? $title,
@@ -378,6 +453,7 @@ PROMPT;
     /**
      * Creative Procedural Hindu Cartoon Sequence Generator with strict continuity.
      * Guaranteed 100% interconnected frame-by-frame storyline without error.
+     * All prompts are formatted as ONE unified prompt per frame in pure Bahasa Indonesia.
      */
     public function generateProceduralCartoonSequence(
         int $duration,
@@ -406,27 +482,29 @@ PROMPT;
             $actionData = $actionsBank[$i] ?? [
                 'title' => "Frame " . sprintf('%02d', $i + 1) . ": Kelanjutan Dharma",
                 'action_id' => "Karakter melanjutkan langkah bajiknya dengan penuh keteguhan hati di jalan Dharma.",
-                'action_en' => "The character steps forward gracefully in adherence to sacred Dharma, glowing aura surrounding them.",
                 'dialogue' => "Kebaikan yang kita tanam hari ini akan berbuah kedamaian esok hari.",
-                'sfx' => "*Gentle temple bell chime!*",
-                'music' => "Peaceful Balinese gamelan suling and gentle strings",
+                'sfx' => "*Denting genta pura suci bergaung syahdu!*",
+                'music' => "Alunan gamelan suling Bali yang damai dipadu gesekan biola lembut",
             ];
 
             $cameraMotion = $cameraCycle[$i % count($cameraCycle)];
 
-            // Highly detailed industry-standard AI video prompt with continuous framing tokens
-            $visualPrompt = sprintf(
-                "[Frame %d of %d: Continuous sequence action from previous shot] %s. Character Anchor: %s. Action Dynamics: %s. Sacred Setting: %s, %s. Cinematography: %s, 35mm cinematic lens, f/2.4 shallow depth of field, fluid 24fps motion. Lighting: %s. %s%s",
+            // Unified complete prompt in pure Bahasa Indonesia combining visual, camera, dialogue, sfx, bgm, negative prompt
+            $unifiedPrompt = $this->formatUnifiedIndonesianPrompt(
                 $i + 1,
                 $sceneCount,
+                $startSec,
+                $endSec,
+                $actionData['title'],
+                $actionData['action_id'],
+                $cameraMotion,
+                $actionData['dialogue'],
+                $actionData['sfx'],
+                $actionData['music'],
+                $styleMeta['negative'],
                 $styleMeta['style_prompt'],
                 $character,
-                $actionData['action_en'],
-                $themeTemplates['environment'],
-                $aspectRatio === '9:16' ? 'vertical 9:16 portrait composition for mobile screens' : ($aspectRatio === '16:9' ? 'cinematic 16:9 widescreen composition' : 'square 1:1 format'),
-                $cameraMotion,
-                $actionData['lighting'] ?? 'sacred golden hour morning sunlight, atmospheric soft incense smoke and drifting petals',
-                $styleMeta['style_prompt'],
+                $aspectRatio,
                 $engineMeta['suffix']
             );
 
@@ -437,7 +515,7 @@ PROMPT;
                 'duration' => $frameDuration,
                 'title' => $actionData['title'],
                 'action_description' => $actionData['action_id'],
-                'visual_prompt' => $visualPrompt,
+                'visual_prompt' => $unifiedPrompt,
                 'camera_movement' => $cameraMotion,
                 'dialogue_or_narration' => $actionData['dialogue'],
                 'sound_effects' => $actionData['sfx'],
@@ -461,7 +539,53 @@ PROMPT;
     }
 
     /**
-     * Regenerate a single scene prompt with creative variations matching Hindu spirituality.
+     * Regenerate all prompts for a project with fresh creative narrative variations while preserving project configuration.
+     */
+    public function regenerateAllProjectPrompts(CartoonPromptProject $project): CartoonPromptProject
+    {
+        $validated = [
+            'title' => $project->title,
+            'theme' => $project->theme,
+            'custom_theme_title' => $project->custom_theme_title,
+            'story_premise' => $project->story_premise,
+            'target_duration' => $project->target_duration,
+            'visual_style' => $project->visual_style,
+            'target_engine' => $project->target_engine,
+            'aspect_ratio' => $project->aspect_ratio,
+            'character_description' => $project->character_description,
+        ];
+
+        $result = $this->generatePrompts($validated);
+
+        if ($result['success'] && !empty($result['scenes'])) {
+            $project->scenes()->delete();
+
+            foreach ($result['scenes'] as $sceneData) {
+                CartoonPromptScene::create([
+                    'cartoon_prompt_project_id' => $project->id,
+                    'scene_number' => $sceneData['scene_number'],
+                    'start_second' => $sceneData['start_second'],
+                    'end_second' => $sceneData['end_second'],
+                    'duration' => $sceneData['duration'],
+                    'title' => $sceneData['title'],
+                    'action_description' => $sceneData['action_description'],
+                    'visual_prompt' => $sceneData['visual_prompt'],
+                    'camera_movement' => $sceneData['camera_movement'] ?? null,
+                    'dialogue_or_narration' => $sceneData['dialogue_or_narration'] ?? null,
+                    'sound_effects' => $sceneData['sound_effects'] ?? null,
+                    'music_mood' => $sceneData['music_mood'] ?? null,
+                    'negative_prompt' => $sceneData['negative_prompt'] ?? null,
+                ]);
+            }
+
+            $project->recalculateTimeline();
+        }
+
+        return $project->fresh('scenes');
+    }
+
+    /**
+     * Regenerate a single scene prompt with creative variations matching Hindu spirituality in pure Bahasa Indonesia.
      */
     public function regenerateSingleScene(CartoonPromptProject $project, CartoonPromptScene $scene): CartoonPromptScene
     {
@@ -475,54 +599,60 @@ PROMPT;
         $variations = [
             [
                 'title' => 'Momen Kebaktian & Doa Suci (Bhakti)',
-                'action_id' => 'Karakter menangkupkan kedua telapak tangan di depan dada dalam sikap Anjali Mudra, memancarkan aura ketenangan dan rasa syukur yang mendalam.',
-                'action_en' => 'The character gracefully folds hands together in sacred Anjali Mudra at heart level, eyes closed peacefully with a gentle sincere smile, glowing golden aura radiating.',
-                'sfx' => '*Resonant temple bell chime!* *Soft gong sound!*',
-                'music' => 'Meditative Balinese gamelan suling with celestial flute harmony',
+                'action_id' => ($scene->scene_number > 1 ? '[Menyambung langsung dari Frame ' . sprintf('%02d', $scene->scene_number - 1) . '] ' : '') . 'Karakter menangkupkan kedua telapak tangan di depan dada dalam sikap Anjali Mudra, memancarkan aura ketenangan dan rasa syukur yang mendalam di hadapan pelinggih pura.',
+                'dialogue' => 'Dengan hati yang tulus dan bersih, kami panjatkan puja syukur ke hadapan Hyang Widhi.',
+                'sfx' => '*Dentang genta suci bergaung syahdu!* *Suara kepulan asap dupa wangi!*',
+                'music' => 'Alunan suling bambu meditatif Bali dipadu petikan dawai gamelan hening',
             ],
             [
                 'title' => 'Langkah Berani Menegakkan Kebenaran (Dharma)',
-                'action_id' => 'Karakter melangkah mantap ke depan dengan sorot mata penuh ketulusan dan tekad luhur, kain selendangnya berkibar ditiup angin sepoi-sepoi.',
-                'action_en' => 'The character strides forward with determined posture and eyes full of noble devotion, silk sash fluttering in the mountain breeze, sacred temple background.',
-                'sfx' => '*Wind whoosh!* *Chime sparkle!*',
-                'music' => 'Uplifting cinematic orchestral gamelan swell',
+                'action_id' => ($scene->scene_number > 1 ? '[Menyambung langsung dari Frame ' . sprintf('%02d', $scene->scene_number - 1) . '] ' : '') . 'Karakter melangkah mantap ke depan dengan sorot mata penuh ketulusan dan tekad luhur, kain selendang sucinya berkibar ditiup angin pegunungan.',
+                'dialogue' => 'Di mana pun Dharma ditegakkan dengan ketulusan, di sanalah kemenangan sejati akan bersemi.',
+                'sfx' => '*Deru hembusan angin sepoi!* *Pendar kilau permata keemasan!*',
+                'music' => 'Alunan orkestra gamelan heroik yang megah dan bersemangat',
             ],
             [
                 'title' => 'Persembahan Tulus Canang Sari',
-                'action_id' => 'Karakter meletakkan canang sari harum berisi bunga kamboja segar ke atas pelinggih batu suci dengan kedua tangan penuh hormat.',
-                'action_en' => 'The character gently places a fragrant woven palm leaf canang sari with colorful blossoms onto a carved volcanic stone shrine with utmost respect.',
-                'sfx' => '*Gentle incense waft sound!* *Water droplet sparkle!*',
-                'music' => 'Serene bamboo bell chimes and warm string harmony',
+                'action_id' => ($scene->scene_number > 1 ? '[Menyambung langsung dari Frame ' . sprintf('%02d', $scene->scene_number - 1) . '] ' : '') . 'Karakter meletakkan canang sari harum berisi bunga kamboja segar ke atas pelinggih batu suci dengan kedua tangan penuh hormat.',
+                'dialogue' => 'Setiap kuntum bunga adalah wujud bakti tulus kita kepada alam semesta dan Sang Pencipta.',
+                'sfx' => '*Aroma dupa semerbak berdesir!* *Tetesan air suci berkilau lembut!*',
+                'music' => 'Harmoni lonceng bambu hening dan alunan melodi string yang menenangkan jiwa',
             ],
             [
                 'title' => 'Pancaran Kedamaian Universal (Shanti)',
-                'action_id' => 'Karakter tersenyum teduh memandang fajar keemasan yang menyinari pura, kelopak bunga melati dan dupa melayang menenangkan jiwa.',
-                'action_en' => 'The character gazes in peaceful wonder at the radiant golden sunrise bathing the temple gate, jasmine petals and fragrant mist curling softly.',
-                'sfx' => '*Morning bird song!* *Temple bell toll!*',
-                'music' => 'Profoundly peaceful sacred flute melody, Om Shanti',
+                'action_id' => ($scene->scene_number > 1 ? '[Menyambung langsung dari Frame ' . sprintf('%02d', $scene->scene_number - 1) . '] ' : '') . 'Karakter tersenyum teduh memandang fajar keemasan yang menyinari gapura pura, kelopak bunga melati dan kepulan dupa melayang menenangkan jiwa.',
+                'dialogue' => 'Damai di hati, damai di dunia, damai selamanya. Om Shanti Shanti Shanti Om.',
+                'sfx' => '*Kicauan burung pagi ceria!* *Gema lonceng perunggu pura mengalun lembut!*',
+                'music' => 'Melodi suling suci nan damai dan syahdu, Om Shanti',
             ],
         ];
 
         $var = $variations[array_rand($variations)];
 
-        $newVisualPrompt = sprintf(
-            "[Frame %d of %d: Continuity variation] %s. Character Anchor: %s. Action Dynamics: %s. Sacred Setting: Sacred Balinese Hindu pura temple courtyard with volcanic stone carvings, %s. Cinematography: %s, 35mm lens, f/2.4 depth of field, 24fps. Lighting: Sacred golden hour warm sunlight, volumetric incense rays. %s%s",
+        $newUnifiedPrompt = $this->formatUnifiedIndonesianPrompt(
             $scene->scene_number,
             $project->scene_count,
-            $styleMeta['style_prompt'],
-            $project->character_description ?: 'Virtuous young Hindu character in traditional sacred attire',
-            $var['action_en'],
-            $aspectRatio === '9:16' ? 'vertical 9:16 portrait composition' : 'widescreen 16:9 composition',
+            (float) $scene->start_second,
+            (float) $scene->end_second,
+            $var['title'],
+            $var['action_id'],
             $randomCamera,
+            $var['dialogue'],
+            $var['sfx'],
+            $var['music'],
+            $styleMeta['negative'],
             $styleMeta['style_prompt'],
+            $project->character_description ?: 'Karakter kesatria cilik berbudi luhur yang memegang teguh ajaran Dharma',
+            $aspectRatio,
             $engineMeta['suffix']
         );
 
         $scene->update([
             'title' => $var['title'],
             'action_description' => $var['action_id'],
-            'visual_prompt' => $newVisualPrompt,
+            'visual_prompt' => $newUnifiedPrompt,
             'camera_movement' => $randomCamera,
+            'dialogue_or_narration' => $var['dialogue'],
             'sound_effects' => $var['sfx'],
             'music_mood' => $var['music'],
             'negative_prompt' => $styleMeta['negative'],

@@ -94,6 +94,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/cartoon-prompts/{project}', [CartoonPromptController::class, 'show'])->name('cartoon-prompts.show');
     Route::put('/cartoon-prompts/{project}', [CartoonPromptController::class, 'update'])->name('cartoon-prompts.update');
     Route::delete('/cartoon-prompts/{project}', [CartoonPromptController::class, 'destroy'])->name('cartoon-prompts.destroy');
+    Route::post('/cartoon-prompts/{project}/regenerate', [CartoonPromptController::class, 'regenerateProject'])->name('cartoon-prompts.regenerate');
     Route::get('/cartoon-prompts/{project}/export/{format}', [CartoonPromptController::class, 'export'])->name('cartoon-prompts.export');
     Route::put('/cartoon-prompts/{project}/scenes/{scene}', [CartoonPromptController::class, 'updateScene'])->name('cartoon-prompts.scenes.update');
     Route::post('/cartoon-prompts/{project}/scenes', [CartoonPromptController::class, 'addScene'])->name('cartoon-prompts.scenes.store');

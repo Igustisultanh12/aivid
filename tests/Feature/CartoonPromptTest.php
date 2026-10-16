@@ -66,8 +66,13 @@ class CartoonPromptTest extends TestCase
         $this->assertEquals(0.0, (float) $firstScene->start_second);
         $this->assertEquals(5.0, (float) $firstScene->end_second);
         $this->assertNotEmpty($firstScene->visual_prompt);
-        $this->assertStringContainsString('3D Disney Pixar animation style', $firstScene->visual_prompt);
+        $this->assertStringContainsString('Gaya animasi 3D Disney Pixar', $firstScene->visual_prompt);
         $this->assertStringContainsString('Hanuman', $firstScene->visual_prompt);
+        $this->assertStringContainsString('• Arah & Gerak Kamera :', $firstScene->visual_prompt);
+        $this->assertStringContainsString('• Dialog / Suara Narasi :', $firstScene->visual_prompt);
+        $this->assertStringContainsString('• Efek Suara (SFX) :', $firstScene->visual_prompt);
+        $this->assertStringContainsString('• Musik Pengiring (BGM) :', $firstScene->visual_prompt);
+        $this->assertStringContainsString('• Negative Prompt :', $firstScene->visual_prompt);
 
         // Verify narrative continuity across scenes
         $scenes = $project->scenes->sortBy('scene_number')->values();
@@ -78,8 +83,8 @@ class CartoonPromptTest extends TestCase
             // Continuity of time
             $this->assertEquals((float) $prev->end_second, (float) $curr->start_second);
 
-            // Continuity markers in prompt
-            $this->assertStringContainsString('Continuous', $curr->visual_prompt);
+            // Continuity markers in Indonesian prompt
+            $this->assertStringContainsString('Menyambung langsung dan berlanjut dari Frame', $curr->visual_prompt);
             $this->assertStringContainsString('Hanuman', $curr->visual_prompt);
         }
 
@@ -118,7 +123,7 @@ class CartoonPromptTest extends TestCase
         $lastScene = $project->scenes->last();
         $this->assertEquals(12, $lastScene->scene_number);
         $this->assertEquals(60.0, (float) $lastScene->end_second);
-        $this->assertStringContainsString('Studio Ghibli anime style', $lastScene->visual_prompt);
+        $this->assertStringContainsString('Gaya anime Studio Ghibli', $lastScene->visual_prompt);
 
         $response->assertRedirect(route('cartoon-prompts.index', ['project_id' => $project->id]));
     }
@@ -256,6 +261,52 @@ class CartoonPromptTest extends TestCase
         $scene->refresh();
         $this->assertNotEquals('Initial prompt', $scene->visual_prompt);
         $this->assertStringContainsString('Sang Hanuman cilik berbulu putih salju', $scene->visual_prompt);
+        $this->assertStringContainsString('• Arah & Gerak Kamera :', $scene->visual_prompt);
+    }
+
+    public function test_user_can_regenerate_entire_project(): void
+    {
+        $user = User::factory()->create();
+        $project = CartoonPromptProject::create([
+            'user_id' => $user->id,
+            'title' => 'Proyek Kartun Hanuman',
+            'theme' => 'ramayana_mahabharata',
+            'target_duration' => 30,
+            'visual_style' => 'pixar_3d',
+            'target_engine' => 'universal',
+            'aspect_ratio' => '9:16',
+            'character_description' => 'Sang Hanuman cilik berbulu putih salju',
+            'scene_count' => 6,
+            'total_duration' => 30.0,
+        ]);
+
+        for ($i = 1; $i <= 6; $i++) {
+            CartoonPromptScene::create([
+                'cartoon_prompt_project_id' => $project->id,
+                'scene_number' => $i,
+                'start_second' => ($i - 1) * 5.0,
+                'end_second' => $i * 5.0,
+                'duration' => 5.0,
+                'title' => "Frame {$i} Lama",
+                'action_description' => "Aksi lama {$i}",
+                'visual_prompt' => "Old prompt {$i}",
+            ]);
+        }
+
+        $response = $this->actingAs($user)->post("/cartoon-prompts/{$project->id}/regenerate");
+
+        $response->assertRedirect();
+        $project->refresh();
+        $this->assertEquals(6, $project->scenes()->count());
+        $firstScene = $project->scenes()->where('scene_number', 1)->first();
+        $this->assertNotEquals('Old prompt 1', $firstScene->visual_prompt);
+        $this->assertStringContainsString('Gaya animasi 3D Disney Pixar', $firstScene->visual_prompt);
+        $this->assertStringContainsString('Sang Hanuman cilik berbulu putih salju', $firstScene->visual_prompt);
+        $this->assertStringContainsString('• Kontinuitas Video :', $firstScene->visual_prompt);
+        $this->assertStringContainsString('• Arah & Gerak Kamera :', $firstScene->visual_prompt);
+
+        $secondScene = $project->scenes()->where('scene_number', 2)->first();
+        $this->assertStringContainsString('Menyambung langsung dan berlanjut dari Frame 01', $secondScene->visual_prompt);
     }
 
     public function test_user_can_add_and_delete_scene(): void
